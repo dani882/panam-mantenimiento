@@ -29,6 +29,7 @@ public class Autor extends JDialog {
 	private static final long serialVersionUID = -4552920338518782653L;
 	private final JPanel contentPanel = new JPanel();
 
+	//Bla
 	/**
 	 * Crea el dialog.
 	 */
