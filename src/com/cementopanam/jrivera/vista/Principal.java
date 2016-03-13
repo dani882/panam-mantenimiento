@@ -55,7 +55,7 @@ public class Principal extends JFrame implements Runnable{
 	public JButton btnReportes;
 	public JButton btnAdministrar;
 	
-	public JLabel usuarioActual = new JLabel();
+	public static JLabel usuarioActual = new JLabel();
 	
 	private JButton btnCerrarSession;
 	
@@ -107,12 +107,6 @@ public class Principal extends JFrame implements Runnable{
 				    // Problemas de permisos de archivos son capturados aqui
 				    System.err.println(x);
 				}
-				
-	/*		       if (JOptionPane.showConfirmDialog(null,"Esta seguro que desea cerrar esta ventana?", "Desea cerrar?", 
-			               JOptionPane.YES_NO_OPTION,
-			               JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-			               System.exit(0);
-			           }*/
 				
 				detenerHiloStatusBar();
 			}
@@ -225,7 +219,8 @@ public class Principal extends JFrame implements Runnable{
 			 */
 			private static final long serialVersionUID = 1L;
 			/*
-			 * Este metodo sirve para redimensionar automaticamente la imagen de fondo dependiendo del tamaño de la pantalla
+			 * Este metodo sirve para redimensionar automaticamente la imagen de fondo 
+			 * dependiendo del tamaño de la pantalla
 			 */
 			ImageIcon icon = new ImageIcon(getClass().getResource("/imagenes/DSC_0002.JPG"));
 		    Image image = icon.getImage();
@@ -300,7 +295,6 @@ public class Principal extends JFrame implements Runnable{
 		    // File permission problems are caught here.
 		    System.err.println(x);
 		}
-		
     }
 
 	private void detenerHiloStatusBar() {

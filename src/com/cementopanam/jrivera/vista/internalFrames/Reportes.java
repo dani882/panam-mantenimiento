@@ -3,12 +3,15 @@ package com.cementopanam.jrivera.vista.internalFrames;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,8 +36,12 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
+import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
+import com.cementopanam.jrivera.vista.helper.tablaModelo.TablaModeloParo;
 import com.toedter.calendar.JDateChooser;
 
 import net.sf.jasperreports.engine.JRException;
@@ -43,12 +50,12 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
-import javax.swing.ImageIcon;
+import javax.swing.ScrollPaneConstants;
 
 public class Reportes extends JInternalFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JTable tablaResultado;
+	private ResultSet rs = null;
 	
 	private String formatoFecha = "yyyy-MM-dd";
 	
@@ -60,7 +67,8 @@ public class Reportes extends JInternalFrame {
 	private JComboBox<String> comboBoxTipoReporte;
 	
 	private SimpleDateFormat df;
-	
+	private JTable tableResultado;
+	private TablaModeloParo modeloParo = new TablaModeloParo();
 	/**
 	 * Crea el frame.
 	 */
@@ -244,16 +252,44 @@ public class Reportes extends JInternalFrame {
 		panelBusqueda.add(panel_Resultado);
 		panel_Resultado.setLayout(new BorderLayout(0, 0));
 		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setEnabled(false);
-		panel_Resultado.add(scrollPane);
+		JScrollPane scrollPaneResultado = new JScrollPane();
+		panel_Resultado.add(scrollPaneResultado, BorderLayout.CENTER);
 		
-		tablaResultado = new JTable();
-		tablaResultado.setFont(new Font("Verdana", Font.PLAIN, 12));
-		scrollPane.setViewportView(tablaResultado);
+		tableResultado = new JTable() {
+			
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -9206177619230112589L;
+
+			@Override
+		    public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+		    	
+				//Ajusta la columna de la tabla a un tamano adecuado
+		    	Component component = super.prepareRenderer(renderer, row, column);
+		    	int rendererWidth = component.getPreferredSize().width;
+		        TableColumn tableColumn = getColumnModel().getColumn(column);
+		        tableColumn.setPreferredWidth(Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
+		        return component;
+		    }
+		};
+		tableResultado.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		//Sirve para no permitir que el usuario reordene las columnas
+		tableResultado.getTableHeader().setReorderingAllowed(false);
+		tableResultado.setFont(new Font("Verdana", Font.PLAIN, 12));
+		
+		scrollPaneResultado.setViewportView(tableResultado);
+		tableResultado.setModel(modeloParo);
 		
 		JButton btnBuscar = new JButton("Buscar");
-		btnBuscar.setEnabled(false);
+		btnBuscar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				modeloParo.buscar("80");
+				
+				
+			}
+		});
 		btnBuscar.setFont(new Font("Verdana", Font.BOLD, 12));
 		btnBuscar.setBounds(10, 175, 89, 23);
 		panelBusqueda.add(btnBuscar);

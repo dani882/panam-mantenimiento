@@ -3,26 +3,30 @@ package com.cementopanam.jrivera.vista;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-
-import com.cementopanam.jrivera.controlador.ListadoEquipos;
-import com.cementopanam.jrivera.controlador.ManipulacionDatos;
-import com.cementopanam.jrivera.modelo.ConeccionBD;
 
 import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
+import com.cementopanam.jrivera.controlador.ManipulacionDatos;
+import com.cementopanam.jrivera.controlador.listadoEquipos.ListadoEquipos;
+import com.cementopanam.jrivera.modelo.ConeccionBD;
+import com.cementopanam.jrivera.vista.helper.tablaModelo.TablaModeloEquipos;
+
+import javax.swing.JTextField;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.FlowLayout;
+import javax.swing.BoxLayout;
 
 public class NombreEquipo extends JDialog {
 
@@ -38,66 +42,53 @@ public class NombreEquipo extends JDialog {
 	
 	PreparedStatement pstmt = null;
 	ResultSet rs = null;
-	private JTextArea textAreaEquipos;
+	private JTable tblEquipo;
+	private TablaModeloEquipos tablaModeloEquipos = new TablaModeloEquipos();
+	private JTextField textField;
 	/**
 	 * Create the panel.
 	 */
 	public NombreEquipo() {
 		
-		this.setSize(new Dimension(401, 370)); 
-		this.setResizable(false);
+		this.setSize(new Dimension(600, 370));
 		
+		setModal(true);
 		setLocationRelativeTo(null);
 		getContentPane().setFont(new Font("Verdana", Font.PLAIN, 12));
 		setFont(new Font("Verdana", Font.PLAIN, 12));
-		
 		setTitle("Codigo de Equipos");
-		setModal(false);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JPanel panelSuperior = new JPanel();
 		getContentPane().add(panelSuperior, BorderLayout.NORTH);
+		panelSuperior.setLayout(new BorderLayout(0, 0));
 		
-		JLabel lblCodigo = new JLabel("Codigo de Equipos");
-		lblCodigo.setFont(new Font("Verdana", Font.PLAIN, 12));
-		panelSuperior.add(lblCodigo);
+		JLabel lblNewLabel = new JLabel("Buscar Codigo:");
+		lblNewLabel.setFont(new Font("Verdana", Font.PLAIN, 12));
+		panelSuperior.add(lblNewLabel, BorderLayout.WEST);
 		
-		JButton btnMostrar = new JButton("Mostrar");
-		btnMostrar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				
-				ListadoEquipos le = new ListadoEquipos();
-				rs = le.mostrarEquipos();
-				
-				StringBuilder equipos = new StringBuilder();
-				try {
-					while(rs.next()) {
-						String codEquipo = rs.getString("cod_equipo");
-						String nombreEquipo = rs.getString("nombre_equipo");
-						equipos.append(codEquipo + " = " + nombreEquipo + "\n");
-					}
-					
-					textAreaEquipos.setText(equipos.toString());
-				} catch (SQLException sqle) {
-					JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
-							JOptionPane.ERROR_MESSAGE);
-				}
-				catch (Exception e) {
-					JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
-							JOptionPane.ERROR_MESSAGE);
-				}
+		textField = new JTextField();
+		textField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				tablaModeloEquipos.buscar(textField.getText());
 			}
 		});
-		panelSuperior.add(btnMostrar);
+		textField.setFont(new Font("Verdana", Font.PLAIN, 12));
+		panelSuperior.add(textField, BorderLayout.CENTER);
+		textField.setColumns(10);
 		
-		textAreaEquipos = new JTextArea();
+		JPanel panelCentral = new JPanel();
+		getContentPane().add(panelCentral, BorderLayout.CENTER);
+		panelCentral.setLayout(new BorderLayout(0, 0));
 		
-		JScrollPane scroll = new JScrollPane (textAreaEquipos);
-	    scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	          scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		JScrollPane scrollPane = new JScrollPane();
+		panelCentral.add(scrollPane);
 		
-		
-		getContentPane().add(scroll, BorderLayout.CENTER);
+		tblEquipo = new JTable();
+		tblEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
+		scrollPane.setViewportView(tblEquipo);
+		tblEquipo.setModel(tablaModeloEquipos);
 		
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setVisible(true);

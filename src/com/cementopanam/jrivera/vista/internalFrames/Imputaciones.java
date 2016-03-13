@@ -50,7 +50,6 @@ import com.cementopanam.jrivera.controlador.CapturaUsuario;
 import com.cementopanam.jrivera.controlador.ComparacionFechas;
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.vista.NombreEquipo;
-import com.cementopanam.jrivera.vista.NombreEquipoConJTable;
 import com.cementopanam.jrivera.vista.Principal;
 import com.cementopanam.jrivera.vista.helper.CustomJComboBox;
 import com.cementopanam.jrivera.vista.helper.JStatusBar;
@@ -148,7 +147,7 @@ public class Imputaciones extends JInternalFrame {
 		
 		setFrameIcon(null);
 		setTitle("Formulario de Imputaciones de Paro");
-		setDefaultCloseOperation(HIDE_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setIconifiable(true);
 		setClosable(true);
 		getContentPane().setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -199,7 +198,6 @@ public class Imputaciones extends JInternalFrame {
 	        			comboBoxEquipo.setEnabled(true);
 	        		}
 	        		rellenarcomboBox("equipo");
-	        		System.out.println(e.getItem().toString());
 	        	}
 	        }
 	    });
@@ -252,20 +250,6 @@ public class Imputaciones extends JInternalFrame {
 		getContentPane().add(lblCausa);
 		
 		comboBoxCausa = new CustomJComboBox();
-		comboBoxCausa.addItemListener(new ItemListener() {
-	        public void itemStateChanged(ItemEvent e) {
-	        	
-	        	if(e.getItem().equals("Otro")) {
-	        		textArea_motivoCausa.setVisible(true);
-	        		scrollPane_MotivoCausa.setVisible(true);
-	        	}
-	        	else{
-	        		textArea_motivoCausa.setVisible(false);
-	        		textArea_motivoCausa.setText("");
-	        		scrollPane_MotivoCausa.setVisible(false);
-	        	}
-	        }
-	    });
 		comboBoxCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
 		
 		comboBoxCausa.setBounds(103, 331, 159, 24);
@@ -390,11 +374,6 @@ public class Imputaciones extends JInternalFrame {
 		getContentPane().add(button_area);
 		
 		button_disciplina = new JButton("+");
-		button_disciplina.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				new NombreEquipoConJTable();
-			}
-		});
 		button_disciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
 		button_disciplina.setBounds(274, 299, 62, 25);
 		getContentPane().add(button_disciplina);
@@ -469,17 +448,15 @@ public class Imputaciones extends JInternalFrame {
 		getContentPane().add(formattedTextField_fechaFin);
 		
 		scrollPane_MotivoCausa = new JScrollPane();
-		scrollPane_MotivoCausa.setViewportBorder(new TitledBorder(null, "Motivo de Causa", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		scrollPane_MotivoCausa.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Descripcion Extendida", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		scrollPane_MotivoCausa.setBounds(102, 367, 234, 79);
 		
 		getContentPane().add(scrollPane_MotivoCausa);
 		
 		textArea_motivoCausa = new JTextArea();
-		textArea_motivoCausa.setVisible(false);
 		textArea_motivoCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
 		
 		scrollPane_MotivoCausa.setViewportView(textArea_motivoCausa);
-		scrollPane_MotivoCausa.setVisible(false);
 		
 		layeredPane_estatusParo = new JLayeredPane();
 		layeredPane_estatusParo.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Estatus de Paro", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
@@ -655,11 +632,7 @@ public class Imputaciones extends JInternalFrame {
 					}
 					
 					comboBoxCausa.setSelectedIndex(-1);
-					System.out.println("Llenando el campo Causa");
-					
 				}
-				
-				md.cerrarConexiones();
 			}
 			
 			
@@ -745,14 +718,13 @@ public class Imputaciones extends JInternalFrame {
 				Principal.lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 				 Principal.lblStatusbar.setText("No se pudo completar la operacion");
 			}
-			
 		} 
 		catch(NumberFormatException nfe) {
 			JOptionPane.showMessageDialog(null, nfe.getMessage(), nfe.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			}
 		
-		/*catch(NullPointerException npe) {
+		catch(NullPointerException npe) {
 			JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos", npe.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			}
@@ -760,8 +732,8 @@ public class Imputaciones extends JInternalFrame {
 			JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			}
-			*/
-
+			
+/*
 	//Barra de progreso
 		   Principal.pbar.setStringPainted(true);
 		   for (int i = min; i <= max; i++) {
@@ -772,7 +744,7 @@ public class Imputaciones extends JInternalFrame {
 					   Principal.pbar.repaint();
 				   }
 			   });
-	       } 
+	       }*/ 
 	}
 	
 	/**
@@ -846,6 +818,9 @@ public class Imputaciones extends JInternalFrame {
 	 * @return Retorna el nombre de usuario
 	 */
 	private String obtenerNombreUsuario() {
+		
+		System.out.println("Usuario Actual: " + Principal.usuarioActual.getText());
+		
 		
 		String usuario = "";
 		//Obtiene el usuario desde el archivo serializado

@@ -1,4 +1,4 @@
-package com.cementopanam.jrivera.vista.helper;
+package com.cementopanam.jrivera.vista.helper.tablaModelo;
 
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;

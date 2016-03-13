@@ -74,6 +74,7 @@ public class Login extends JFrame {
 	//	PlasticLookAndFeel.setPlasticTheme(new DesertBlue());
 
 	    try {
+	   // 	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	    	UIManager.setLookAndFeel("com.jtattoo.plaf.acryl.AcrylLookAndFeel");
 	    //	UIManager.setLookAndFeel("com.jtattoo.plaf.mint.MintLookAndFeel");
 	    	  
@@ -116,7 +117,7 @@ public class Login extends JFrame {
 		Principal p = new Principal();
 		
 		try {
-	    	rs = md.logearUsuario(usuario, clave);
+	    	rs = md.autenticarUsuario(usuario, clave);
 	    	//si los datos son correctos, entra al formulario
 			if(rs.next()) {
 				int tipoUsuario = rs.getInt("id_tipo_usuario");

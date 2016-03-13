@@ -1,4 +1,4 @@
-package com.cementopanam.jrivera.controlador;
+package com.cementopanam.jrivera.controlador.listadoEquipos;
 
 public class NombreEquipo {
 

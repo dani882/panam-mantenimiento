@@ -12,11 +12,11 @@ import com.cementopanam.jrivera.modelo.ConeccionBD;
 
 public class ManipulacionDatos {
 	
-	ConeccionBD cbd;
-	Connection con = null;
-	CallableStatement cs = null;
-	PreparedStatement pstmt = null;
-	ResultSet rs = null;
+	private ConeccionBD cbd;
+	private Connection con = null;
+	private CallableStatement cs = null;
+	private PreparedStatement pstmt = null;
+	private ResultSet rs = null;
 	
 	private String formatoFecha = "yyyy-MM-dd HH:mm:ss";
 	
@@ -42,8 +42,8 @@ public class ManipulacionDatos {
 		cbd = ConeccionBD.getInstance();
 		con = cbd.conectarABaseDatos();
 		} catch (Exception e) {
-			
-			JOptionPane.showMessageDialog(null, e);
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
 		}
 		return con;
 	}
@@ -99,7 +99,7 @@ public class ManipulacionDatos {
 				break;
 			}
 		}
-					
+				
 		return rs;
 		
 		
@@ -213,26 +213,15 @@ public class ManipulacionDatos {
 				String sqlInsertCausa = "INSERT INTO `mantenimientodb`.`causa` "
 						+ "(`tipo_causa`, `descripcion_adicional`, `id_usuario`) VALUES (?, ?, ?);";
 				
-				//Si se selecciona la opcion de Otro
-				if(tipoCausa.equals("Otro")) {
+
+				pstmt = con.prepareStatement(sqlInsertCausa, PreparedStatement.RETURN_GENERATED_KEYS);
 					
-					pstmt = con.prepareStatement(sqlInsertCausa, PreparedStatement.RETURN_GENERATED_KEYS);
+				pstmt.setString(1, tipoCausa);
+				pstmt.setString(2, otraCausa);
+				pstmt.setInt(3, idUsuario);
 					
-					pstmt.setString(1, "Otro");
-					pstmt.setString(2, otraCausa);
-					pstmt.setInt(3, idUsuario);
-					
-					pstmt.executeUpdate();
-				}
-				else {
-					pstmt = con.prepareStatement(sqlInsertCausa, PreparedStatement.RETURN_GENERATED_KEYS);
-					
-					pstmt.setString(1, tipoCausa);
-					pstmt.setString(2, null);
-					pstmt.setInt(3, idUsuario);
-					
-					pstmt.executeUpdate();
-				}
+				pstmt.executeUpdate();
+				
 				
 				// Variable para obtener la clave del ultimo registro generado
 				int claveCausaGenerada = 0;  
@@ -495,7 +484,7 @@ public class ManipulacionDatos {
 		return resultado;
 	}
 	
-	public ResultSet logearUsuario(String user, String password) throws SQLException {
+	public ResultSet autenticarUsuario(String user, String password) throws SQLException {
 		
 		try {
 			

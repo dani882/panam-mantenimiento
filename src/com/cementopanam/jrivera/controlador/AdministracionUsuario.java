@@ -19,6 +19,7 @@ public class AdministracionUsuario {
 	private Connection con = null;
 	private CallableStatement cs = null;
 	private ResultSet rs = null;
+	private ManipulacionDatos md = new ManipulacionDatos();
 	
 	public AdministracionUsuario() {
 		
@@ -71,7 +72,7 @@ public class AdministracionUsuario {
 		}
 		
 		finally{
-			cerrarConexiones();
+			md.cerrarConexiones();
 		}
 		return resultado;
 	}
@@ -111,43 +112,6 @@ public class AdministracionUsuario {
 			con.rollback();
 			return resultado = false;
 		}
-		return resultado;
-		
-		
-		
-		
-		
-		
-		
-		
-	}
-	
-	
-	
-	/** Cierra todas las conexiones de Base de Datos
-	 * 
-	 * */
-	private void cerrarConexiones() {
-		
-			try {		
-				
-				if (rs != null) {
-					rs.close();
-				}
-				
-				if (cs != null) {
-					cs.close();
-				}
-				
-				cbd.cerrarConexion();
-			}
-			catch (SQLException sqle) {
-				JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
-						JOptionPane.ERROR_MESSAGE);
-			}
-			catch (Exception e) {
-				JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
-						JOptionPane.ERROR_MESSAGE);
-			}
+		return resultado;	
 	}	
 }
