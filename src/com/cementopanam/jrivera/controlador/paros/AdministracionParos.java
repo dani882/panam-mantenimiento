@@ -8,9 +8,10 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.modelo.ConeccionBD;
 
-public class AdministracionParos {
+public class AdministracionParos extends ManipulacionDatos{
 
 	private ConeccionBD cbd;
 	private Connection con = null;
@@ -47,11 +48,14 @@ public class AdministracionParos {
 				String area = rs.getString(3);
 				String subArea = rs.getString(4);
 				String equipo = rs.getString(5);
-				String tiempoInicio = rs.getString(6);
-				String tiempoFin = rs.getString(7);
-				String solucion = rs.getString(8);
+				String disciplina = rs.getString(6);
+				String causa = rs.getString(7);
+				String descripcionAdicional = rs.getString(8);
+				String tiempoInicio = rs.getString(9);
+				String tiempoFin = rs.getString(10);
+				String solucion = rs.getString(11);
 				
-				lista.add(new Paro(codigo, usuario, area, subArea, equipo, tiempoInicio, tiempoFin, solucion));	
+				lista.add(new Paro(codigo, usuario, area, subArea, equipo, tiempoInicio, tiempoFin, solucion, causa, descripcionAdicional, disciplina));	
 			}
 		}
 		catch (SQLException sqle) {

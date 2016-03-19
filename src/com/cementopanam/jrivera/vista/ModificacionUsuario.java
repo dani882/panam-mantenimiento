@@ -9,14 +9,14 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.Font;
 
-public class EdicionUsuario extends JDialog {
+public class ModificacionUsuario extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 
 	/**
 	 * Create the dialog.
 	 */
-	public EdicionUsuario() {
+	public ModificacionUsuario() {
 		setFont(new Font("Verdana", Font.PLAIN, 12));
 		setTitle("Modificacion de Usuario");
 		

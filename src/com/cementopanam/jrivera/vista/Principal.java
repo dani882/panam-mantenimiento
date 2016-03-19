@@ -30,6 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import com.cementopanam.jrivera.controlador.CapturaUsuario;
@@ -75,6 +76,7 @@ public class Principal extends JFrame implements Runnable{
 	
 	public static Icon icono;
 	public static JProgressBar pbar;
+	
 	static int min = 0;
 	static int max = 100;
 	
@@ -326,8 +328,9 @@ public class Principal extends JFrame implements Runnable{
 		statusBar.setLeftComponent(lblStatusbar);
 		
 		pbar = new JProgressBar();
+		pbar.setStringPainted(true);
 		statusBar.addRightComponent(pbar);
-			
+		
 		final JLabel dateLabel = new JLabel();
 	    dateLabel.setHorizontalAlignment(JLabel.CENTER);
 	    statusBar.addRightComponent(dateLabel);
@@ -345,5 +348,31 @@ public class Principal extends JFrame implements Runnable{
 		
 		timerThread = new TimerThread(dateLabel, timeLabel);
 	    timerThread.start();	
+	}
+	
+	//Muestra Barra de Progreso
+	public static void mostrarProgreso(int duracion) {
+		
+	    pbar.setMinimum(min);
+	    pbar.setMaximum(max);
+	    
+	    for (int i = min; i <= max; i++) {
+	      final int porcentaje = i;
+	     // int progress = (int)(((float)i / (float)ss.size()) * 100f);
+	      try {
+	        SwingUtilities.invokeLater(new Runnable() {
+	          public void run() {
+	        	  pbar.setValue(porcentaje);
+	          }
+	        });
+	        Thread.sleep(duracion);
+	      } catch (InterruptedException e) {
+	    	  JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
+	    				JOptionPane.ERROR_MESSAGE);
+	      }
+	    }
+	    pbar.setValue(0);
+	    pbar.setStringPainted(false);
+	    pbar.repaint();
 	}
 }

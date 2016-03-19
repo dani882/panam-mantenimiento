@@ -141,13 +141,14 @@ public class Imputaciones extends JInternalFrame {
 		initComponents();
 		rellenarcomboBox("area");
 		rellenarcomboBox("causa");
+		rellenarcomboBox("disciplina");
 	}
 	
 	private void initComponents() {
 		
 		setFrameIcon(null);
 		setTitle("Formulario de Imputaciones de Paro");
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		setIconifiable(true);
 		setClosable(true);
 		getContentPane().setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -216,8 +217,6 @@ public class Imputaciones extends JInternalFrame {
 	        	
 	        	if(e.getStateChange() == ItemEvent.SELECTED) {
 	        		
-	        		System.out.println(comboBoxArea.getItemCount());
-	        		
 	        		//Verifica si el combo de SubArea no esta activo
 	        		if (!(comboBoxSubArea.isEnabled())) {
 	        			comboBoxSubArea.setEnabled(true);
@@ -266,20 +265,21 @@ public class Imputaciones extends JInternalFrame {
 		panel.add(scrollPane_tabla);
 		
 		tablaParos = new JTable(){
-		    /**
+
+			/**
 			 * 
 			 */
-			private static final long serialVersionUID = 1L;
+			private static final long serialVersionUID = -6964605111921202585L;
 
 			@Override
 		    public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 		    	
 				//Ajusta la columna de la tabla a un tamano adecuado
-		    	Component component = super.prepareRenderer(renderer, row, column);
-		    	int rendererWidth = component.getPreferredSize().width;
-		        TableColumn tableColumn = getColumnModel().getColumn(column);
-		        tableColumn.setPreferredWidth(Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
-		        return component;
+		    	Component componente = super.prepareRenderer(renderer, row, column);
+		    	int archoRenderizador = componente.getPreferredSize().width;
+		        TableColumn columnaTabla = getColumnModel().getColumn(column);
+		        columnaTabla.setPreferredWidth(Math.max(archoRenderizador + getIntercellSpacing().width, columnaTabla.getPreferredWidth()));
+		        return componente;
 		    }
 		};
 		tablaParos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -310,10 +310,10 @@ public class Imputaciones extends JInternalFrame {
 				
 				try {
 					
-					int row = tablaParos.getSelectedRow();
-					int idParo = Integer.parseInt(String.valueOf(tablaParos.getValueAt(row, 0)));
+					int fila = tablaParos.getSelectedRow();
+					int idParo = Integer.parseInt(String.valueOf(tablaParos.getValueAt(fila, 0)));
 					String fechaFin = formattedTextField_fechaFin.getText();
-					String fechaInicio = String.valueOf(tablaParos.getValueAt(row, 5));
+					String fechaInicio = String.valueOf(tablaParos.getValueAt(fila, 5));
 				
 					resultado = md.actualizarParo(idParo, fechaFin, fechaInicio);
 					
@@ -326,16 +326,15 @@ public class Imputaciones extends JInternalFrame {
 					else {
 						Principal.lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 						 Principal.lblStatusbar.setText("No se pudo completar la operacion");
-					}	
-						
+					}		
 				} 
 				catch (SQLException sqle) {
 					JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
 				}
-					catch (ArrayIndexOutOfBoundsException aiobe) {
-						JOptionPane.showMessageDialog(null, "Debe elegir un paro", aiobe.getClass().toString(),
-								JOptionPane.ERROR_MESSAGE);
+				catch (ArrayIndexOutOfBoundsException aiobe) {
+					JOptionPane.showMessageDialog(null, "Debe elegir un paro", aiobe.getClass().toString(),
+							JOptionPane.ERROR_MESSAGE);
 				}
 				catch (Exception e1) {
 					JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(),
@@ -381,6 +380,7 @@ public class Imputaciones extends JInternalFrame {
 		button_causa = new JButton("+");
 		button_causa.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
 				obtenerNombreUsuario();
 			}
 		});
@@ -454,6 +454,7 @@ public class Imputaciones extends JInternalFrame {
 		getContentPane().add(scrollPane_MotivoCausa);
 		
 		textArea_motivoCausa = new JTextArea();
+		textArea_motivoCausa.setToolTipText("Informacion Adicional sobre Causa Seleccionada");
 		textArea_motivoCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
 		
 		scrollPane_MotivoCausa.setViewportView(textArea_motivoCausa);
@@ -623,6 +624,17 @@ public class Imputaciones extends JInternalFrame {
 					comboBoxEquipo.setSelectedIndex(-1);
 				}
 				
+				//Rellena comboBox Area
+				if(campo.equals("disciplina")) {
+					rs2 = md.rellenarCombo("disciplina", 0);
+					
+					while(rs2.next()) {
+						comboBoxDisciplina.addItem(rs2.getString("nombre_disciplina"));
+					}
+					
+					comboBoxDisciplina.setSelectedIndex(-1);
+				}
+				
 				else if(campo.equals("causa")) {
 					//Rellena comboBox Area
 					rs = md.rellenarCombo("causa", 0);
@@ -647,10 +659,7 @@ public class Imputaciones extends JInternalFrame {
 			}
 			finally {
 				md.cerrarConexiones();
-			}
-			
-			comboBoxDisciplina.setModel(new DefaultComboBoxModel<String>(new String[] {"Electrico", "Produccion", "Mecanico", "Proceso", "Electronico"}));
-			comboBoxDisciplina.setSelectedIndex(-1);			
+			}		
 		}
 	
 		private void limpiarCampos() {
@@ -690,33 +699,43 @@ public class Imputaciones extends JInternalFrame {
 			String usuario = obtenerNombreUsuario();
 			String otraCausa = textArea_motivoCausa.getText();
 			
-			if(estadoParo.equals(null)){
+			if(estadoParo.equals(null)) {
 				JOptionPane.showMessageDialog(null, "Debe seleccionar el estado de Paro", 
 						"Seleccionar Paro", JOptionPane.ERROR_MESSAGE);
 				
 				return;
 			}
 			
-			//Verifica si el Paro es Compleado o Pendiente
-			if(estadoParo.equals("Completado")) {
-				resultado = md.imputarParo(fechaInicio, fechaFin, equipo, estadoParo,
-						estadoEquipo, subArea, area, disciplina, tipoCausa, usuario, otraCausa);
-			}
-			else{
-				resultado = md.imputarParo(fechaInicio, null, equipo, estadoParo,
-						estadoEquipo, subArea, area, disciplina, tipoCausa, usuario, otraCausa);
-			}
-			
-			//Si el resultado es satisfactorio, notifica la imputacion exitosa o no por el contrario
-			if(resultado == true) {
-				Principal.lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
-				Principal.lblStatusbar.setText("Paro Imputado correctamente");
-				limpiarCampos();
-				actualizarTabla(estatus[0]);
+			else if(otraCausa.equals(null) || otraCausa.length() == 0) {
+				
+				JOptionPane.showMessageDialog(null, "Debe escribir Descripcional Adicional de Paro", 
+						"Descripcion Adicional", JOptionPane.ERROR_MESSAGE);
+				return;
+				
 			}
 			else {
-				Principal.lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
-				 Principal.lblStatusbar.setText("No se pudo completar la operacion");
+				
+				//Verifica si el Paro es Compleado o Pendiente
+				if(estadoParo.equals("Completado")) {
+					resultado = md.imputarParo(fechaInicio, fechaFin, equipo, estadoParo,
+							estadoEquipo, subArea, area, disciplina, tipoCausa, usuario, otraCausa);
+				}
+				else{
+					resultado = md.imputarParo(fechaInicio, null, equipo, estadoParo,
+							estadoEquipo, subArea, area, disciplina, tipoCausa, usuario, otraCausa);
+				}
+				
+				//Si el resultado es satisfactorio, notifica la imputacion exitosa o no por el contrario
+				if(resultado == true) {
+					Principal.lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
+					Principal.lblStatusbar.setText("Paro Imputado correctamente");
+					limpiarCampos();
+					actualizarTabla(estatus[0]);
+				}
+				else {
+					Principal.lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+					 Principal.lblStatusbar.setText("No se pudo completar la operacion");
+				}	
 			}
 		} 
 		catch(NumberFormatException nfe) {
@@ -876,8 +895,12 @@ public class Imputaciones extends JInternalFrame {
 				@Override
 				public void run() {
 					actualizarTabla(estatus[1]);
+					System.out.println("Paros Pendiente: " + tablaParos.getRowCount());
 				}
 			});
 		}
 	}
+	  public void updateBar(int newValue) {
+		    Principal.pbar.setValue(newValue);
+		  }
 }

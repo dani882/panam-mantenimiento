@@ -19,17 +19,20 @@ public class TablaModeloParo extends AbstractTableModel {
 	private static final int AREA = 2;
 	private static final int SUBAREA = 3;
 	private static final int EQUIPO = 4;
-	private static final int TINICIO = 5;
-	private static final int TFIN = 6;
-	private static final int SOLUCION =7;
+	private static final int DISCIPLINA = 5;
+	private static final int CAUSA = 6;
+	private static final int DESCRIPCION_ADICIONAL = 7;
+	private static final int TINICIO = 8;
+	private static final int TFIN = 9;
+	private static final int SOLUCION =10;
 	
-	
-	String[] columnas = {"Codigo", "Usuario", "Area", "SubArea", "Equipo", "Tiempo de Inicio", "Tiempo de Fin",
+	String[] columnas = {"Codigo", "Usuario", "Area", "SubArea", "Equipo", "Disciplina","Causa",
+			"Descripcion Adicional", "Tiempo de Inicio", "Tiempo de Fin",
 			"Solucion"};
+	
 	ArrayList<Paro> lista = null;
 	AdministracionParos paros = new AdministracionParos();
 	
-
 	public TablaModeloParo() {
 		lista = paros.mostrarParo();
 	}
@@ -86,6 +89,15 @@ public class TablaModeloParo extends AbstractTableModel {
 		case EQUIPO:
 			retorno = paro.getEquipo();
 			break;
+		case DISCIPLINA:
+			retorno = paro.getDisciplina();
+			break;
+		case CAUSA:
+			retorno = paro.getCausa();
+			break;
+		case DESCRIPCION_ADICIONAL:
+			retorno = paro.getDescripcionAdicional();
+			break;
 		case TINICIO:
 			retorno = paro.getTiempoInicio();
 			break;
@@ -95,11 +107,8 @@ public class TablaModeloParo extends AbstractTableModel {
 		case SOLUCION:
 			retorno = paro.getSolucion();
 			break;
-		default:
-			break;
 		}
 
 		return retorno;
 	}
-
 }

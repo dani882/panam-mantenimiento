@@ -8,10 +8,11 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +42,8 @@ import javax.swing.table.TableColumn;
 
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
+import com.cementopanam.jrivera.controlador.paros.Paro;
+import com.cementopanam.jrivera.vista.ModificacionParo;
 import com.cementopanam.jrivera.vista.helper.tablaModelo.TablaModeloParo;
 import com.toedter.calendar.JDateChooser;
 
@@ -50,7 +53,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
-import javax.swing.ScrollPaneConstants;
 
 public class Reportes extends JInternalFrame {
 
@@ -67,8 +69,9 @@ public class Reportes extends JInternalFrame {
 	private JComboBox<String> comboBoxTipoReporte;
 	
 	private SimpleDateFormat df;
-	private JTable tableResultado;
+	private JTable tablaResultado;
 	private TablaModeloParo modeloParo = new TablaModeloParo();
+	private JButton btnBuscar;
 	/**
 	 * Crea el frame.
 	 */
@@ -255,7 +258,7 @@ public class Reportes extends JInternalFrame {
 		JScrollPane scrollPaneResultado = new JScrollPane();
 		panel_Resultado.add(scrollPaneResultado, BorderLayout.CENTER);
 		
-		tableResultado = new JTable() {
+		tablaResultado = new JTable() {
 			
 			/**
 			 * 
@@ -273,19 +276,59 @@ public class Reportes extends JInternalFrame {
 		        return component;
 		    }
 		};
-		tableResultado.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		tablaResultado.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				
+				if (e.getClickCount() == 2 && !e.isConsumed()) {
+					
+					int fila = tablaResultado.getSelectedRow();
+					int columna = tablaResultado.getSelectedColumn();
+					
+					String tiempoInicio = "";
+					String solucion = "";
+					String descripcionAdicional = "";
+					String tiempoFin = "";
+					String causa = "";
+					String disciplina = "";
+					
+					for(int i = 0; i < columna; i++) {
+						
+						disciplina = String.valueOf(tablaResultado.getValueAt(fila, 5));
+						causa = String.valueOf(tablaResultado.getValueAt(fila, 6));
+						descripcionAdicional = String.valueOf(tablaResultado.getValueAt(fila, 7));
+					    tiempoInicio = String.valueOf(tablaResultado.getValueAt(fila, 8));
+					    tiempoFin = String.valueOf(tablaResultado.getValueAt(fila, 9));
+					    solucion = String.valueOf(tablaResultado.getValueAt(fila, 10));
+					}
+					
+					System.out.println("Fecha Inicio: " + tiempoInicio);
+					System.out.println("Fecha Fin: " + tiempoFin);
+					System.out.println("Descripcion Adicional: " + descripcionAdicional);
+					System.out.println("Causa: " + causa);
+					System.out.println("Disciplina: " + disciplina);
+				
+					ModificacionParo modificacion = new ModificacionParo(new Paro(tiempoInicio, tiempoFin, solucion, 
+							causa, descripcionAdicional, disciplina), new AdministracionParos());
+					
+					modificacion.setVisible(true);
+					e.consume();
+				}
+			}
+		});
+		tablaResultado.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		//Sirve para no permitir que el usuario reordene las columnas
-		tableResultado.getTableHeader().setReorderingAllowed(false);
-		tableResultado.setFont(new Font("Verdana", Font.PLAIN, 12));
+		tablaResultado.getTableHeader().setReorderingAllowed(false);
+		tablaResultado.setFont(new Font("Verdana", Font.PLAIN, 12));
 		
-		scrollPaneResultado.setViewportView(tableResultado);
-		tableResultado.setModel(modeloParo);
+		scrollPaneResultado.setViewportView(tablaResultado);
+		tablaResultado.setModel(modeloParo);
 		
-		JButton btnBuscar = new JButton("Buscar");
+		btnBuscar = new JButton("Buscar");
 		btnBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				modeloParo.buscar("80");
+				modeloParo.buscar("");
 				
 				
 			}

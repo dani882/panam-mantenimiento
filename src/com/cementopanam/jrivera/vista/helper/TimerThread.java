@@ -11,17 +11,19 @@ public class TimerThread extends Thread {
 	 
     protected boolean isRunning;
 
-    protected JLabel dateLabel;
-    protected JLabel timeLabel;
+    protected JLabel lblFecha;
+    protected JLabel lblTiempo;
     
-    protected SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
-    protected SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm:ss a");
+    protected SimpleDateFormat formatoFecha = new SimpleDateFormat("EEE, d MMM yyyy");
+    protected SimpleDateFormat formatoTiempo = new SimpleDateFormat("h:mm:ss a");
 
     public TimerThread(JLabel dateLabel, JLabel timeLabel) {
-        this.dateLabel = dateLabel;
-        this.timeLabel = timeLabel;
+        this.lblFecha = dateLabel;
+        this.lblTiempo = timeLabel;
         this.isRunning = true;
     }
+    
+    //TODO Agregar barra de progreso
 
     @Override
     public void run() {
@@ -32,8 +34,8 @@ public class TimerThread extends Thread {
                     Calendar currentCalendar = Calendar.getInstance();
                     Date currentTime = currentCalendar.getTime();
                     
-                    dateLabel.setText(dateFormat.format(currentTime));
-                    timeLabel.setText(timeFormat.format(currentTime));
+                    lblFecha.setText(formatoFecha.format(currentTime));
+                    lblTiempo.setText(formatoTiempo.format(currentTime));
                 }
             });
 

@@ -7,8 +7,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import com.cementopanam.jrivera.modelo.ConeccionBD;
+import com.cementopanam.jrivera.vista.Principal;
 
 public class ManipulacionDatos {
 	
@@ -59,36 +61,42 @@ public class ManipulacionDatos {
 		String sql = "";
 		try {
 			con = cbd.conectarABaseDatos();
-		} catch (Exception e) {
+		/*} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
-		}
-		
-		if(sentencia.equalsIgnoreCase("area") && indice == 0) {
-			sql = "SELECT * FROM mantenimientodb.area;";
-			pstmt = con.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-		}
-		else if(sentencia.equalsIgnoreCase("causa") && indice == 0) {
-			
-			sql = "SELECT * FROM mantenimientodb.causa WHERE id_usuario=1;";
-			pstmt = con.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-			
-		}
-		else {
-			
-			switch (sentencia) {
-			
-			case "subArea":
-				sql = "SELECT * FROM mantenimientodb.sub_area WHERE id_area = ?;";
+		}*/
+			if(sentencia.equalsIgnoreCase("area") && indice == 0) {
+				
+				sql = "SELECT * FROM mantenimientodb.area;";
 				pstmt = con.prepareStatement(sql);
-				pstmt.setInt(1, indice);
 				rs = pstmt.executeQuery();
-				break;
+			}
+			else if(sentencia.equalsIgnoreCase("causa") && indice == 0) {
+				
+				sql = "SELECT * FROM mantenimientodb.causa WHERE id_usuario=1;";
+				pstmt = con.prepareStatement(sql);
+				rs = pstmt.executeQuery();
+			}
+			else if(sentencia.equalsIgnoreCase("disciplina") && indice == 0) {
+				
+				sql = "SELECT * FROM mantenimientodb.disciplina;";
+				pstmt = con.prepareStatement(sql);
+				rs = pstmt.executeQuery();
+			}
+			
+			else {
+				
+				switch (sentencia) {
+				
+				case "subArea":
+					sql = "SELECT * FROM mantenimientodb.sub_area WHERE id_area = ?;";
+					pstmt = con.prepareStatement(sql);
+					pstmt.setInt(1, indice);
+					rs = pstmt.executeQuery();
+					break;
 					
-			case "equipo":
-				sql = "SELECT * FROM mantenimientodb.equipo WHERE idSubArea = ?;";
+				case "equipo":
+					sql = "SELECT * FROM mantenimientodb.equipo WHERE idSubArea = ?;";
 				pstmt = con.prepareStatement(sql);
 				pstmt.setInt(1, indice);
 				rs = pstmt.executeQuery();
@@ -98,6 +106,11 @@ public class ManipulacionDatos {
 				JOptionPane.showMessageDialog(null, "Debe seleccionar todos los campos", "Seleccione campos", JOptionPane.WARNING_MESSAGE);
 				break;
 			}
+		}
+		}
+		catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
 		}
 				
 		return rs;
@@ -347,6 +360,13 @@ public class ManipulacionDatos {
 			    }
 			    
 			    con.commit();
+			    
+				//Muestra la Barra de Progreso
+			//	if (SwingUtilities.isEventDispatchThread()) {
+					Principal.mostrarProgreso(5);
+		
+			//	}
+	
 				} catch(SQLException sqle) {
 				
 				JOptionPane.showMessageDialog(null, sqle.getMessage(),sqle.getClass().toString(),
