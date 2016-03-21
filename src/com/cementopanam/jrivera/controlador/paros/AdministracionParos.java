@@ -18,6 +18,11 @@ public class AdministracionParos extends ManipulacionDatos{
 	private CallableStatement cs = null;
 	private ResultSet rs = null;
 	
+	private String formatoFecha = "yyyy-MM-dd HH:mm:ss";
+	
+	/**
+	 * 
+	 */
 	public AdministracionParos() {
 		
 		cbd = ConeccionBD.getInstance();
@@ -33,6 +38,9 @@ public class AdministracionParos extends ManipulacionDatos{
 		}
 	}
 	
+	/**
+	 * @return el listado de Paros
+	 */
 	public ArrayList<Paro> mostrarParo() {
 		
 		ArrayList<Paro> lista = new ArrayList<Paro>();
@@ -55,7 +63,8 @@ public class AdministracionParos extends ManipulacionDatos{
 				String tiempoFin = rs.getString(10);
 				String solucion = rs.getString(11);
 				
-				lista.add(new Paro(codigo, usuario, area, subArea, equipo, tiempoInicio, tiempoFin, solucion, causa, descripcionAdicional, disciplina));	
+				lista.add(new Paro(codigo, usuario, area, subArea, equipo, tiempoInicio, 
+						tiempoFin, solucion, causa, descripcionAdicional, disciplina));	
 			}
 		}
 		catch (SQLException sqle) {
@@ -71,40 +80,84 @@ public class AdministracionParos extends ManipulacionDatos{
 	}
 	
 	
-/*	public void poblarTabla(JTable tabla) {
-	   
+	public boolean modificarParo(Paro p, int idCausa) throws SQLException {
+		
+		if(compararFecha(p.getTiempoInicio(), p.getTiempoFin(), formatoFecha) == false) {
+			return false;
+		}
+		
+		int idDisciplina = Integer.parseInt(buscarIndice(p.getDisciplina(), "disciplina"));
+		
 		try {
-	        rs = mostrarParo();
-	        System.out.println("Poblando tabla");
-
-	        //To remove previously added rows
-	  //      while(tabla.getRowCount() > 0) 
-	  //      {
-	  //          ((DefaultTableModel) tabla.getModel()).removeRow(0);
-	   //     }
-	        int columns = rs.getMetaData().getColumnCount();
-	        while(rs.next())
-	        {
-	            Object[] row = new Object[columns];
-	            for (int i = 1; i <= columns; i++)
-	            {  
-	                row[i - 1] = rs.getObject(i);
-	            }
-	            ((DefaultTableModel) tabla.getModel()).insertRow(rs.getRow()-1,row);
-	        }
-
-	        System.out.println("Termine");
-	    }
-	    catch(SQLException sqle) {
-	    	JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+	
+			con = cbd.conectarABaseDatos();
+			cs = con.prepareCall("{call sp_modificar_paro(?,?,?,?,?,?,?,?)}");
+			
+			cs.setInt(1, p.getCodigo());
+			cs.setString(2, p.getSolucion());
+			cs.setString(3, p.getTiempoInicio());
+			cs.setString(4, p.getTiempoFin());
+			cs.setInt(5, idDisciplina);
+			cs.setString(6, p.getCausa());
+			cs.setString(7, p.getDescripcionAdicional());
+			cs.setInt(8, idCausa);
+			
+			cs.execute();
+			con.commit();
+		}
+		catch (SQLException sqle) {
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
-	    }
-		catch(Exception e) {
+			con.rollback();
+			return false;
+		}
+		catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+			con.rollback();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * @param causa - Causa del paro
+	 * @param descripcion - Descripcion Adicional del Paro
+	 * @return el indice de la Causa Seleccionada
+	 */
+	public String buscarIndiceCausa(String causa, String descripcion) {
+		
+		String resultado = "";
+		
+		//Valida si la descripcion adicional esta vacia o nula
+		int longitud = causa.length();
+		if(longitud == 0) {
+			
+			return resultado = buscarIndice(causa, "causa");
+		}
+		
+		try {
+		con = cbd.conectarABaseDatos();
+		
+		cs = con.prepareCall("{call sp_buscar_causa(?,?,?)}");
+		
+		cs.setString(1, causa);
+		cs.setString(2, descripcion);
+		
+		cs.registerOutParameter(3, java.sql.Types.VARCHAR);
+		cs.executeQuery();
+		
+		resultado = cs.getString(3);
+		
+		} catch (SQLException sqle) {
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+		}
+		catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		}
-		finally{
-			md.cerrarConexiones();
-		}
-	}*/
+		return resultado;
+	}
 }

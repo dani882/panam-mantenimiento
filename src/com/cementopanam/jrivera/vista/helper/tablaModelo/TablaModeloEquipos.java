@@ -13,7 +13,7 @@ public class TablaModeloEquipos extends AbstractTableModel {
 	 * 
 	 */
 	private static final long serialVersionUID = -5597879599705517993L;
-	String[] columnas = {"Codigo Equipo", "Nombre Equipo"};
+	String[] columnas = {"Codigo Equipo", "Nombre Equipo", "Nombre Area", "Nombre SubArea"};
 	ArrayList<NombreEquipo> lista = null;
 	ListadoEquipos equipos = new ListadoEquipos();
 
@@ -59,17 +59,19 @@ public class TablaModeloEquipos extends AbstractTableModel {
 		
 		switch (y) {
 		case 0:
-			retorno = equipo.getCodigo();
+			retorno = equipo.getCodigoEquipo();
 			break;
 		case 1:
-			retorno = equipo.getNombre();
+			retorno = equipo.getNombreEquipo();
 			break;
-
-		default:
+		case 2:
+			retorno = equipo.getNombreArea();
+			break;
+		case 3:
+			retorno = equipo.getNombreSubArea();
 			break;
 		}
 
 		return retorno;
 	}
-
 }

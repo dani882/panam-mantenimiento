@@ -4,8 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -24,14 +29,14 @@ import javax.swing.border.TitledBorder;
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
 import com.cementopanam.jrivera.vista.helper.CustomJComboBox;
-
-import java.awt.event.ActionListener;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.awt.event.ActionEvent;
+import com.cementopanam.jrivera.vista.internalFrames.Reportes;
 
 public class ModificacionParo extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7239938319668117403L;
 	private final JPanel contentPanel = new JPanel();
 	private JButton okButton;
 	private JButton cancelButton;
@@ -39,26 +44,20 @@ public class ModificacionParo extends JDialog {
 	private JLabel lblTiempoDeFin;
 	private JTextField textFieldTiempoInicio;
 	private JTextField textFieldTiempoFin;
+	private JTextArea txtDescripcionAdicional;
 	private JComboBox<String> comboBoxCausa;
 	private JComboBox<String> comboBoxDisciplina;
 	private JTextArea txtAreaSolucion;
 	
-	private Paro paro;
+	private int codigo;
+	private int codigoCausa;
+	
 	private AdministracionParos admParo;
-	private JTextArea txtDescripcionAdicional;
-
-	/**
-	 * Create the dialog.
-	 */
 	
 	public ModificacionParo(Paro modificacion, AdministracionParos paroDB) {
 		
 		this();
-		
-		paro = modificacion;
 		admParo = paroDB;
-		
-		System.out.println("Desde Modificacion "  + modificacion.getDisciplina());
 		
 		try {
 			
@@ -74,6 +73,18 @@ public class ModificacionParo extends JDialog {
 			}
 			
 		} catch (SQLException e) {}
+		
+		codigo = modificacion.getCodigo();
+		
+		//Obtiene el codigo de Causa
+		if(modificacion.getDescripcionAdicional().length() == 0) {
+			codigoCausa = Integer.parseInt(admParo.buscarIndiceCausa(modificacion.getCausa(), 
+					""));
+		}
+		else {
+			codigoCausa = Integer.parseInt(admParo.buscarIndiceCausa(modificacion.getCausa(), 
+					modificacion.getDescripcionAdicional()));
+		}
 		
 		txtAreaSolucion.setText(modificacion.getSolucion());
 		txtDescripcionAdicional.setText(modificacion.getDescripcionAdicional());
@@ -184,9 +195,11 @@ public class ModificacionParo extends JDialog {
 		);
 		
 		txtDescripcionAdicional = new JTextArea();
+		txtDescripcionAdicional.setFont(new Font("Verdana", Font.PLAIN, 12));
 		scrollPaneDescripcionAdicional.setViewportView(txtDescripcionAdicional);
 		
 		txtAreaSolucion = new JTextArea();
+		txtAreaSolucion.setFont(new Font("Verdana", Font.PLAIN, 12));
 		scrollPaneSolucion.setViewportView(txtAreaSolucion);
 		contentPanel.setLayout(gl_contentPanel);
 		{
@@ -208,6 +221,7 @@ public class ModificacionParo extends JDialog {
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
+			
 			{
 				cancelButton = new JButton("Cancelar");
 				cancelButton.addActionListener(new ActionListener() {
@@ -222,15 +236,37 @@ public class ModificacionParo extends JDialog {
 		}
 	}
 
+	/**
+	 * Metodo utilizado para actualizar Datos de los Paros
+	 */
 	private void actualizarParo() {
 		
-		textFieldTiempoInicio.getText();
-		comboBoxDisciplina.getSelectedItem();
-//		textFieldTiempoFin
-//		comboBoxCausa
-//		txtAreaSolucion
-//		txtDescripcionAdicional
+		String tiempoInicio = textFieldTiempoInicio.getText();
+		String disciplina = String.valueOf(comboBoxDisciplina.getSelectedItem());
+		String tiempoFin = textFieldTiempoFin.getText();
+		String causa = String.valueOf(comboBoxCausa.getSelectedItem());
+		String solucion = txtAreaSolucion.getText();
+		String descripcionAdicional = txtDescripcionAdicional.getText();
 		
-		
+		//Si el paro fue exitoso
+		try {
+			if(admParo.modificarParo(new Paro(codigo, tiempoInicio, tiempoFin, solucion, 
+					causa, descripcionAdicional, disciplina), codigoCausa) == true) {
+				
+				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
+				Principal.lblStatusBar.setText("Paro Actualizado correctamente");
+				
+				Reportes repo = new Reportes();
+				repo.setVisible(true);
+				this.dispose();
+			}
+			else {
+				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+				 Principal.lblStatusBar.setText("No se pudo completar la operacion");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

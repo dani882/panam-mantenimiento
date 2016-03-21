@@ -2,35 +2,78 @@ package com.cementopanam.jrivera.controlador.listadoEquipos;
 
 public class NombreEquipo {
 
-	private String codigo;
-	private String nombre;
+	private String codigoEquipo;
+	private String nombreEquipo;
+	private String nombreArea;
+	private String nombreSubArea;
+	
 	/**
-	 * @return the codigo
+	 * @return the codigoEquipo
 	 */
-	public String getCodigo() {
-		return codigo;
-	}
-	/**
-	 * @param codigo the codigo to set
-	 */
-	public void setCodigo(String codigo) {
-		this.codigo = codigo;
-	}
-	/**
-	 * @return the nombre
-	 */
-	public String getNombre() {
-		return nombre;
-	}
-	/**
-	 * @param nombre the nombre to set
-	 */
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+	public String getCodigoEquipo() {
+		return codigoEquipo;
 	}
 	
-	public NombreEquipo(String codigo, String nombre) {
-		this.codigo = codigo;
-		this.nombre = nombre;
+	/**
+	 * @param codigoEquipo the codigoEquipo to set
+	 */
+	public void setCodigoEquipo(String codigoEquipo) {
+		this.codigoEquipo = codigoEquipo;
+	}
+	
+	/**
+	 * @return the nombreEquipo
+	 */
+	public String getNombreEquipo() {
+		return nombreEquipo;
+	}
+	
+	/**
+	 * @param nombreEquipo the nombreEquipo to set
+	 */
+	public void setNombreEquipo(String nombreEquipo) {
+		this.nombreEquipo = nombreEquipo;
+	}
+	
+	/**
+	 * @return the nombreArea
+	 */
+	public String getNombreArea() {
+		return nombreArea;
+	}
+	
+	/**
+	 * @param nombreArea the nombreArea to set
+	 */
+	public void setNombreArea(String nombreArea) {
+		this.nombreArea = nombreArea;
+	}
+	
+	/**
+	 * @return the nombreSubArea
+	 */
+	public String getNombreSubArea() {
+		return nombreSubArea;
+	}
+	
+	/**
+	 * @param nombreSubArea the nombreSubArea to set
+	 */
+	public void setNombreSubArea(String nombreSubArea) {
+		this.nombreSubArea = nombreSubArea;
+	}
+	
+	/**
+	 * @param codigoEquipo
+	 * @param nombreEquipo
+	 * @param nombreArea
+	 * @param nombreSubArea
+	 */
+	public NombreEquipo(String codigoEquipo, String nombreEquipo, String nombreArea, String nombreSubArea) {
+		super();
+		this.codigoEquipo = codigoEquipo;
+		this.nombreEquipo = nombreEquipo;
+		this.nombreArea = nombreArea;
+		this.nombreSubArea = nombreSubArea;
 	}
 }

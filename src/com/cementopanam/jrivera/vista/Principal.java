@@ -67,7 +67,7 @@ public class Principal extends JFrame implements Runnable{
 	private JPanel contentPane;
 	
 	private JLabel lblOperaciones;
-	public static JLabel lblStatusbar;
+	public static JLabel lblStatusBar;
 	public JStatusBar statusBar;
 	
 	private JDesktopPane desktopPane;
@@ -307,13 +307,13 @@ public class Principal extends JFrame implements Runnable{
 	
 	public void mostrarMensaje(String mensaje, String alerta) {
 		
-		lblStatusbar.setText(mensaje);
+		lblStatusBar.setText(mensaje);
 		
 		if(alerta.equalsIgnoreCase("advertencia")){
-		lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+		lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 		}
 		else if(alerta.equalsIgnoreCase("ok")) {
-			lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
+			lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 		}
 		else {JOptionPane.showMessageDialog(null, "Hay un problema con las fechas");}
 	}
@@ -323,9 +323,9 @@ public class Principal extends JFrame implements Runnable{
 		
 		statusBar = new JStatusBar();
 			
-		lblStatusbar = new JLabel("Listo");
-		lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
-		statusBar.setLeftComponent(lblStatusbar);
+		lblStatusBar = new JLabel("Listo");
+		lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
+		statusBar.setLeftComponent(lblStatusBar);
 		
 		pbar = new JProgressBar();
 		pbar.setStringPainted(true);

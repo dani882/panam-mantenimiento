@@ -15,6 +15,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -61,6 +62,7 @@ public class AdministracionRegistros2 extends JInternalFrame {
 		
 		setFrameIcon(new ImageIcon(AdministracionRegistros2.class.getResource("/imagenes/logo-panam.png")));
 		setTitle("Administracion de Registros");
+		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setIconifiable(true);
 		setClosable(true);
 		getContentPane().setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -316,14 +318,14 @@ public class AdministracionRegistros2 extends JInternalFrame {
 			Usuario usuario = new Usuario(codEmpleado, nombreEmpleado, apellidoEmpleado, nombreUsuario, clave, tipoUsuario);
 			
 			if(admUsuario.registrarUsuario(usuario) == true) {
-				Principal.lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
-				Principal.lblStatusbar.setText("Usuario " +nombreUsuario+ " creado correctamente");
+				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
+				Principal.lblStatusBar.setText("Usuario " +nombreUsuario+ " creado correctamente");
 				limpiarCamposUsuario();
 				resultado = true;
 			}
 			else{
-				Principal.lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
-				Principal.lblStatusbar.setText("No se pudo completar la operacion");
+				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+				Principal.lblStatusBar.setText("No se pudo completar la operacion");
 			}
 		}
 		catch(SQLException sqle) {

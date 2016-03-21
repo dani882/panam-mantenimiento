@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -31,6 +32,7 @@ import javax.swing.border.EmptyBorder;
 import com.cementopanam.jrivera.controlador.CapturaUsuario;
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.vista.internalFrames.Imputaciones;
+import com.jtattoo.plaf.acryl.AcrylLookAndFeel;
 
 /**
  * @autor Jesus Rivera
@@ -74,7 +76,43 @@ public class Login extends JFrame {
 	//	PlasticLookAndFeel.setPlasticTheme(new DesertBlue());
 
 	    try {
-	   // 	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    	
+	    	Properties props = new Properties();
+            
+   //         props.put("logoString", "my company"); 
+   //         props.put("licenseKey", "INSERT YOUR LICENSE KEY HERE");
+            
+   //         props.put("selectionBackgroundColor", "180 240 197"); 
+            props.put("menuSelectionBackgroundColor", "180 240 197"); 
+            
+            props.put("controlColor", "218 254 230");
+            props.put("controlColorLight", "218 254 230");
+            props.put("controlColorDark", "180 240 197"); 
+
+            props.put("buttonColor", "218 230 254");
+            props.put("buttonColorLight", "255 255 255");
+            props.put("buttonColorDark", "244 242 232");
+
+            props.put("rolloverColor", "218 254 230"); 
+            props.put("rolloverColorLight", "218 254 230"); 
+            props.put("rolloverColorDark", "180 240 197"); 
+
+     //       props.put("windowTitleForegroundColor", "0 0 0");
+     //       props.put("windowTitleBackgroundColor", "180 240 197"); 
+     //       props.put("windowTitleColorLight", "218 254 230"); 
+     //       props.put("windowTitleColorDark", "180 240 197"); 
+            props.put("windowBorderColor", "218 254 230");
+            
+            // set your theme
+            AcrylLookAndFeel.setCurrentTheme(props);
+            // select the Look and Feel
+  //          UIManager.setLookAndFeel("com.jtattoo.plaf.acryl.AcrylLookAndFeel");
+
+	
+	    	
+	    	
+	    	
+	    //	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	    	UIManager.setLookAndFeel("com.jtattoo.plaf.acryl.AcrylLookAndFeel");
 	    //	UIManager.setLookAndFeel("com.jtattoo.plaf.mint.MintLookAndFeel");
 	    	  

@@ -50,7 +50,7 @@ public class NombreEquipo extends JDialog {
 	 */
 	public NombreEquipo() {
 		
-		this.setSize(new Dimension(600, 370));
+		this.setSize(new Dimension(1130, 455));
 		
 		setModal(true);
 		setLocationRelativeTo(null);

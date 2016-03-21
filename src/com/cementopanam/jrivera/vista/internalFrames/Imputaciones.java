@@ -24,7 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -195,9 +194,11 @@ public class Imputaciones extends JInternalFrame {
 	        public void itemStateChanged(ItemEvent e) {
 	        	
 	        	if(e.getStateChange() == ItemEvent.SELECTED) {
+	        		
 	        		if (!(comboBoxEquipo.isEnabled())) {
 	        			comboBoxEquipo.setEnabled(true);
 	        		}
+	        		comboBoxEquipo.removeAllItems();
 	        		rellenarcomboBox("equipo");
 	        	}
 	        }
@@ -318,14 +319,14 @@ public class Imputaciones extends JInternalFrame {
 					resultado = md.actualizarParo(idParo, fechaFin, fechaInicio);
 					
 					if(resultado == true) {
-						Principal.lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
-						Principal.lblStatusbar.setText("Paro Imputado correctamente");
+						Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
+						Principal.lblStatusBar.setText("Paro Imputado correctamente");
 						limpiarCampos();
 						actualizarTabla(estatus[1]);
 					}
 					else {
-						Principal.lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
-						 Principal.lblStatusbar.setText("No se pudo completar la operacion");
+						Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+						 Principal.lblStatusBar.setText("No se pudo completar la operacion");
 					}		
 				} 
 				catch (SQLException sqle) {
@@ -727,14 +728,14 @@ public class Imputaciones extends JInternalFrame {
 				
 				//Si el resultado es satisfactorio, notifica la imputacion exitosa o no por el contrario
 				if(resultado == true) {
-					Principal.lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
-					Principal.lblStatusbar.setText("Paro Imputado correctamente");
+					Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
+					Principal.lblStatusBar.setText("Paro Imputado correctamente");
 					limpiarCampos();
 					actualizarTabla(estatus[0]);
 				}
 				else {
-					Principal.lblStatusbar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
-					 Principal.lblStatusbar.setText("No se pudo completar la operacion");
+					Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+					 Principal.lblStatusBar.setText("No se pudo completar la operacion");
 				}	
 			}
 		} 

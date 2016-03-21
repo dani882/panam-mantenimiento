@@ -185,10 +185,11 @@ public class Paro {
 	 * @param descripcionAdicional
 	 * @param disciplina
 	 */
-	public Paro(String tiempoInicio, String tiempoFin, String solucion, String causa, String descripcionAdicional,
-			String disciplina) {
+	public Paro(int codigo,String tiempoInicio, String tiempoFin, 
+			String solucion, String causa, String descripcionAdicional, String disciplina) {
 		
 		super();
+		this.codigo = codigo;
 		this.tiempoInicio = tiempoInicio;
 		this.tiempoFin = tiempoFin;
 		this.solucion = solucion;

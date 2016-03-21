@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import com.cementopanam.jrivera.modelo.ConeccionBD;
 import com.cementopanam.jrivera.vista.Principal;
@@ -169,24 +168,10 @@ public class ManipulacionDatos {
 		
 		try {
 
-			if(!(fechaFin == (null))) {
-				//Verifica si la fecha de Fin es Mayor a Fecha Inicio de Paro
-				ComparacionFechas cf = new ComparacionFechas();
-				boolean comparacionFechas = cf.compararFechas(fechaInicio, fechaFin, formatoFecha);
-				
-				if(comparacionFechas == true) {
-					
-					try{
-						JOptionPane.showMessageDialog(null, "La fecha Fin no puede ser Mayor a la Fecha de "
-								+ "Inicio de Paro", "Comparacion Fechas",
-			    				JOptionPane.ERROR_MESSAGE);
-						
-						return resultado = false;
-					}
-					catch(Exception e) {}
-				}
-				
+			if(compararFecha(fechaInicio, fechaFin, formatoFecha) == false) {
+				return false;
 			}
+			
 			
 			//Conecta a la base de datos
 			con = cbd.conectarABaseDatos();
@@ -502,6 +487,31 @@ public class ManipulacionDatos {
 					JOptionPane.ERROR_MESSAGE);
 		}
 		return resultado;
+	}
+	
+	public boolean compararFecha(String fechaInicio, String fechaFin, String formatoFecha) {
+		
+		if(!(fechaFin == (null))) {
+			//Verifica si la fecha de Fin es Mayor a Fecha Inicio de Paro
+			ComparacionFechas cf = new ComparacionFechas();
+			boolean comparacionFechas = cf.compararFechas(fechaInicio, fechaFin, formatoFecha);
+			
+			if(comparacionFechas == true) {
+				
+				try{
+					JOptionPane.showMessageDialog(null, "La fecha Fin no puede ser Mayor a la Fecha de "
+							+ "Inicio de Paro", "Comparacion Fechas",
+		    				JOptionPane.ERROR_MESSAGE);
+					
+					return false;
+				}
+				catch(Exception e) {}
+			}
+			
+		}
+		return true;
+		
+		
 	}
 	
 	public ResultSet autenticarUsuario(String user, String password) throws SQLException {

@@ -10,9 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyVetoException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,12 +53,15 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
+import javax.swing.ImageIcon;
 
 public class Reportes extends JInternalFrame {
-
-	private static final long serialVersionUID = 1L;
-	private ResultSet rs = null;
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3425343178839382975L;
+
 	private String formatoFecha = "yyyy-MM-dd";
 	
 	private JDateChooser busquedaDCFechaDesde;
@@ -72,6 +75,7 @@ public class Reportes extends JInternalFrame {
 	private JTable tablaResultado;
 	private TablaModeloParo modeloParo = new TablaModeloParo();
 	private JButton btnBuscar;
+	
 	/**
 	 * Crea el frame.
 	 */
@@ -90,6 +94,7 @@ public class Reportes extends JInternalFrame {
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setFont(new Font("Verdana", Font.PLAIN, 12));
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		
 		JPanel panelBusqueda = new JPanel();
@@ -99,6 +104,8 @@ public class Reportes extends JInternalFrame {
 		tabbedPane.addTab("Informes", null, panelInformes, null);
 		
 		JButton btnInformeGenerarReporte = new JButton("Generar Reporte");
+		btnInformeGenerarReporte.setIcon(new ImageIcon(Reportes.class.getResource("/iconos32x32/report32x32.png")));
+		btnInformeGenerarReporte.setFont(new Font("Verdana", Font.PLAIN, 12));
 		btnInformeGenerarReporte.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -110,6 +117,7 @@ public class Reportes extends JInternalFrame {
 				ManipulacionDatos md = new ManipulacionDatos();
 				Connection con = md.obtenerConexion();
 				String archivo = "";
+				String titulo = "";
 				
 				try (InputStream in = getClass().getResourceAsStream("/paros.properties");) {
 					// Carga las propiedades del archivo
@@ -120,14 +128,17 @@ public class Reportes extends JInternalFrame {
 					case 0:
 						//Paros por fecha
 						archivo = pros.getProperty("fecha");
+						titulo = "Fecha";
 						break;
 					case 1:
 						//Paros por Frecuencia
 						archivo = pros.getProperty("frecuencia");
+						titulo = "Frecuencia";
 						break;
 					case 2:
 						//Paros por duracion
 						archivo = pros.getProperty("duracion");
+						titulo = "Duracion";
 						break;
 					default:
 						JOptionPane.showMessageDialog(null, "Debe elegir un tipo de Paro");
@@ -145,7 +156,7 @@ public class Reportes extends JInternalFrame {
 					
 					JasperViewer jv = new JasperViewer(jp, false);
 					jv.setVisible(true);
-					jv.setTitle("Reporte de Paros ");
+					jv.setTitle("Reporte de Paros por " + titulo);
 					}
 					catch (JRException ex) {
 					Logger.getLogger(Reportes.class.getName()).log(Level.SEVERE, null, ex);
@@ -170,7 +181,7 @@ public class Reportes extends JInternalFrame {
 		comboBoxTipoReporte = new JComboBox<String>();
 		comboBoxTipoReporte.setModel(new DefaultComboBoxModel<String>(new String[] {"Rango de Fecha", "Frecuentes", "Duracion"}));
 		comboBoxTipoReporte.setSelectedIndex(-1);
-		comboBoxTipoReporte.setFont(new Font("Verdana", Font.BOLD, 12));
+		comboBoxTipoReporte.setFont(new Font("Verdana", Font.PLAIN, 12));
 		GroupLayout gl_panelInformes = new GroupLayout(panelInformes);
 		gl_panelInformes.setHorizontalGroup(
 			gl_panelInformes.createParallelGroup(Alignment.LEADING)
@@ -285,6 +296,7 @@ public class Reportes extends JInternalFrame {
 					int fila = tablaResultado.getSelectedRow();
 					int columna = tablaResultado.getSelectedColumn();
 					
+					int codigo = 0;
 					String tiempoInicio = "";
 					String solucion = "";
 					String descripcionAdicional = "";
@@ -294,6 +306,7 @@ public class Reportes extends JInternalFrame {
 					
 					for(int i = 0; i < columna; i++) {
 						
+						codigo = (int)tablaResultado.getValueAt(fila, 0);
 						disciplina = String.valueOf(tablaResultado.getValueAt(fila, 5));
 						causa = String.valueOf(tablaResultado.getValueAt(fila, 6));
 						descripcionAdicional = String.valueOf(tablaResultado.getValueAt(fila, 7));
@@ -301,18 +314,14 @@ public class Reportes extends JInternalFrame {
 					    tiempoFin = String.valueOf(tablaResultado.getValueAt(fila, 9));
 					    solucion = String.valueOf(tablaResultado.getValueAt(fila, 10));
 					}
-					
-					System.out.println("Fecha Inicio: " + tiempoInicio);
-					System.out.println("Fecha Fin: " + tiempoFin);
-					System.out.println("Descripcion Adicional: " + descripcionAdicional);
-					System.out.println("Causa: " + causa);
-					System.out.println("Disciplina: " + disciplina);
+
 				
-					ModificacionParo modificacion = new ModificacionParo(new Paro(tiempoInicio, tiempoFin, solucion, 
-							causa, descripcionAdicional, disciplina), new AdministracionParos());
+					ModificacionParo modificacion = new ModificacionParo(new Paro(codigo, tiempoInicio, tiempoFin, 
+							solucion, causa, descripcionAdicional, disciplina), new AdministracionParos());
 					
 					modificacion.setVisible(true);
 					e.consume();
+
 				}
 			}
 		});

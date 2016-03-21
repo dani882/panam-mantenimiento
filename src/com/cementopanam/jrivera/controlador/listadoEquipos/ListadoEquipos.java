@@ -38,15 +38,17 @@ public class ListadoEquipos {
 		ArrayList<NombreEquipo> listaEquipo = new ArrayList<NombreEquipo>();
 
 		try {
+			
 			con = cbd.conectarABaseDatos();
 			cs = con.prepareCall("{call sp_buscar_equipo(?)}");
 			
 			cs.setString(1, codigo);
 			rs = cs.executeQuery();
 			
-			
 			while(rs.next()) {
-				listaEquipo.add(new NombreEquipo(rs.getString(2), rs.getString(3)));
+				
+				listaEquipo.add(new NombreEquipo(rs.getString(1), rs.getString(2),
+						rs.getString(3), rs.getString(4)));
 				}
 			}
 			
