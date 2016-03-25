@@ -54,6 +54,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
 import javax.swing.ImageIcon;
+import javax.swing.JSplitPane;
 
 public class Reportes extends JInternalFrame {
 	
