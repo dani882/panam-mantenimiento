@@ -1,6 +1,7 @@
 package com.cementopanam.jrivera.vista;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -33,6 +34,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
 import com.cementopanam.jrivera.controlador.CapturaUsuario;
 import com.cementopanam.jrivera.vista.helper.JStatusBar;
 import com.cementopanam.jrivera.vista.helper.TimerThread;
@@ -57,6 +60,7 @@ public class Principal extends JFrame implements Runnable{
 	public JButton btnAdministrar;
 	
 	public static JLabel usuarioActual = new JLabel();
+	private Logger logger = Logger.getLogger(this.getClass());
 	
 	private JButton btnCerrarSession;
 	
@@ -113,6 +117,7 @@ public class Principal extends JFrame implements Runnable{
 				detenerHiloStatusBar();
 			}
 		});
+		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Principal.class.getResource("/imagenes/logo-panam.png")));
 		setTitle("Mantenimiento - Imputaciones de Paro");
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -317,6 +322,14 @@ public class Principal extends JFrame implements Runnable{
 		}
 		else {JOptionPane.showMessageDialog(null, "Hay un problema con las fechas");}
 	}
+	
+    public JDesktopPane getDesktopPane() {
+        return desktopPane;
+    }
+ 
+    public void setDesktopPane(JDesktopPane desktopPane) {
+        this.desktopPane = desktopPane;
+    }
 
 	@Override
 	public void run() {

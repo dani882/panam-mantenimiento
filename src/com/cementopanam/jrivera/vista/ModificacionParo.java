@@ -2,6 +2,7 @@ package com.cementopanam.jrivera.vista;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -10,10 +11,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.GroupLayout;
-import javax.swing.ImageIcon;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -53,11 +55,13 @@ public class ModificacionParo extends JDialog {
 	private int codigoCausa;
 	
 	private AdministracionParos admParo;
+	private JDesktopPane pane;
 	
-	public ModificacionParo(Paro modificacion, AdministracionParos paroDB) {
+	public ModificacionParo(Paro modificacion, AdministracionParos paroDB, JDesktopPane pane) {
 		
 		this();
 		admParo = paroDB;
+		this.pane = pane;
 		
 		try {
 			
@@ -98,7 +102,7 @@ public class ModificacionParo extends JDialog {
 		
 		getContentPane().setFont(new Font("Verdana", Font.PLAIN, 12));
 		setTitle("Modificar Paro");
-		setModal(true);
+	//	setModal(true);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -226,7 +230,8 @@ public class ModificacionParo extends JDialog {
 				cancelButton = new JButton("Cancelar");
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						dispose();
+						
+						mostrarReporte();
 					}
 				});
 				cancelButton.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -234,6 +239,16 @@ public class ModificacionParo extends JDialog {
 				buttonPane.add(cancelButton);
 			}
 		}
+	}
+
+	protected void mostrarReporte() {
+		
+		Reportes repo = new Reportes();
+		pane.add(repo);
+		repo.toFront();
+		repo.setVisible(true);
+		dispose();
+		
 	}
 
 	/**
@@ -256,9 +271,7 @@ public class ModificacionParo extends JDialog {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Paro Actualizado correctamente");
 				
-				Reportes repo = new Reportes();
-				repo.setVisible(true);
-				this.dispose();
+				mostrarReporte();
 			}
 			else {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));

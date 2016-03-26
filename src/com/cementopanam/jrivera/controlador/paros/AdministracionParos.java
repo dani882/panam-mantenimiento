@@ -75,10 +75,8 @@ public class AdministracionParos extends ManipulacionDatos{
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		}
-		
 		return lista;
 	}
-	
 	
 	public boolean modificarParo(Paro p, int idCausa) throws SQLException {
 		
@@ -86,6 +84,7 @@ public class AdministracionParos extends ManipulacionDatos{
 			return false;
 		}
 		
+		//Busca ID de Disciplina
 		int idDisciplina = Integer.parseInt(buscarIndice(p.getDisciplina(), "disciplina"));
 		
 		try {
@@ -117,7 +116,6 @@ public class AdministracionParos extends ManipulacionDatos{
 			con.rollback();
 			return false;
 		}
-		
 		return true;
 	}
 	
@@ -144,10 +142,9 @@ public class AdministracionParos extends ManipulacionDatos{
 		
 		cs.setString(1, causa);
 		cs.setString(2, descripcion);
-		
 		cs.registerOutParameter(3, java.sql.Types.VARCHAR);
-		cs.executeQuery();
 		
+		cs.executeQuery();
 		resultado = cs.getString(3);
 		
 		} catch (SQLException sqle) {

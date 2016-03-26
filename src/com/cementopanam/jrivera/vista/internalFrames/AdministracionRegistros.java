@@ -1,7 +1,6 @@
 package com.cementopanam.jrivera.vista.internalFrames;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,13 +14,13 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
@@ -30,8 +29,10 @@ import javax.swing.border.TitledBorder;
 
 import com.cementopanam.jrivera.controlador.AdministracionUsuario;
 import com.cementopanam.jrivera.controlador.Usuario;
+import com.cementopanam.jrivera.vista.ModificacionUsuario;
 import com.cementopanam.jrivera.vista.Principal;
-import javax.swing.JFrame;
+
+import net.miginfocom.swing.MigLayout;
 
 public class AdministracionRegistros extends JInternalFrame {
 
@@ -49,6 +50,7 @@ public class AdministracionRegistros extends JInternalFrame {
 
 	private AdministracionUsuario admUsuario = new AdministracionUsuario();
 	private final ButtonGroup buttonGroup = new ButtonGroup();
+	private JTextField textField;
 	/**
 	 * Crea el frame.
 	 */
@@ -71,6 +73,18 @@ public class AdministracionRegistros extends JInternalFrame {
 		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		tabbedPane.setFont(new Font("Verdana", Font.PLAIN, 12));
 		getContentPane().add(tabbedPane);
+		
+		JPanel panelRegistros = new JPanel();
+		tabbedPane.addTab("Registros", null, panelRegistros, null);
+		panelRegistros.setLayout(new MigLayout("", "[30px][grow]", "[14px][]"));
+		
+		JLabel lblCausa = new JLabel("Causa");
+		lblCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
+		panelRegistros.add(lblCausa, "cell 0 1,alignx trailing,aligny top");
+		
+		textField = new JTextField();
+		panelRegistros.add(textField, "cell 1 1,growx");
+		textField.setColumns(10);
 		
 		JPanel panelUsuarios = new JPanel();
 		tabbedPane.addTab("Usuarios", null, panelUsuarios, null);
@@ -206,7 +220,11 @@ public class AdministracionRegistros extends JInternalFrame {
 		buttonGuardarUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
 		
 		JButton btnEditar = new JButton("Editar");
-		btnEditar.setEnabled(false);
+		btnEditar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new ModificacionUsuario();
+			}
+		});
 		btnEditar.setBounds(191, 11, 152, 41);
 		layeredPaneBotones.add(btnEditar);
 		btnEditar.setIcon(new ImageIcon(AdministracionRegistros.class.getResource("/iconos32x32/edit-male-user-icon32x32.png")));

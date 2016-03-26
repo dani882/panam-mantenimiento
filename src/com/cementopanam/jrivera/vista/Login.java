@@ -52,11 +52,11 @@ public class Login extends JFrame {
 	private JPanel contentPane;
 	
 	private JTextField txtUsuario;
-	private JPasswordField passwordField;
+	private JPasswordField pwdClave;
 	
 	private JLabel lblContrasena;
-	private JLabel label;
-	private JLabel label_1;
+	private JLabel lblUsuario;
+	private JLabel lblLogo;
 	private JLabel lblIncorrecto;
 	
 	private JButton btnAcceder;
@@ -140,11 +140,9 @@ public class Login extends JFrame {
 	}
 	
 	public boolean validarUsuario() {
-		
-		boolean resultado = false;
 	
 		String usuario = txtUsuario.getText();
-		char[] password = passwordField.getPassword();
+		char[] password = pwdClave.getPassword();
 		
 		String clave = "";
 		
@@ -159,7 +157,9 @@ public class Login extends JFrame {
 	    	//si los datos son correctos, entra al formulario
 			if(rs.next()) {
 				int tipoUsuario = rs.getInt("id_tipo_usuario");
-				if (tipoUsuario == 1) { 
+				String estadoUsuario = rs.getString("estatus");
+				
+				if (tipoUsuario == 1 && estadoUsuario.equalsIgnoreCase("activo")) { 
 					// Interfaz de Administrador
 					System.out.println("Es Administrador");
 					guardarUsuario();
@@ -167,56 +167,65 @@ public class Login extends JFrame {
 					SwingUtilities.invokeLater(p);
 					md.cerrarConexiones();
 	
-					p.usuarioActual.setText(getNombreUsuario().toLowerCase());
+					Principal.usuarioActual.setText(getNombreUsuario());
 					p.setVisible(true);
 					dispose();
-					return resultado = true;
+					return true;
 				}
-				else if (tipoUsuario == 2) {
+				else if (tipoUsuario == 2 && estadoUsuario.equalsIgnoreCase("activo")) {
 					// Interfaz de el Operador
 					System.out.println("Es Operador");
 					guardarUsuario();
 					
-					p.usuarioActual.setText(getNombreUsuario().toLowerCase());
+					Principal.usuarioActual.setText(getNombreUsuario());
 					p.btnReportes.setVisible(false);
 					p.btnAdministrar.setVisible(false);
 		
 					SwingUtilities.invokeLater(p);
 					p.setVisible(true);
 					dispose();
-					return resultado = true;
+					return true;
 				}
-				else if (tipoUsuario == 3) {
+				else if (tipoUsuario == 3 && estadoUsuario.equalsIgnoreCase("activo")) {
 					// Interfaz de el Consultor
 					System.out.println("Es Consultor");
 					
 					SwingUtilities.invokeLater(p);
 					
-					p.usuarioActual.setText(getNombreUsuario().toLowerCase());
+					Principal.usuarioActual.setText(getNombreUsuario());
 					p.btnImputaciones.setVisible(false);
 					p.btnAdministrar.setVisible(false);
 					p.setVisible(true);
 					dispose();
-					return resultado = true;
+					return true;
 				}
 				else {
-					lblIncorrecto.setText("El Usuario no esta en rol");
-					return resultado;
+					lblIncorrecto.setVisible(true);
+					lblIncorrecto.setText("El Usuario no esta activo");
+					return false;
 				}
 			}
+			
 			else {
 				lblIncorrecto.setVisible(true);
 				lblIncorrecto.setText("Credenciales invalidos!");
-				return resultado;
-			    }
-		} catch (SQLException e1) {
-			JOptionPane.showMessageDialog(null, e1);
-			return resultado;
-		}		
+				return false;
+			}
+		} 
+		catch (SQLException sqle) {
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
 	}
 
 	private String getNombreUsuario() {
-		return txtUsuario.getText();
+		return txtUsuario.getText().toLowerCase();
 	}
 
 	private void initComponents() {
@@ -247,23 +256,35 @@ public class Login extends JFrame {
 		lblContrasena.setFont(new Font("Verdana", Font.PLAIN, 12));
 		lblContrasena.setBounds(267, 118, 103, 21);
 		contentPane.add(lblContrasena);
+		
+		lblLogo = new JLabel("");
+		lblLogo.setIcon(new ImageIcon(Login.class.getResource("/imagenes/logo-panam.png")));
+		lblLogo.setBounds(12, 12, 234, 180);
+		contentPane.add(lblLogo);
+		
+		lblIncorrecto = new JLabel("");
+		lblIncorrecto.setForeground(Color.RED);
+		lblIncorrecto.setVisible(false);
+		lblIncorrecto.setFont(new Font("Nimbus Roman No9 L", Font.BOLD, 16));
+		lblIncorrecto.setBounds(12, 178, 518, 21);
+		contentPane.add(lblIncorrecto);
 				
 		txtUsuario = new JTextField();
 		txtUsuario.setBounds(363, 76, 167, 30);
 		contentPane.add(txtUsuario);
 		txtUsuario.setColumns(10);
 				
-		label = new JLabel("Usuario");
-		label.setFont(new Font("Verdana", Font.PLAIN, 12));
-		label.setBounds(267, 80, 63, 21);
-		contentPane.add(label);
+		lblUsuario = new JLabel("Usuario");
+		lblUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
+		lblUsuario.setBounds(267, 80, 63, 21);
+		contentPane.add(lblUsuario);
 
-		passwordField = new JPasswordField();
-		passwordField.setEchoChar('*');
+		pwdClave = new JPasswordField();
+		pwdClave.setEchoChar('*');
 		//passwordField.setHint("Contrase\u00F1a");
-		passwordField.setBounds(363, 111, 167, 30);
-		contentPane.add(passwordField);
-		passwordField.addKeyListener(new KeyAdapter() {
+		pwdClave.setBounds(363, 111, 167, 30);
+		contentPane.add(pwdClave);
+		pwdClave.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				passwordFieldKeyPressed(e);
 				}
@@ -283,20 +304,7 @@ public class Login extends JFrame {
 	        });
 
 		btnAcceder.setBounds(363, 224, 167, 42);
-		contentPane.add(btnAcceder);
-		
-		label_1 = new JLabel("");
-		label_1.setIcon(new ImageIcon(Login.class.getResource("/imagenes/logo-panam.png")));
-		label_1.setBounds(12, 12, 234, 180);
-		contentPane.add(label_1);
-		
-		lblIncorrecto = new JLabel("");
-		lblIncorrecto.setForeground(Color.RED);
-		lblIncorrecto.setVisible(false);
-		lblIncorrecto.setFont(new Font("Nimbus Roman No9 L", Font.BOLD, 16));
-		lblIncorrecto.setBounds(12, 178, 518, 21);
-		contentPane.add(lblIncorrecto);
-
+		contentPane.add(btnAcceder);	
 	}
 
     private void passwordFieldKeyPressed(KeyEvent e) {
@@ -311,19 +319,16 @@ public class Login extends JFrame {
     }
     
     private boolean guardarUsuario() {
-    	
-    	boolean resultado = false;
+
 		//Serializa la clase para retener el valor del usuario
 		captura.nombreUsuario = txtUsuario.getText();
 		try(FileOutputStream archivoEntrada = new FileOutputStream(captura.obtenerNombrePC() +".ser");
 				ObjectOutputStream out = new ObjectOutputStream(archivoEntrada);) {
 
 	        out.writeObject(captura);
-	        resultado = true;
 	      } catch(IOException e) {
-	    	  return resultado;
+	    	  return false;
 	      }
-		return resultado;
- 
+		return true;
     }
 }

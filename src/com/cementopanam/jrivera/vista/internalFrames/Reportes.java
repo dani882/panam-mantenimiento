@@ -316,12 +316,14 @@ public class Reportes extends JInternalFrame {
 					    solucion = String.valueOf(tablaResultado.getValueAt(fila, 10));
 					}
 
-				
 					ModificacionParo modificacion = new ModificacionParo(new Paro(codigo, tiempoInicio, tiempoFin, 
-							solucion, causa, descripcionAdicional, disciplina), new AdministracionParos());
+							solucion, causa, descripcionAdicional, disciplina), new AdministracionParos(),
+							getDesktopPane());
 					
 					modificacion.setVisible(true);
 					e.consume();
+					
+					setVisible(false);
 
 				}
 			}
@@ -375,5 +377,8 @@ public class Reportes extends JInternalFrame {
 		busquedaDCFechaDesde.setEnabled(false);
 		panelRangoFecha.add(busquedaDCFechaDesde);
 		setBounds(60, 26, 850, 663);
+		
+		//Actualiza el JTable
+		modeloParo.fireTableDataChanged();
 	}
 }
