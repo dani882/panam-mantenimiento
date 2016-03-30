@@ -1,7 +1,6 @@
 package com.cementopanam.jrivera.vista;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -36,7 +35,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
 
-import com.cementopanam.jrivera.controlador.CapturaUsuario;
+import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.vista.helper.JStatusBar;
 import com.cementopanam.jrivera.vista.helper.TimerThread;
 import com.cementopanam.jrivera.vista.internalFrames.AdministracionRegistros;

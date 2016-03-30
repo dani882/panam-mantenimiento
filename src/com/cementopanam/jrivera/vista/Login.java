@@ -29,9 +29,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-import com.cementopanam.jrivera.controlador.CapturaUsuario;
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
-import com.cementopanam.jrivera.vista.internalFrames.Imputaciones;
+import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.jtattoo.plaf.acryl.AcrylLookAndFeel;
 
 /**

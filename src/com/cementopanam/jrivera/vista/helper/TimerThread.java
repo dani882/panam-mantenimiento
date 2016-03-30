@@ -3,6 +3,7 @@ package com.cementopanam.jrivera.vista.helper;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -14,7 +15,7 @@ public class TimerThread extends Thread {
     protected JLabel lblFecha;
     protected JLabel lblTiempo;
     
-    protected SimpleDateFormat formatoFecha = new SimpleDateFormat("EEE, d MMM yyyy");
+    protected SimpleDateFormat formatoFecha = new SimpleDateFormat("EEE, dd 'de' MMMM 'de' yyyy", new Locale("ES"));
     protected SimpleDateFormat formatoTiempo = new SimpleDateFormat("h:mm:ss a");
 
     public TimerThread(JLabel dateLabel, JLabel timeLabel) {
@@ -41,8 +42,7 @@ public class TimerThread extends Thread {
 
             try {
                 Thread.sleep(1000L);
-            } catch (InterruptedException e) {
-            }
+            } catch (InterruptedException e) {}
         }
     }
 

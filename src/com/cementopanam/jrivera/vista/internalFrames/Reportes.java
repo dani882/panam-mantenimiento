@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyVetoException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
@@ -23,6 +22,7 @@ import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
@@ -53,8 +53,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
-import javax.swing.ImageIcon;
-import javax.swing.JSplitPane;
 
 public class Reportes extends JInternalFrame {
 	
@@ -320,11 +318,9 @@ public class Reportes extends JInternalFrame {
 							solucion, causa, descripcionAdicional, disciplina), new AdministracionParos(),
 							getDesktopPane());
 					
-					modificacion.setVisible(true);
+					dispose();
 					e.consume();
-					
-					setVisible(false);
-
+					modificacion.setVisible(true);
 				}
 			}
 		});
@@ -341,7 +337,6 @@ public class Reportes extends JInternalFrame {
 			public void actionPerformed(ActionEvent e) {
 				
 				modeloParo.buscar("");
-				
 				
 			}
 		});

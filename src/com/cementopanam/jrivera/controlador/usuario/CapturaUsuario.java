@@ -1,4 +1,4 @@
-package com.cementopanam.jrivera.controlador;
+package com.cementopanam.jrivera.controlador.usuario;
 
 import java.io.Serializable;
 import java.net.InetAddress;

@@ -27,8 +27,8 @@ import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import com.cementopanam.jrivera.controlador.AdministracionUsuario;
-import com.cementopanam.jrivera.controlador.Usuario;
+import com.cementopanam.jrivera.controlador.usuario.AdministracionUsuario;
+import com.cementopanam.jrivera.controlador.usuario.Usuario;
 import com.cementopanam.jrivera.vista.ModificacionUsuario;
 import com.cementopanam.jrivera.vista.Principal;
 
@@ -43,7 +43,7 @@ public class AdministracionRegistros extends JInternalFrame {
 	private JTextField textFieldNombreUsuario;
 	private JPasswordField passwordFieldContrasena;
 	private JPasswordField passwordFieldConfirmarContrasena;
-	private JComboBox comboBoxTipoUsuario;
+	private JComboBox<?> comboBoxTipoUsuario;
 	private JTextField textFieldNombreEmpleado;
 	private JTextField textFieldApellidoEmpleado;
 	private JTextField textFieldCodigoEmpleado;
@@ -91,7 +91,9 @@ public class AdministracionRegistros extends JInternalFrame {
 		
 		JLayeredPane layeredPaneInformacionAcceso = new JLayeredPane();
 		layeredPaneInformacionAcceso.setLayout(null);
-		layeredPaneInformacionAcceso.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229), 2, true), "Informacion de Acceso", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
+		layeredPaneInformacionAcceso.setBorder(new TitledBorder(
+				new LineBorder(new Color(184, 207, 229), 2, true), "Informacion de Acceso", 
+				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
 		
 		JLabel labelNombreUsuario = new JLabel("Nombre de Usuario");
 		labelNombreUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -110,7 +112,7 @@ public class AdministracionRegistros extends JInternalFrame {
 		layeredPaneInformacionAcceso.add(textFieldNombreUsuario);
 		
 		String[] tipoUsuarios = {"Administrador", "Operador", "Consultor"};
-		comboBoxTipoUsuario = new JComboBox(tipoUsuarios);
+		comboBoxTipoUsuario = new JComboBox<Object>(tipoUsuarios);
 		comboBoxTipoUsuario.setSelectedIndex(-1);
 		comboBoxTipoUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
 		comboBoxTipoUsuario.setBounds(10, 110, 147, 30);
@@ -131,7 +133,9 @@ public class AdministracionRegistros extends JInternalFrame {
 		
 		JLayeredPane layeredPaneDatosEmpleado = new JLayeredPane();
 		layeredPaneDatosEmpleado.setLayout(null);
-		layeredPaneDatosEmpleado.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229), 2, true), "Datos de Empleado", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
+		layeredPaneDatosEmpleado.setBorder(new TitledBorder(new LineBorder(
+				new Color(184, 207, 229), 2, true), "Datos de Empleado", TitledBorder.LEADING, 
+				TitledBorder.TOP, null, new Color(51, 51, 51)));
 		
 		JLabel labelCodigoEmpleado = new JLabel("Codigo Empleado");
 		labelCodigoEmpleado.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -177,7 +181,8 @@ public class AdministracionRegistros extends JInternalFrame {
 							.addComponent(layeredPaneBotones, GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
 							.addGap(20))
 						.addGroup(gl_panelUsuarios.createSequentialGroup()
-							.addComponent(layeredPaneInformacionAcceso, GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
+							.addComponent(layeredPaneInformacionAcceso, GroupLayout.DEFAULT_SIZE, 523, 
+									Short.MAX_VALUE)
 							.addContainerGap())))
 		);
 		gl_panelUsuarios.setVerticalGroup(
@@ -186,7 +191,8 @@ public class AdministracionRegistros extends JInternalFrame {
 					.addContainerGap()
 					.addComponent(layeredPaneDatosEmpleado, GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
 					.addGap(18)
-					.addComponent(layeredPaneInformacionAcceso, GroupLayout.PREFERRED_SIZE, 172, GroupLayout.PREFERRED_SIZE)
+					.addComponent(layeredPaneInformacionAcceso, GroupLayout.PREFERRED_SIZE, 172,
+							GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
 					.addComponent(layeredPaneBotones, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
@@ -203,7 +209,8 @@ public class AdministracionRegistros extends JInternalFrame {
 				limpiarCamposUsuario();
 			}
 		});
-		btnLimpiar.setIcon(new ImageIcon(AdministracionRegistros.class.getResource("/iconos32x32/clean32x32.png")));
+		btnLimpiar.setIcon(new ImageIcon(
+				AdministracionRegistros.class.getResource("/iconos32x32/clean32x32.png")));
 		btnLimpiar.setBounds(351, 11, 152, 41);
 		layeredPaneBotones.add(btnLimpiar);
 		btnLimpiar.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -216,18 +223,24 @@ public class AdministracionRegistros extends JInternalFrame {
 				agregarUsuario();
 			}
 		});
-		buttonGuardarUsuario.setIcon(new ImageIcon(AdministracionRegistros.class.getResource("/iconos32x32/registroUsuario32x32.png")));
+		buttonGuardarUsuario.setIcon(new ImageIcon(
+				AdministracionRegistros.class.getResource("/iconos32x32/registroUsuario32x32.png")));
 		buttonGuardarUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
 		
 		JButton btnEditar = new JButton("Editar");
 		btnEditar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new ModificacionUsuario();
+				
+				String usuarioActual = Principal.usuarioActual.getText();
+				
+				ModificacionUsuario modUsuario = new ModificacionUsuario();
+				modUsuario.setVisible(true);
 			}
 		});
 		btnEditar.setBounds(191, 11, 152, 41);
 		layeredPaneBotones.add(btnEditar);
-		btnEditar.setIcon(new ImageIcon(AdministracionRegistros.class.getResource("/iconos32x32/edit-male-user-icon32x32.png")));
+		btnEditar.setIcon(new ImageIcon(
+				AdministracionRegistros.class.getResource("/iconos32x32/edit-male-user-icon32x32.png")));
 		btnEditar.setFont(new Font("Verdana", Font.PLAIN, 12));
 		panelUsuarios.setLayout(gl_panelUsuarios);
 	}
@@ -253,7 +266,7 @@ public class AdministracionRegistros extends JInternalFrame {
 		if (Arrays.equals(passwordFieldContrasena.getPassword(), passwordFieldConfirmarContrasena.getPassword())) {
 			  return true;
 			}
-		else	return false;
+		else return false;
 	}
 	
 	private void limpiarCamposUsuario() {
@@ -271,7 +284,6 @@ public class AdministracionRegistros extends JInternalFrame {
 	
 	private boolean agregarUsuario() {
 		
-		boolean resultado = false;
 		//TODO Realizar la comprobacion de si estan todos los campos rellenados
 		try{
 			
@@ -291,43 +303,46 @@ public class AdministracionRegistros extends JInternalFrame {
 			if(validarPassword() == false) {
 				JOptionPane.showMessageDialog(null, "La clave de usuario no coincide", "Clave de Usuario", 
 						JOptionPane.WARNING_MESSAGE);
-				return resultado;
+				return false;
 			}
 			
-			Usuario usuario = new Usuario(codEmpleado, nombreEmpleado, apellidoEmpleado, nombreUsuario, clave, tipoUsuario);
+			Usuario usuario = new Usuario(codEmpleado, nombreEmpleado, apellidoEmpleado, 
+					nombreUsuario, clave, tipoUsuario);
 			
 			if(admUsuario.registrarUsuario(usuario) == true) {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Usuario " +nombreUsuario+ " creado correctamente");
 				limpiarCamposUsuario();
-				resultado = true;
+				return true;
 			}
 			else{
-				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+				Principal.lblStatusBar.setIcon(new ImageIcon(
+						getClass().getResource("/iconos16x16/warning-icon.png")));
 				Principal.lblStatusBar.setText("No se pudo completar la operacion");
 			}
 		}
 		catch(SQLException sqle) {
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
-			resultado = false;
+			return false;
 		}
 		
 		catch(NumberFormatException nfe) {
 			JOptionPane.showMessageDialog(null, "Formato de entrada de datos no valido", "Entrada datos invalida",
 				JOptionPane.ERROR_MESSAGE);
-			resultado = false;
+			return false;
 		}
 		
 		catch(NullPointerException npe) {
 			JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos", "Rellenar campos",
 					JOptionPane.ERROR_MESSAGE);
+			return false;
 			}
 		catch(Exception e1) {
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
-			resultado = false;
+			return false;
 		}
-		return resultado;
+		return true;
 	}
 }

@@ -3,30 +3,23 @@ package com.cementopanam.jrivera.vista;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
-import com.cementopanam.jrivera.controlador.listadoEquipos.ListadoEquipos;
 import com.cementopanam.jrivera.modelo.ConeccionBD;
 import com.cementopanam.jrivera.vista.helper.tablaModelo.TablaModeloEquipos;
-
-import javax.swing.JTextField;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.FlowLayout;
-import javax.swing.BoxLayout;
 
 public class NombreEquipo extends JDialog {
 

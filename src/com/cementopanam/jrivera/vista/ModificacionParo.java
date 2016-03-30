@@ -2,7 +2,6 @@ package com.cementopanam.jrivera.vista;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -98,11 +97,12 @@ public class ModificacionParo extends JDialog {
 		comboBoxDisciplina.setSelectedItem(String.valueOf(modificacion.getDisciplina()));
 	}
 	
+	@SuppressWarnings("unchecked")
 	public ModificacionParo() {
 		
 		getContentPane().setFont(new Font("Verdana", Font.PLAIN, 12));
 		setTitle("Modificar Paro");
-	//	setModal(true);
+		setModal(true);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setFont(new Font("Verdana", Font.PLAIN, 12));

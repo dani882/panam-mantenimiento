@@ -60,10 +60,7 @@ public class ManipulacionDatos {
 		String sql = "";
 		try {
 			con = cbd.conectarABaseDatos();
-		/*} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
-					JOptionPane.ERROR_MESSAGE);
-		}*/
+
 			if(sentencia.equalsIgnoreCase("area") && indice == 0) {
 				
 				sql = "SELECT * FROM mantenimientodb.area;";
