@@ -10,6 +10,8 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -26,8 +28,10 @@ import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -39,6 +43,7 @@ import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.vista.helper.JStatusBar;
 import com.cementopanam.jrivera.vista.helper.TimerThread;
 import com.cementopanam.jrivera.vista.internalFrames.AdministracionRegistros;
+import com.cementopanam.jrivera.vista.internalFrames.AdministracionUsuarios;
 import com.cementopanam.jrivera.vista.internalFrames.Imputaciones;
 import com.cementopanam.jrivera.vista.internalFrames.Reportes;
 
@@ -49,10 +54,15 @@ public class Principal extends JFrame implements Runnable{
 	 * 
 	 */
 	private static final long serialVersionUID = 5631455790428057770L;
-	private com.cementopanam.jrivera.vista.internalFrames.AdministracionRegistros admRegistros;
-	private com.cementopanam.jrivera.vista.internalFrames.Imputaciones imputaciones;
-	private com.cementopanam.jrivera.vista.internalFrames.Reportes reportes;
-	private com.cementopanam.jrivera.vista.Autor author;
+	private AdministracionUsuarios admUsuario;
+	private AdministracionRegistros admRegistros;
+	private Imputaciones imputaciones;
+	private Reportes reportes;
+	private Autor author;
+	
+	final JPopupMenu menu = new JPopupMenu();
+	private JMenuItem itemRegistros;
+	private JMenuItem itemUsuario;
 
 	public JButton btnImputaciones;
 	public JButton btnReportes;
@@ -181,16 +191,47 @@ public class Principal extends JFrame implements Runnable{
 			}
 		});
 		
-		btnAdministrar = new JButton("");
-		btnAdministrar.setFont(new Font("Verdana", Font.PLAIN, 12));
-		btnAdministrar.addActionListener(new ActionListener() {
+		menu.setLightWeightPopupEnabled(false);
+		// Popup Menu item Registros
+		itemRegistros = new JMenuItem("Registros");
+		itemRegistros.setFont(new Font("Verdana", Font.PLAIN, 12));
+		itemRegistros.setIcon(new ImageIcon(Principal.class.getResource("/iconos32x32/excavadora32x32.png")));
+	    menu.add(itemRegistros);
+	    
+	    menu.addSeparator();
+	    // Popup Menu item Usuario
+	    itemUsuario = new JMenuItem("Usuario");
+	    itemRegistros.setFont(new Font("Verdana", Font.PLAIN, 12));
+	    itemUsuario.setIcon(new ImageIcon(Principal.class.getResource("/iconos32x32/user32x32.png")));
+	    menu.add(itemUsuario);
+		
+	    itemUsuario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				btnAdministrarActionPerformed(e);
+				admUsuario.setVisible(true);
 
 			}
 		});
-		btnAdministrar.setToolTipText("Administracion Registros");
+		
+		itemRegistros.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				admRegistros.setVisible(true);
+
+			}
+		});
+		btnAdministrar = new JButton("");
+		btnAdministrar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent evt) {
+				// Muestra el popup Menu
+			       if (!evt.isPopupTrigger()) {
+			           menu.show(evt.getComponent(), evt.getX() + 20, evt.getY());
+			         }
+			}
+		});
+		btnAdministrar.setFont(new Font("Verdana", Font.PLAIN, 12));
+		btnAdministrar.setToolTipText("Administracion Registros y Usuarios");
 		btnAdministrar.setIcon(new ImageIcon(Principal.class.getResource("/iconos/Add-icon.png")));
 		panel_oeste.add(btnAdministrar);
 		
@@ -254,8 +295,10 @@ public class Principal extends JFrame implements Runnable{
 		reportes.setLocation(60, 5);
 		desktopPane.add(reportes);
 		
+		admUsuario = new AdministracionUsuarios();
+		desktopPane.add(admUsuario);
+		
 		admRegistros = new AdministracionRegistros();
-		admRegistros.setBounds(30, 60, 969, 570);
 		desktopPane.add(admRegistros);
 		
 		author = new Autor();
@@ -273,10 +316,6 @@ public class Principal extends JFrame implements Runnable{
 	
 	private void btnReportesActionPerformed(ActionEvent e) {
 		reportes.setVisible(true);
-    }
-	
-	private void btnAdministrarActionPerformed(ActionEvent e) {
-		admRegistros.setVisible(true);
     }
 	
 	private void btnAuthorActionPerformed(ActionEvent e) {
@@ -370,7 +409,7 @@ public class Principal extends JFrame implements Runnable{
 	    
 	    for (int i = min; i <= max; i++) {
 	      final int porcentaje = i;
-	     // int progress = (int)(((float)i / (float)ss.size()) * 100f);
+	     
 	      try {
 	        SwingUtilities.invokeLater(new Runnable() {
 	          public void run() {

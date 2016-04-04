@@ -47,6 +47,7 @@ import javax.swing.text.MaskFormatter;
 
 import com.cementopanam.jrivera.controlador.ComparacionFechas;
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
+import com.cementopanam.jrivera.controlador.usuario.AdministracionUsuario;
 import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.vista.NombreEquipo;
 import com.cementopanam.jrivera.vista.Principal;
@@ -70,6 +71,7 @@ public class Imputaciones extends JInternalFrame {
 
 	private CapturaUsuario captura = null;
 	private CapturaUsuario nombreHost = new CapturaUsuario();
+	private AdministracionUsuario admUsuario = new AdministracionUsuario();
 
 	private JButton btnIniciarParo;
 	private JButton btnDetenerParo;
@@ -311,14 +313,28 @@ public class Imputaciones extends JInternalFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				boolean resultado;
+				String usuarioActual = Principal.usuarioActual.getText();
 
 				try {
 
 					int fila = tablaParos.getSelectedRow();
 					int idParo = Integer.parseInt(String.valueOf(tablaParos.getValueAt(fila, 0)));
+					
+					String usuarioTabla = String.valueOf(tablaParos.getValueAt(fila, 1));
 					String fechaFin = formattedTextField_fechaFin.getText();
 					String fechaInicio = String.valueOf(tablaParos.getValueAt(fila, 5));
-
+					
+					
+					String tipoUsuario = mostrarUsuario(usuarioActual);
+					
+					if(usuarioActual.equals(usuarioTabla) || tipoUsuario.equals("administrador")) {
+						System.out.println("");
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "No tiene privilegios para modificar este paro");
+						return;
+					}
+					
 					resultado = md.actualizarParo(idParo, fechaFin, fechaInicio);
 
 					if (resultado == true) {
@@ -326,18 +342,22 @@ public class Imputaciones extends JInternalFrame {
 						Principal.lblStatusBar.setText("Paro Imputado correctamente");
 						limpiarCampos();
 						actualizarTabla(estatus[1]);
-					} else {
+					} 
+					else {
 						Principal.lblStatusBar
 								.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 						Principal.lblStatusBar.setText("No se pudo completar la operacion");
 					}
-				} catch (SQLException sqle) {
+				}
+				catch (SQLException sqle) {
 					JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
-				} catch (ArrayIndexOutOfBoundsException aiobe) {
+				}
+				catch (ArrayIndexOutOfBoundsException aiobe) {
 					JOptionPane.showMessageDialog(null, "Debe elegir un paro", aiobe.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
-				} catch (Exception e1) {
+				}
+				catch (Exception e1) {
 					JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
 				} finally {
@@ -878,12 +898,37 @@ public class Imputaciones extends JInternalFrame {
 				@Override
 				public void run() {
 					actualizarTabla(estatus[1]);
+					
+					//TODO Agregar visualizacion de Paros Pendientes en la Barra de Estado
 					System.out.println("Paros Pendiente: " + tablaParos.getRowCount());
 				}
 			});
 		}
 	}
-
+	
+	private String mostrarUsuario(String usuarioSeleccionado) {
+		
+		String tipoUsuario = "";
+		
+		try {
+			rs = admUsuario.mostrarUsuario(usuarioSeleccionado);
+			
+			if(rs.next()) {
+			
+				tipoUsuario = rs.getString("tipo_usuario");	
+			}
+		
+		} catch (SQLException sqle) {
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+		}
+		catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+		}
+		return tipoUsuario;
+	}
+	
 	public void updateBar(int newValue) {
 		Principal.pbar.setValue(newValue);
 	}

@@ -44,7 +44,7 @@ public class ModificacionUsuario extends JDialog {
 	private JPasswordField pwdClave;
 	private JPasswordField pwdRepetirClave;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
-	private JComboBox<String> cbTipoUsuario;
+	private JComboBox<Object> cbTipoUsuario;
 	
 	private String usuarioActual = Principal.usuarioActual.getText();
 	private JRadioButton rdbtnActivo;
@@ -72,14 +72,14 @@ public class ModificacionUsuario extends JDialog {
 		lblUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
 
 		cbUsuario = new JComboBox<String>();
+		cbUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
 		cbUsuario.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				
 				if (e.getStateChange() == ItemEvent.SELECTED) {
+
 					mostrarUsuario(String.valueOf(e.getItem()));
-					
-					System.out.println("Usuario seleccionado: " + e.getItem());
-					
+					mostrarUsuario();
 					
 				}
 			}
@@ -92,8 +92,10 @@ public class ModificacionUsuario extends JDialog {
 		lblRepetirClave.setFont(new Font("Verdana", Font.PLAIN, 12));
 
 		pwdClave = new JPasswordField();
+		pwdClave.setFont(new Font("Verdana", Font.PLAIN, 12));
 
 		pwdRepetirClave = new JPasswordField();
+		pwdRepetirClave.setFont(new Font("Verdana", Font.PLAIN, 12));
 
 		JLayeredPane layeredPane = new JLayeredPane();
 		layeredPane.setBorder(
@@ -102,37 +104,39 @@ public class ModificacionUsuario extends JDialog {
 		JLabel lblTipoDeUsuario = new JLabel("Tipo de Usuario");
 		lblTipoDeUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
 
-		cbTipoUsuario = new JComboBox<String>();
+		String[] tipoUsuarios = {"Administrador", "Operador", "Consultor"};
+		cbTipoUsuario = new JComboBox<Object>(tipoUsuarios);
 		cbTipoUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_contentPanel.createSequentialGroup()
 							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addComponent(lblClaveNueva, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addGap(20))
+									.addComponent(lblTipoDeUsuario, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.UNRELATED))
 								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addComponent(lblUsuario, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addGap(49))
-								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addComponent(lblRepetirClave, GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
-									.addGap(3)))
-							.addGap(0)
+									.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+										.addGroup(gl_contentPanel.createSequentialGroup()
+											.addComponent(lblClaveNueva, GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE)
+											.addGap(20))
+										.addGroup(gl_contentPanel.createSequentialGroup()
+											.addComponent(lblUsuario, GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE)
+											.addGap(49))
+										.addGroup(gl_contentPanel.createSequentialGroup()
+											.addComponent(lblRepetirClave, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+											.addGap(3)))
+									.addGap(0)))
 							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(pwdRepetirClave, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
-								.addComponent(pwdClave)
-								.addComponent(cbUsuario, Alignment.TRAILING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addComponent(lblTipoDeUsuario, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(layeredPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
-								.addComponent(cbTipoUsuario, 0, 174, Short.MAX_VALUE))))
-					.addGap(89))
+								.addComponent(pwdClave, Alignment.TRAILING, 175, 175, Short.MAX_VALUE)
+								.addComponent(cbUsuario, Alignment.TRAILING, 0, 175, Short.MAX_VALUE)
+								.addComponent(pwdRepetirClave, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+								.addComponent(cbTipoUsuario, 0, 175, Short.MAX_VALUE)))
+						.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE))
+					.addGap(83))
 		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
@@ -153,7 +157,7 @@ public class ModificacionUsuario extends JDialog {
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblTipoDeUsuario)
 						.addComponent(cbTipoUsuario, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addComponent(layeredPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
@@ -175,7 +179,8 @@ public class ModificacionUsuario extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("Aceptar");
+				JButton okButton = new JButton("Modificar");
+				okButton.setIcon(new ImageIcon(ModificacionUsuario.class.getResource("/iconos32x32/edit-male-user-icon32x32.png")));
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						modificarUsuario();
@@ -188,6 +193,7 @@ public class ModificacionUsuario extends JDialog {
 			}
 			{
 				JButton cancelButton = new JButton("Cancelar");
+				cancelButton.setIcon(new ImageIcon(ModificacionUsuario.class.getResource("/iconos32x32/fail32x32.png")));
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						dispose();
@@ -214,10 +220,13 @@ public class ModificacionUsuario extends JDialog {
 
 	private int obtenerTipoUsuario() {
 
+		//Elige un Administrador
 		if (cbTipoUsuario.getSelectedIndex() == 0) {
 			return 1;
+		//Elige un Operador
 		} else if (cbTipoUsuario.getSelectedIndex() == 1) {
 			return 2;
+		//Elige un Consultor
 		} else if (cbTipoUsuario.getSelectedIndex() == 2) {
 			return 3;
 		} else {
@@ -272,12 +281,21 @@ public class ModificacionUsuario extends JDialog {
 				"usuario"));
 		
 		try {
-			boolean resultado = admUsuario.modificarUsuario(new Usuario
-					(idUsuario, tipoUsuario, usuario, clave, estadoUsuario));
+			boolean resultado = false;
+			if(clave.length() == 0) {
+				
+				resultado = admUsuario.modificarUsuario(new Usuario
+						(idUsuario, tipoUsuario, usuario, null, estadoUsuario));
+			}
+			else{
+				resultado = admUsuario.modificarUsuario(new Usuario
+						(idUsuario, tipoUsuario, usuario, clave, estadoUsuario));
+			}
 			
 			if (resultado == true) {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Usuario " + usuario + " actualizado correctamente");
+				dispose();
 			} 
 			else {
 				Principal.lblStatusBar.setIcon(new ImageIcon(
@@ -304,15 +322,10 @@ public class ModificacionUsuario extends JDialog {
 			while(rs.next()) {
 				
 				cbUsuario.addItem(rs.getString("nombre_usuario"));
-				cbTipoUsuario.addItem(rs.getString("tipo_usuario"));
-				
-				//Verifica el estado del usuario
-				if(rs.getString("estatus").equalsIgnoreCase("activo")) {
-					rdbtnActivo.setSelected(true);
-				}
-				else{
-					rdbtnInactivo.setSelected(true);
-				}
+			}
+			//Elimina el item duplicado
+			if(cbUsuario.getItemAt(1).equals("admin")) {
+				cbUsuario.removeItemAt(1);;
 			}
 		}
 		catch(Exception e) {
@@ -327,12 +340,33 @@ public class ModificacionUsuario extends JDialog {
 			rs = admUsuario.mostrarUsuario(usuarioSeleccionado);
 			
 			if(rs.next()) {
-				cbTipoUsuario.setSelectedItem(rs.getString("tipo_usuario"));
+				
+				if(rs.getString("tipo_usuario").equalsIgnoreCase("administrador")) {
+					cbTipoUsuario.setSelectedIndex(0);
+				}
+				else if(rs.getString("tipo_usuario").equalsIgnoreCase("operador")) {
+					cbTipoUsuario.setSelectedIndex(1);
+				}
+				else if(rs.getString("tipo_usuario").equalsIgnoreCase("consultor")) {
+					cbTipoUsuario.setSelectedIndex(2);
+				}
+				
+				//Verifica el estado del usuario
+				if(rs.getString("estatus").equalsIgnoreCase("activo")) {
+					rdbtnActivo.setSelected(true);
+				}
+				else{
+					rdbtnInactivo.setSelected(true);
+				}	
 			}
 		
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (SQLException sqle) {
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+		}
+		catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }
