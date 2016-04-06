@@ -13,7 +13,7 @@ public class TablaModeloParo extends AbstractTableModel {
 	 * 
 	 */
 	private static final long serialVersionUID = -5597879599705517993L;
-	
+
 	private static final int CODIGO = 0;
 	private static final int USUARIO = 1;
 	private static final int AREA = 2;
@@ -24,34 +24,33 @@ public class TablaModeloParo extends AbstractTableModel {
 	private static final int DESCRIPCION_ADICIONAL = 7;
 	private static final int TINICIO = 8;
 	private static final int TFIN = 9;
-	private static final int SOLUCION =10;
-	
-	String[] columnas = {"Codigo", "Usuario", "Area", "SubArea", "Equipo", "Disciplina","Causa",
-			"Descripcion Adicional", "Tiempo de Inicio", "Tiempo de Fin",
-			"Solucion"};
-	
+	private static final int SOLUCION = 10;
+
+	String[] columnas = { "Codigo", "Usuario", "Area", "SubArea", "Equipo", "Disciplina", "Causa",
+			"Descripcion Adicional", "Tiempo de Inicio", "Tiempo de Fin", "Solucion" };
+
 	ArrayList<Paro> lista = null;
 	AdministracionParos paros = new AdministracionParos();
-	
+
 	public TablaModeloParo() {
 		lista = paros.mostrarParo();
 	}
-	
+
 	public void eliminar(int fila) {
 		lista.remove(fila);
 		fireTableRowsDeleted(fila, fila);
 	}
-	
+
 	public void agregar(Paro paro) {
 		lista.add(paro);
 		fireTableDataChanged();
 	}
-	
+
 	public void buscar(String codigo) {
-	//	lista = paros.mostrarParo(codigo);
+		// lista = paros.mostrarParo(codigo);
 		fireTableDataChanged();
 	}
-	
+
 	@Override
 	public String getColumnName(int x) {
 		return columnas[x];
@@ -69,10 +68,10 @@ public class TablaModeloParo extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int x, int y) {
-		
+
 		Object retorno = null;
 		Paro paro = lista.get(x);
-		
+
 		switch (y) {
 		case CODIGO:
 			retorno = paro.getCodigo();

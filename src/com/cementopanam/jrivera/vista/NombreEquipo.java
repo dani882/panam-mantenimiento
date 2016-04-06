@@ -32,34 +32,35 @@ public class NombreEquipo extends JDialog {
 	Connection con = null;
 
 	CallableStatement cs = null;
-	
+
 	PreparedStatement pstmt = null;
 	ResultSet rs = null;
 	private JTable tblEquipo;
 	private TablaModeloEquipos tablaModeloEquipos = new TablaModeloEquipos();
 	private JTextField textField;
+
 	/**
 	 * Create the panel.
 	 */
 	public NombreEquipo() {
-		
+
 		this.setSize(new Dimension(1130, 455));
-		
+
 		setModal(true);
 		setLocationRelativeTo(null);
 		getContentPane().setFont(new Font("Verdana", Font.PLAIN, 12));
 		setFont(new Font("Verdana", Font.PLAIN, 12));
 		setTitle("Codigo de Equipos");
 		getContentPane().setLayout(new BorderLayout(0, 0));
-		
+
 		JPanel panelSuperior = new JPanel();
 		getContentPane().add(panelSuperior, BorderLayout.NORTH);
 		panelSuperior.setLayout(new BorderLayout(0, 0));
-		
+
 		JLabel lblNewLabel = new JLabel("Buscar Codigo:");
 		lblNewLabel.setFont(new Font("Verdana", Font.PLAIN, 12));
 		panelSuperior.add(lblNewLabel, BorderLayout.WEST);
-		
+
 		textField = new JTextField();
 		textField.addKeyListener(new KeyAdapter() {
 			@Override
@@ -70,19 +71,19 @@ public class NombreEquipo extends JDialog {
 		textField.setFont(new Font("Verdana", Font.PLAIN, 12));
 		panelSuperior.add(textField, BorderLayout.CENTER);
 		textField.setColumns(10);
-		
+
 		JPanel panelCentral = new JPanel();
 		getContentPane().add(panelCentral, BorderLayout.CENTER);
 		panelCentral.setLayout(new BorderLayout(0, 0));
-		
+
 		JScrollPane scrollPane = new JScrollPane();
 		panelCentral.add(scrollPane);
-		
+
 		tblEquipo = new JTable();
 		tblEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
 		scrollPane.setViewportView(tblEquipo);
 		tblEquipo.setModel(tablaModeloEquipos);
-		
+
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setVisible(true);
 	}

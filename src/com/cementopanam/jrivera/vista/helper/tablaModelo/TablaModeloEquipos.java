@@ -13,29 +13,29 @@ public class TablaModeloEquipos extends AbstractTableModel {
 	 * 
 	 */
 	private static final long serialVersionUID = -5597879599705517993L;
-	String[] columnas = {"Codigo Equipo", "Nombre Equipo", "Nombre Area", "Nombre SubArea"};
+	String[] columnas = { "Codigo Equipo", "Nombre Equipo", "Nombre Area", "Nombre SubArea" };
 	ArrayList<NombreEquipo> lista = null;
 	ListadoEquipos equipos = new ListadoEquipos();
 
 	public TablaModeloEquipos() {
 		lista = equipos.mostrarEquipos("");
 	}
-	
+
 	public void eliminar(int fila) {
 		lista.remove(fila);
 		fireTableRowsDeleted(fila, fila);
 	}
-	
+
 	public void agregar(NombreEquipo equipo) {
 		lista.add(equipo);
 		fireTableDataChanged();
 	}
-	
+
 	public void buscar(String codigo) {
 		lista = equipos.mostrarEquipos(codigo);
 		fireTableDataChanged();
 	}
-	
+
 	@Override
 	public String getColumnName(int x) {
 		return columnas[x];
@@ -53,10 +53,10 @@ public class TablaModeloEquipos extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int x, int y) {
-		
+
 		Object retorno = null;
 		NombreEquipo equipo = lista.get(x);
-		
+
 		switch (y) {
 		case 0:
 			retorno = equipo.getCodigoEquipo();

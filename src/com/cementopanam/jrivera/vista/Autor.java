@@ -36,7 +36,7 @@ public class Autor extends JDialog {
 
 		StringBuilder anio = new StringBuilder(String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
 
-		setSize(454, 337);
+		setSize(454, 181);
 
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setResizable(false);
@@ -54,14 +54,14 @@ public class Autor extends JDialog {
 		lblRegistradorDePacientes.setBounds(6, 18, 270, 22);
 		contentPanel.add(lblRegistradorDePacientes);
 
-		JLabel lblVersion = new JLabel("Version 1.1");
+		JLabel lblVersion = new JLabel("Version 1.2.1 ");
 		lblVersion.setFont(new Font("Verdana", Font.PLAIN, 14));
 		lblVersion.setBounds(6, 52, 146, 16);
 		contentPanel.add(lblVersion);
 
-		JLabel lblCopyright = new JLabel("Copyright \u00A9 " + anio + " - Jesus Rivera");
+		JLabel lblCopyright = new JLabel(" - Copyright \u00A9 " + anio + " - Jesus Rivera");
 		lblCopyright.setFont(new Font("Verdana", Font.PLAIN, 14));
-		lblCopyright.setBounds(97, 49, 245, 22);
+		lblCopyright.setBounds(97, 49, 270, 22);
 		contentPanel.add(lblCopyright);
 
 		JButton btnNewButton = new JButton("Aceptar");

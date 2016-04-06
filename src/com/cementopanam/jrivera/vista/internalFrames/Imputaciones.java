@@ -12,9 +12,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -48,11 +45,10 @@ import javax.swing.text.MaskFormatter;
 import com.cementopanam.jrivera.controlador.ComparacionFechas;
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.controlador.usuario.AdministracionUsuario;
-import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.vista.NombreEquipo;
 import com.cementopanam.jrivera.vista.Principal;
-import com.cementopanam.jrivera.vista.helper.CustomJComboBox;
-import com.cementopanam.jrivera.vista.helper.JStatusBar;
+import com.cementopanam.jrivera.vista.helper.JComboBoxPersonalizado;
+import com.cementopanam.jrivera.vista.helper.BarraEstado;
 import com.cementopanam.jrivera.vista.helper.TimerThread;
 
 import net.proteanit.sql.DbUtils;
@@ -69,8 +65,8 @@ public class Imputaciones extends JInternalFrame {
 	ComparacionFechas comparacionFechas;
 	Principal pri;
 
-	private CapturaUsuario captura = null;
-	private CapturaUsuario nombreHost = new CapturaUsuario();
+	// private CapturaUsuario captura = null;
+	// private CapturaUsuario nombreHost = new CapturaUsuario();
 	private AdministracionUsuario admUsuario = new AdministracionUsuario();
 
 	private JButton btnIniciarParo;
@@ -96,7 +92,7 @@ public class Imputaciones extends JInternalFrame {
 	private JLabel lblHoraDeInicio;
 	private JLabel lblFechaDeFin;
 
-	public JStatusBar statusBar;
+	public BarraEstado statusBar;
 
 	private DateFormat df;
 	private MaskFormatter dateMask;
@@ -180,7 +176,7 @@ public class Imputaciones extends JInternalFrame {
 		lblEquipo.setBounds(12, 203, 74, 15);
 		getContentPane().add(lblEquipo);
 
-		comboBoxEquipo = new CustomJComboBox();
+		comboBoxEquipo = new JComboBoxPersonalizado();
 		comboBoxEquipo.setEnabled(false);
 		comboBoxEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
 		comboBoxEquipo.setBounds(104, 198, 158, 24);
@@ -191,7 +187,7 @@ public class Imputaciones extends JInternalFrame {
 		lblSubArea.setBounds(12, 172, 70, 15);
 		getContentPane().add(lblSubArea);
 
-		comboBoxSubArea = new CustomJComboBox();
+		comboBoxSubArea = new JComboBoxPersonalizado();
 		comboBoxSubArea.setEnabled(false);
 		comboBoxSubArea.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -215,7 +211,7 @@ public class Imputaciones extends JInternalFrame {
 		lblArea.setBounds(12, 141, 70, 15);
 		getContentPane().add(lblArea);
 
-		comboBoxArea = new CustomJComboBox();
+		comboBoxArea = new JComboBoxPersonalizado();
 		comboBoxArea.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 
@@ -252,7 +248,7 @@ public class Imputaciones extends JInternalFrame {
 		lblCausa.setBounds(12, 336, 70, 15);
 		getContentPane().add(lblCausa);
 
-		comboBoxCausa = new CustomJComboBox();
+		comboBoxCausa = new JComboBoxPersonalizado();
 		comboBoxCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
 
 		comboBoxCausa.setBounds(103, 331, 159, 24);
@@ -297,6 +293,7 @@ public class Imputaciones extends JInternalFrame {
 		actualizarTabla(estatus[0]);
 
 		btnIniciarParo = new JButton("Imputar Paro");
+		btnIniciarParo.setIcon(new ImageIcon(Imputaciones.class.getResource("/iconos32x32/ok32x32.png")));
 		btnIniciarParo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -304,10 +301,11 @@ public class Imputaciones extends JInternalFrame {
 			}
 		});
 		btnIniciarParo.setFont(new Font("Verdana", Font.PLAIN, 12));
-		btnIniciarParo.setBounds(472, 457, 117, 25);
+		btnIniciarParo.setBounds(431, 457, 158, 35);
 		getContentPane().add(btnIniciarParo);
 
 		btnDetenerParo = new JButton("Detener Paro");
+		btnDetenerParo.setIcon(new ImageIcon(Imputaciones.class.getResource("/iconos32x32/stop.32x32.png")));
 		btnDetenerParo.setEnabled(false);
 		btnDetenerParo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -319,22 +317,20 @@ public class Imputaciones extends JInternalFrame {
 
 					int fila = tablaParos.getSelectedRow();
 					int idParo = Integer.parseInt(String.valueOf(tablaParos.getValueAt(fila, 0)));
-					
+
 					String usuarioTabla = String.valueOf(tablaParos.getValueAt(fila, 1));
 					String fechaFin = formattedTextField_fechaFin.getText();
 					String fechaInicio = String.valueOf(tablaParos.getValueAt(fila, 5));
-					
-					
+
 					String tipoUsuario = mostrarUsuario(usuarioActual);
-					
-					if(usuarioActual.equals(usuarioTabla) || tipoUsuario.equals("administrador")) {
+
+					if (usuarioActual.equals(usuarioTabla) || tipoUsuario.equals("administrador")) {
 						System.out.println("");
-					}
-					else {
+					} else {
 						JOptionPane.showMessageDialog(null, "No tiene privilegios para modificar este paro");
 						return;
 					}
-					
+
 					resultado = md.actualizarParo(idParo, fechaFin, fechaInicio);
 
 					if (resultado == true) {
@@ -342,22 +338,18 @@ public class Imputaciones extends JInternalFrame {
 						Principal.lblStatusBar.setText("Paro Imputado correctamente");
 						limpiarCampos();
 						actualizarTabla(estatus[1]);
-					} 
-					else {
+					} else {
 						Principal.lblStatusBar
 								.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 						Principal.lblStatusBar.setText("No se pudo completar la operacion");
 					}
-				}
-				catch (SQLException sqle) {
+				} catch (SQLException sqle) {
 					JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
-				}
-				catch (ArrayIndexOutOfBoundsException aiobe) {
+				} catch (ArrayIndexOutOfBoundsException aiobe) {
 					JOptionPane.showMessageDialog(null, "Debe elegir un paro", aiobe.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
-				}
-				catch (Exception e1) {
+				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
 				} finally {
@@ -366,7 +358,7 @@ public class Imputaciones extends JInternalFrame {
 			}
 		});
 		btnDetenerParo.setFont(new Font("Verdana", Font.PLAIN, 12));
-		btnDetenerParo.setBounds(609, 457, 140, 25);
+		btnDetenerParo.setBounds(609, 457, 156, 35);
 		getContentPane().add(btnDetenerParo);
 
 		button_equipo = new JButton("");
@@ -398,12 +390,6 @@ public class Imputaciones extends JInternalFrame {
 		getContentPane().add(button_disciplina);
 
 		button_causa = new JButton("+");
-		button_causa.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-
-				obtenerNombreUsuario();
-			}
-		});
 		button_causa.setFont(new Font("Verdana", Font.PLAIN, 12));
 		button_causa.setBounds(274, 331, 62, 25);
 		getContentPane().add(button_causa);
@@ -709,7 +695,8 @@ public class Imputaciones extends JInternalFrame {
 			String area = comboBoxArea.getSelectedItem().toString();
 			String disciplina = comboBoxDisciplina.getSelectedItem().toString();
 			String tipoCausa = comboBoxCausa.getSelectedItem().toString();
-			String usuario = obtenerNombreUsuario();
+			// String usuario = obtenerNombreUsuario();
+			String usuario = Principal.usuarioActual.getText();
 			String otraCausa = textArea_motivoCausa.getText();
 
 			if (estadoParo.equals(null)) {
@@ -838,34 +825,6 @@ public class Imputaciones extends JInternalFrame {
 	}
 
 	/**
-	 * @return Retorna el nombre de usuario
-	 */
-	private String obtenerNombreUsuario() {
-
-		System.out.println("Usuario Actual: " + Principal.usuarioActual.getText());
-
-		String usuario = "";
-		// Obtiene el usuario desde el archivo serializado
-		try (FileInputStream archivoEntrada = new FileInputStream(nombreHost.obtenerNombrePC() + ".ser");
-				ObjectInputStream in = new ObjectInputStream(archivoEntrada);) {
-
-			captura = (CapturaUsuario) in.readObject();
-
-		} catch (IOException i) {
-			JOptionPane.showMessageDialog(null, i.getMessage(), i.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-
-		} catch (ClassNotFoundException c) {
-			JOptionPane.showMessageDialog(null, "Nombre de Usuario no encontrado", c.getClass().toString(),
-					JOptionPane.ERROR_MESSAGE);
-
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-		}
-		usuario = captura.nombreUsuario;
-		return usuario;
-	}
-
-	/**
 	 * Metodo para mostrar los Paros Pendientes en una Tabla
 	 * 
 	 * @param e
@@ -880,7 +839,7 @@ public class Imputaciones extends JInternalFrame {
 		comboBoxEquipo.setEnabled(false);
 		rdbtnInactivo.setEnabled(false);
 		comboBoxDisciplina.setEnabled(false);
-		;
+
 		comboBoxCausa.setEnabled(false);
 		scrollPane_MotivoCausa.setEnabled(false);
 		textArea_motivoCausa.setEnabled(false);
@@ -898,37 +857,36 @@ public class Imputaciones extends JInternalFrame {
 				@Override
 				public void run() {
 					actualizarTabla(estatus[1]);
-					
-					//TODO Agregar visualizacion de Paros Pendientes en la Barra de Estado
+
+					// TODO Agregar visualizacion de Paros Pendientes en la
+					// Barra de Estado
 					System.out.println("Paros Pendiente: " + tablaParos.getRowCount());
 				}
 			});
 		}
 	}
-	
+
 	private String mostrarUsuario(String usuarioSeleccionado) {
-		
+
 		String tipoUsuario = "";
-		
+
 		try {
 			rs = admUsuario.mostrarUsuario(usuarioSeleccionado);
-			
-			if(rs.next()) {
-			
-				tipoUsuario = rs.getString("tipo_usuario");	
+
+			if (rs.next()) {
+
+				tipoUsuario = rs.getString("tipo_usuario");
 			}
-		
+
 		} catch (SQLException sqle) {
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
-		}
-		catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
-					JOptionPane.ERROR_MESSAGE);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 		return tipoUsuario;
 	}
-	
+
 	public void updateBar(int newValue) {
 		Principal.pbar.setValue(newValue);
 	}

@@ -29,8 +29,10 @@ import javax.swing.border.TitledBorder;
 
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
-import com.cementopanam.jrivera.vista.helper.CustomJComboBox;
+import com.cementopanam.jrivera.vista.helper.JComboBoxPersonalizado;
 import com.cementopanam.jrivera.vista.internalFrames.Reportes;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class ModificacionParo extends JDialog {
 
@@ -41,241 +43,262 @@ public class ModificacionParo extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	private JButton okButton;
 	private JButton cancelButton;
-	private JLabel lblTiempoDeInicio;
-	private JLabel lblTiempoDeFin;
-	private JTextField textFieldTiempoInicio;
-	private JTextField textFieldTiempoFin;
+	private JLabel lblTiempoInicio;
+	private JLabel lblTiempoFin;
+	private JTextField txtTiempoInicio;
+	private JTextField txtTiempoFin;
 	private JTextArea txtDescripcionAdicional;
-	private JComboBox<String> comboBoxCausa;
-	private JComboBox<String> comboBoxDisciplina;
+	private JComboBox<String> cbCausa;
+	private JComboBox<String> cbDisciplina;
 	private JTextArea txtAreaSolucion;
-	
+
 	private int codigo;
 	private int codigoCausa;
-	
+
 	private AdministracionParos admParo;
-	private JDesktopPane pane;
-	
-	public ModificacionParo(Paro modificacion, AdministracionParos paroDB, JDesktopPane pane) {
-		
+	private JDesktopPane desktopPane;
+	private JLabel label;
+
+	public ModificacionParo(Paro modificacion, AdministracionParos paroDB, JDesktopPane desktopPane) {
+
 		this();
 		admParo = paroDB;
-		this.pane = pane;
-		
+		this.desktopPane = desktopPane;
+
 		try {
-			
-			//Rellena combo Causa
+
+			// Rellena combo Causa
 			ResultSet rs = admParo.rellenarCombo("causa", 0);
-			while(rs.next()) {
-				comboBoxCausa.addItem(rs.getString("tipo_causa"));
+			while (rs.next()) {
+				cbCausa.addItem(rs.getString("tipo_causa"));
 			}
-			//Rellena combo Disciplina
+			// Rellena combo Disciplina
 			ResultSet rs2 = admParo.rellenarCombo("disciplina", 0);
-			while(rs2.next()) {
-				comboBoxDisciplina.addItem(rs2.getString("nombre_disciplina"));
+			while (rs2.next()) {
+				cbDisciplina.addItem(rs2.getString("nombre_disciplina"));
 			}
-			
-		} catch (SQLException e) {}
-		
+
+		} catch (SQLException e) {
+		}
+
 		codigo = modificacion.getCodigo();
-		
-		//Obtiene el codigo de Causa
-		if(modificacion.getDescripcionAdicional().length() == 0) {
-			codigoCausa = Integer.parseInt(admParo.buscarIndiceCausa(modificacion.getCausa(), 
-					""));
+
+		// Obtiene el codigo de Causa
+		if (modificacion.getDescripcionAdicional().length() == 0) {
+			codigoCausa = Integer.parseInt(admParo.buscarIndiceCausa(modificacion.getCausa(), ""));
+		} else {
+			codigoCausa = Integer.parseInt(
+					admParo.buscarIndiceCausa(modificacion.getCausa(), modificacion.getDescripcionAdicional()));
 		}
-		else {
-			codigoCausa = Integer.parseInt(admParo.buscarIndiceCausa(modificacion.getCausa(), 
-					modificacion.getDescripcionAdicional()));
-		}
-		
+
 		txtAreaSolucion.setText(modificacion.getSolucion());
 		txtDescripcionAdicional.setText(modificacion.getDescripcionAdicional());
-		textFieldTiempoInicio.setText(modificacion.getTiempoInicio());
-		textFieldTiempoFin.setText(modificacion.getTiempoFin());
-		comboBoxCausa.setSelectedItem(String.valueOf(modificacion.getCausa()));
-		comboBoxDisciplina.setSelectedItem(String.valueOf(modificacion.getDisciplina()));
+		txtTiempoInicio.setText(modificacion.getTiempoInicio());
+		txtTiempoFin.setText(modificacion.getTiempoFin());
+		cbCausa.setSelectedItem(String.valueOf(modificacion.getCausa()));
+		cbDisciplina.setSelectedItem(String.valueOf(modificacion.getDisciplina()));
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public ModificacionParo() {
-		
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				
+				mostrarReporte();
+				
+				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+				Principal.lblStatusBar.setText("Operacion cancelada por el usuario");
+			}
+		});
+
 		getContentPane().setFont(new Font("Verdana", Font.PLAIN, 12));
 		setTitle("Modificar Paro");
 		setModal(true);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setFont(new Font("Verdana", Font.PLAIN, 12));
-		setBounds(100, 100, 588, 407);
+		setBounds(100, 100, 588, 421);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.NORTH);
 		{
-			lblTiempoDeInicio = new JLabel("Tiempo de Inicio");
-			lblTiempoDeInicio.setFont(new Font("Verdana", Font.PLAIN, 12));
+			lblTiempoInicio = new JLabel("Tiempo de Inicio");
+			lblTiempoInicio.setFont(new Font("Verdana", Font.PLAIN, 12));
 		}
 		{
-			lblTiempoDeFin = new JLabel("Tiempo de Fin");
-			lblTiempoDeFin.setHorizontalAlignment(SwingConstants.RIGHT);
-			lblTiempoDeFin.setFont(new Font("Verdana", Font.PLAIN, 12));
+			lblTiempoFin = new JLabel("Tiempo de Fin");
+			lblTiempoFin.setHorizontalAlignment(SwingConstants.RIGHT);
+			lblTiempoFin.setFont(new Font("Verdana", Font.PLAIN, 12));
 		}
-		
-		textFieldTiempoInicio = new JTextField();
-		textFieldTiempoInicio.setFont(new Font("Verdana", Font.PLAIN, 12));
-		textFieldTiempoInicio.setColumns(10);
-		
-		textFieldTiempoFin = new JTextField();
-		textFieldTiempoFin.setFont(new Font("Verdana", Font.PLAIN, 12));
-		textFieldTiempoFin.setColumns(10);
-		
+
+		txtTiempoInicio = new JTextField();
+		txtTiempoInicio.setFont(new Font("Verdana", Font.PLAIN, 12));
+		txtTiempoInicio.setColumns(10);
+
+		txtTiempoFin = new JTextField();
+		txtTiempoFin.setFont(new Font("Verdana", Font.PLAIN, 12));
+		txtTiempoFin.setColumns(10);
+
 		JLabel lblCausa = new JLabel("Causa");
 		lblCausa.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
-		
-		comboBoxCausa = new CustomJComboBox();
-		comboBoxCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
-		
+
+		cbCausa = new JComboBoxPersonalizado();
+		cbCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
+
 		JLabel lblDisciplina = new JLabel("Disciplina");
 		lblDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
-		
-		comboBoxDisciplina = new CustomJComboBox();
-		comboBoxDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
-		
+
+		cbDisciplina = new JComboBoxPersonalizado();
+		cbDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
+
 		JScrollPane scrollPaneSolucion = new JScrollPane();
-		scrollPaneSolucion.setViewportBorder(new TitledBorder(null, "Solucion", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
+		scrollPaneSolucion.setViewportBorder(
+				new TitledBorder(null, "Solucion", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
 		JScrollPane scrollPaneDescripcionAdicional = new JScrollPane();
-		scrollPaneDescripcionAdicional.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Descripcion Adicional", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		scrollPaneDescripcionAdicional.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"),
+				"Descripcion Adicional", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
-		gl_contentPanel.setHorizontalGroup(
-			gl_contentPanel.createParallelGroup(Alignment.LEADING)
+		gl_contentPanel.setHorizontalGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(scrollPaneSolucion, GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(scrollPaneDescripcionAdicional, GroupLayout.PREFERRED_SIZE, 267, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addGap(8)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblTiempoDeInicio)
-								.addComponent(lblDisciplina))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
-								.addComponent(comboBoxDisciplina, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(textFieldTiempoInicio, GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblCausa)
+						.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
 								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addComponent(lblTiempoDeFin)
-									.addGap(18)
-									.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-										.addComponent(comboBoxCausa, Alignment.TRAILING, 0, 162, Short.MAX_VALUE)
-										.addComponent(textFieldTiempoFin, GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE))))))
-					.addContainerGap())
-		);
-		gl_contentPanel.setVerticalGroup(
-			gl_contentPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addGap(38)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblTiempoDeInicio)
-						.addComponent(textFieldTiempoInicio, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
-						.addComponent(textFieldTiempoFin, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblTiempoDeFin))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(comboBoxDisciplina, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblDisciplina)
-						.addComponent(lblCausa)
-						.addComponent(comboBoxCausa, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE))
-					.addGap(54)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(scrollPaneSolucion, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
-						.addComponent(scrollPaneDescripcionAdicional, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(25, Short.MAX_VALUE))
-		);
-		
+										.addContainerGap()
+										.addComponent(scrollPaneSolucion, GroupLayout.DEFAULT_SIZE,
+												265, Short.MAX_VALUE)
+										.addPreferredGap(ComponentPlacement.UNRELATED)
+										.addComponent(scrollPaneDescripcionAdicional, GroupLayout.PREFERRED_SIZE, 267,
+												GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_contentPanel.createSequentialGroup().addGap(8)
+										.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+												.addComponent(lblTiempoInicio).addComponent(lblDisciplina))
+										.addPreferredGap(ComponentPlacement.UNRELATED)
+										.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
+												.addComponent(cbDisciplina, GroupLayout.DEFAULT_SIZE,
+														GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+												.addComponent(txtTiempoInicio, GroupLayout.DEFAULT_SIZE, 155,
+														Short.MAX_VALUE))
+										.addPreferredGap(ComponentPlacement.UNRELATED)
+										.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+												.addComponent(lblCausa)
+												.addGroup(gl_contentPanel.createSequentialGroup()
+														.addComponent(lblTiempoFin).addGap(18).addGroup(
+																gl_contentPanel.createParallelGroup(Alignment.LEADING)
+																		.addComponent(cbCausa, Alignment.TRAILING,
+																				0, 162, Short.MAX_VALUE)
+																		.addComponent(txtTiempoFin,
+																				GroupLayout.DEFAULT_SIZE, 162,
+																				Short.MAX_VALUE))))))
+						.addContainerGap()));
+		gl_contentPanel.setVerticalGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING).addGroup(gl_contentPanel
+				.createSequentialGroup().addGap(38)
+				.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblTiempoInicio)
+						.addComponent(txtTiempoInicio, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+						.addComponent(txtTiempoFin, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblTiempoFin))
+				.addPreferredGap(ComponentPlacement.UNRELATED)
+				.addGroup(
+						gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(cbDisciplina, GroupLayout.PREFERRED_SIZE, 31,
+										GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblDisciplina).addComponent(lblCausa).addComponent(cbCausa,
+										GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE))
+				.addGap(54)
+				.addGroup(
+						gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(scrollPaneSolucion, GroupLayout.PREFERRED_SIZE, 137,
+										GroupLayout.PREFERRED_SIZE)
+								.addComponent(scrollPaneDescripcionAdicional, GroupLayout.PREFERRED_SIZE, 137,
+										GroupLayout.PREFERRED_SIZE))
+				.addContainerGap(25, Short.MAX_VALUE)));
+
 		txtDescripcionAdicional = new JTextArea();
 		txtDescripcionAdicional.setFont(new Font("Verdana", Font.PLAIN, 12));
 		scrollPaneDescripcionAdicional.setViewportView(txtDescripcionAdicional);
-		
+
 		txtAreaSolucion = new JTextArea();
 		txtAreaSolucion.setFont(new Font("Verdana", Font.PLAIN, 12));
 		scrollPaneSolucion.setViewportView(txtAreaSolucion);
 		contentPanel.setLayout(gl_contentPanel);
 		{
-			JPanel buttonPane = new JPanel();
-			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			JPanel buttonPaneBotones = new JPanel();
+			buttonPaneBotones.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			getContentPane().add(buttonPaneBotones, BorderLayout.SOUTH);
 			{
 				okButton = new JButton("Guardar");
+				okButton.setIcon(new ImageIcon(ModificacionParo.class.getResource("/iconos32x32/ok32x32.png")));
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						
+
 						actualizarParo();
-			
+
 					}
 
 				});
 				okButton.setFont(new Font("Verdana", Font.PLAIN, 12));
 				okButton.setActionCommand("OK");
-				buttonPane.add(okButton);
+				buttonPaneBotones.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
-			
+
 			{
 				cancelButton = new JButton("Cancelar");
+				cancelButton.setIcon(new ImageIcon(ModificacionParo.class.getResource("/iconos32x32/fail32x32.png")));
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						
+
 						mostrarReporte();
+						
+						Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+						Principal.lblStatusBar.setText("Operacion cancelada por el usuario");
 					}
 				});
 				cancelButton.setFont(new Font("Verdana", Font.PLAIN, 12));
 				cancelButton.setActionCommand("Cancel");
-				buttonPane.add(cancelButton);
+				buttonPaneBotones.add(cancelButton);
 			}
+			
+			label = new JLabel(" ");
+			buttonPaneBotones.add(label);
 		}
 	}
 
 	protected void mostrarReporte() {
-		
+
 		Reportes repo = new Reportes();
-		pane.add(repo);
+		desktopPane.add(repo);
 		repo.toFront();
 		repo.setVisible(true);
 		dispose();
-		
 	}
 
 	/**
 	 * Metodo utilizado para actualizar Datos de los Paros
 	 */
 	private void actualizarParo() {
-		
-		String tiempoInicio = textFieldTiempoInicio.getText();
-		String disciplina = String.valueOf(comboBoxDisciplina.getSelectedItem());
-		String tiempoFin = textFieldTiempoFin.getText();
-		String causa = String.valueOf(comboBoxCausa.getSelectedItem());
+
+		String tiempoInicio = txtTiempoInicio.getText();
+		String disciplina = String.valueOf(cbDisciplina.getSelectedItem());
+		String tiempoFin = txtTiempoFin.getText();
+		String causa = String.valueOf(cbCausa.getSelectedItem());
 		String solucion = txtAreaSolucion.getText();
 		String descripcionAdicional = txtDescripcionAdicional.getText();
-		
-		//Si el paro fue exitoso
+
+		// Si el paro fue exitoso
 		try {
-			if(admParo.modificarParo(new Paro(codigo, tiempoInicio, tiempoFin, solucion, 
-					causa, descripcionAdicional, disciplina), codigoCausa) == true) {
-				
+			if (admParo.modificarParo(
+					new Paro(codigo, tiempoInicio, tiempoFin, solucion, causa, descripcionAdicional, disciplina),
+					codigoCausa) == true) {
+
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Paro Actualizado correctamente");
-				
+
 				mostrarReporte();
-			}
-			else {
+			} else {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
-				 Principal.lblStatusBar.setText("No se pudo completar la operacion");
+				Principal.lblStatusBar.setText("No se pudo completar la operacion");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
