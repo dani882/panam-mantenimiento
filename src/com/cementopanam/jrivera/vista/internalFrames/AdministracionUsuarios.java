@@ -16,10 +16,10 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
-import javax.swing.border.MatteBorder;
 import javax.swing.border.TitledBorder;
 
 import com.cementopanam.jrivera.controlador.usuario.AdministracionUsuario;
@@ -57,99 +57,99 @@ public class AdministracionUsuarios extends JInternalFrame {
 		setTitle("Administracion de Usuarios");
 		getContentPane().setEnabled(false);
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		setBounds(50, 50, 439, 466);
+		setBounds(50, 50, 439, 526);
 
 		JLayeredPane layeredPaneDatosEmpleado = new JLayeredPane();
-		layeredPaneDatosEmpleado.setBounds(10, 11, 392, 170);
+		layeredPaneDatosEmpleado.setBounds(10, 58, 392, 170);
 		layeredPaneDatosEmpleado.setLayout(null);
 		layeredPaneDatosEmpleado.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229), 2, true),
 				"Datos de Empleado", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
 
 		JLabel lblCodEmpleado = new JLabel("Codigo Empleado");
 		lblCodEmpleado.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblCodEmpleado.setBounds(10, 31, 124, 15);
+		lblCodEmpleado.setBounds(35, 29, 124, 15);
 		layeredPaneDatosEmpleado.add(lblCodEmpleado);
 
 		JLabel lblNombre = new JLabel("Nombre");
 		lblNombre.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblNombre.setBounds(10, 98, 49, 16);
+		lblNombre.setBounds(35, 96, 49, 16);
 		layeredPaneDatosEmpleado.add(lblNombre);
 
 		txtNombre = new JTextField();
 		txtNombre.setFont(new Font("Verdana", Font.PLAIN, 12));
 		txtNombre.setColumns(10);
-		txtNombre.setBounds(10, 120, 147, 30);
+		txtNombre.setBounds(35, 118, 147, 30);
 		layeredPaneDatosEmpleado.add(txtNombre);
 
 		JLabel lblApellido = new JLabel("Apellido");
 		lblApellido.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblApellido.setBounds(167, 98, 49, 16);
+		lblApellido.setBounds(192, 96, 49, 16);
 		layeredPaneDatosEmpleado.add(lblApellido);
 
 		txtApellido = new JTextField();
 		txtApellido.setFont(new Font("Verdana", Font.PLAIN, 12));
 		txtApellido.setColumns(10);
-		txtApellido.setBounds(167, 120, 147, 30);
+		txtApellido.setBounds(192, 118, 147, 30);
 		layeredPaneDatosEmpleado.add(txtApellido);
 
 		txtCodEmpleado = new JTextField();
 		txtCodEmpleado.setFont(new Font("Verdana", Font.PLAIN, 12));
 		txtCodEmpleado.setColumns(10);
-		txtCodEmpleado.setBounds(10, 57, 147, 30);
+		txtCodEmpleado.setBounds(35, 55, 147, 30);
 		layeredPaneDatosEmpleado.add(txtCodEmpleado);
 
 		JLayeredPane layeredPaneAcceso = new JLayeredPane();
-		layeredPaneAcceso.setBounds(10, 192, 392, 172);
+		layeredPaneAcceso.setBounds(10, 239, 392, 172);
 		layeredPaneAcceso.setLayout(null);
 		layeredPaneAcceso.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229), 2, true),
 				"Informacion de Acceso", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
 
 		JLabel lblNombreUsuario = new JLabel("Nombre de Usuario");
 		lblNombreUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblNombreUsuario.setBounds(10, 31, 124, 15);
+		lblNombreUsuario.setBounds(35, 31, 124, 15);
 		layeredPaneAcceso.add(lblNombreUsuario);
 
 		JLabel lblConfirmarClave = new JLabel("Confirmar contrase\u00F1a");
 		lblConfirmarClave.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblConfirmarClave.setBounds(167, 90, 147, 16);
+		lblConfirmarClave.setBounds(192, 90, 147, 16);
 		layeredPaneAcceso.add(lblConfirmarClave);
 
 		txtNombreUsuario = new JTextField();
 		txtNombreUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
 		txtNombreUsuario.setColumns(10);
-		txtNombreUsuario.setBounds(10, 53, 147, 30);
+		txtNombreUsuario.setBounds(35, 53, 147, 30);
 		layeredPaneAcceso.add(txtNombreUsuario);
 
 		String[] tipoUsuarios = { "Administrador", "Operador", "Consultor" };
 		cbTipoUsuario = new JComboBox<Object>(tipoUsuarios);
 		cbTipoUsuario.setSelectedIndex(-1);
 		cbTipoUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
-		cbTipoUsuario.setBounds(10, 110, 147, 30);
+		cbTipoUsuario.setBounds(35, 110, 147, 30);
 		layeredPaneAcceso.add(cbTipoUsuario);
 
 		JLabel lblTipoUsuario = new JLabel("Tipo de Usuario");
 		lblTipoUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblTipoUsuario.setBounds(10, 90, 124, 16);
+		lblTipoUsuario.setBounds(35, 90, 124, 16);
 		layeredPaneAcceso.add(lblTipoUsuario);
 
 		pwdClave = new JPasswordField();
 		pwdClave.setFont(new Font("Verdana", Font.PLAIN, 12));
-		pwdClave.setBounds(167, 54, 147, 30);
+		pwdClave.setBounds(192, 54, 147, 30);
 		layeredPaneAcceso.add(pwdClave);
 
 		pwdConfirmarClave = new JPasswordField();
 		pwdConfirmarClave.setFont(new Font("Verdana", Font.PLAIN, 12));
-		pwdConfirmarClave.setBounds(167, 110, 147, 30);
+		pwdConfirmarClave.setBounds(192, 110, 147, 30);
 		layeredPaneAcceso.add(pwdConfirmarClave);
 
 		JLabel lblClave = new JLabel("Contrase\u00F1a");
 		lblClave.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblClave.setBounds(167, 32, 124, 15);
+		lblClave.setBounds(192, 32, 124, 15);
 		layeredPaneAcceso.add(lblClave);
 
 		JLayeredPane layeredPaneBotones = new JLayeredPane();
-		layeredPaneBotones.setBorder(new MatteBorder(1, 1, 1, 1, (Color) null));
-		layeredPaneBotones.setBounds(10, 375, 392, 50);
+		layeredPaneBotones.setBorder(new LineBorder(new Color(184, 207, 229), 2, true));
+		layeredPaneBotones.setBounds(10, 422, 392, 55);
 		layeredPaneBotones.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		JButton btnGuardar = new JButton("Guardar");
@@ -185,6 +185,16 @@ public class AdministracionUsuarios extends JInternalFrame {
 		getContentPane().add(layeredPaneDatosEmpleado);
 		getContentPane().add(layeredPaneAcceso);
 		getContentPane().add(layeredPaneBotones);
+		
+		JPanel panelTitulo = new JPanel();
+		panelTitulo.setBackground(Color.BLACK);
+		panelTitulo.setBounds(0, 11, 433, 36);
+		getContentPane().add(panelTitulo);
+		
+		JLabel lblNuevoUsuario = new JLabel("Agregar Nuevo Usuario");
+		lblNuevoUsuario.setForeground(Color.WHITE);
+		lblNuevoUsuario.setFont(new Font("Verdana", Font.BOLD, 16));
+		panelTitulo.add(lblNuevoUsuario);
 	}
 
 	private int obtenerTipoUsuario() {

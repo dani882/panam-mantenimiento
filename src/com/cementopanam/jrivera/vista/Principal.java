@@ -12,14 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -39,7 +31,6 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
 
-import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.vista.helper.BarraEstado;
 import com.cementopanam.jrivera.vista.helper.TimerThread;
 import com.cementopanam.jrivera.vista.internalFrames.AdministracionRegistros;
@@ -293,6 +284,7 @@ public class Principal extends JFrame implements Runnable {
 		desktopPane.add(admUsuario);
 
 		admRegistros = new AdministracionRegistros();
+		admRegistros.setLocation(50, 2);
 		desktopPane.add(admRegistros);
 
 		author = new Autor();

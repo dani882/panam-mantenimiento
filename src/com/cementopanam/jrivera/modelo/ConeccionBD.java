@@ -37,7 +37,7 @@ public class ConeccionBD {
 	 */
 	public Connection conectarABaseDatos() throws SQLException {
 
-		try (InputStream in = getClass().getResourceAsStream("/db.properties");) {
+		try (InputStream in = getClass().getResourceAsStream("/properties/db.properties");) {
 			// Carga las propiedades del archivo
 			Properties pros = new Properties();
 			pros.load(in);

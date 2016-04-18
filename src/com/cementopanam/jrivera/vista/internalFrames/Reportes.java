@@ -48,6 +48,7 @@ import com.cementopanam.jrivera.vista.helper.tablaModelo.TablaModeloParo;
 import com.toedter.calendar.JDateChooser;
 
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
@@ -118,7 +119,7 @@ public class Reportes extends JInternalFrame {
 				String archivo = "";
 				String titulo = "";
 
-				try (InputStream in = getClass().getResourceAsStream("/paros.properties");) {
+				try (InputStream in = getClass().getResourceAsStream("/properties/paros.properties");) {
 					// Carga las propiedades del archivo
 					Properties pros = new Properties();
 					pros.load(in);
@@ -149,6 +150,8 @@ public class Reportes extends JInternalFrame {
 						Map<String, Object> parametro = new HashMap<String, Object>();
 						parametro.put("fechaInicio", fechaInicio);
 						parametro.put("fechaFin", fechaFin);
+						// Sirve para que el reporte sea de una pagina
+						parametro.put(JRParameter.IS_IGNORE_PAGINATION, true);
 
 						jr = (JasperReport) JRLoader.loadObjectFromFile(archivo);
 						JasperPrint jp = JasperFillManager.fillReport(jr, parametro, con);

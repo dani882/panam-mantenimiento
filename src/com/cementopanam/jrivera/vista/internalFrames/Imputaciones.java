@@ -695,7 +695,6 @@ public class Imputaciones extends JInternalFrame {
 			String area = comboBoxArea.getSelectedItem().toString();
 			String disciplina = comboBoxDisciplina.getSelectedItem().toString();
 			String tipoCausa = comboBoxCausa.getSelectedItem().toString();
-			// String usuario = obtenerNombreUsuario();
 			String usuario = Principal.usuarioActual.getText();
 			String otraCausa = textArea_motivoCausa.getText();
 

@@ -8,6 +8,11 @@ import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
 
+import com.cementopanam.jrivera.controlador.entidad.Area;
+import com.cementopanam.jrivera.controlador.entidad.Causa;
+import com.cementopanam.jrivera.controlador.entidad.Disciplina;
+import com.cementopanam.jrivera.controlador.entidad.Equipo;
+import com.cementopanam.jrivera.controlador.entidad.SubArea;
 import com.cementopanam.jrivera.modelo.ConeccionBD;
 import com.cementopanam.jrivera.vista.Principal;
 
@@ -47,7 +52,7 @@ public class ManipulacionDatos {
 	}
 
 	/**
-	 * Metodo para agregar elementos a los comboBox
+	 * Agrega elementos a los comboBox
 	 * 
 	 * @param sentencia
 	 * @param indice
@@ -72,6 +77,11 @@ public class ManipulacionDatos {
 			} else if (sentencia.equalsIgnoreCase("disciplina") && indice == 0) {
 
 				sql = "SELECT * FROM mantenimientodb.disciplina;";
+				pstmt = con.prepareStatement(sql);
+				rs = pstmt.executeQuery();
+			} else if (sentencia.equalsIgnoreCase("subArea") && indice == 0) {
+
+				sql = "SELECT * FROM mantenimientodb.sub_area;";
 				pstmt = con.prepareStatement(sql);
 				rs = pstmt.executeQuery();
 			}
@@ -133,7 +143,7 @@ public class ManipulacionDatos {
 	}
 
 	/**
-	 * Metodo para agregar paros a la base de datos
+	 * Agrega nuevos paros a la base de datos
 	 * 
 	 * @param fechaInicio
 	 * @param fechaFin
@@ -356,8 +366,15 @@ public class ManipulacionDatos {
 		return resultado;
 	}
 
-	/*
+	/**
 	 * Actualiza el paro de Pendiente a Completado
+	 * 
+	 * @param idParo
+	 * @param tiempoFin
+	 * @param tiempoInicio
+	 * @return true - si se realizado con exito la operacion, false - si no se
+	 *         completo la operacion
+	 * @throws SQLException
 	 */
 	public boolean actualizarParo(int idParo, String tiempoFin, String tiempoInicio) throws SQLException {
 
@@ -402,14 +419,12 @@ public class ManipulacionDatos {
 		return resultado = true;
 	}
 
-	public void borrar() {
-	}
-
 	/**
-	 * Metodo para visualizar el estado de los paros
+	 * Visualiza el estado de los paros
 	 * 
 	 * @param estatus
-	 *            - Parametro para visualizar los estados de los Paros
+	 *            estado el paro - Parametro para visualizar los estados de los
+	 *            Paros
 	 * @return Resultset - Retorna el listado de paros
 	 */
 	public ResultSet actualizarTabla(String estatus) throws SQLException {
@@ -430,7 +445,7 @@ public class ManipulacionDatos {
 	}
 
 	/**
-	 * Metodo para buscar el indice de un campo
+	 * Busca el indice de un campo
 	 * 
 	 * @param indice
 	 *            - atributo que se desea buscar indice
@@ -463,6 +478,18 @@ public class ManipulacionDatos {
 		return resultado;
 	}
 
+	/**
+	 * Compara las fechas indicando cual es el mayor
+	 * 
+	 * @param fechaInicio
+	 *            - Fecha de Inicio que se va a comparar
+	 * @param fechaFin
+	 *            - Fecha de Fin que se va a comparar
+	 * @param formatoFecha
+	 *            - Formato de comparacion
+	 * @return true, si la fecha de fin es mayor a la Fecha de Inicio. false, si
+	 *         la Fecha de Inicio es mayor a la Fecha de Fin
+	 */
 	public boolean compararFecha(String fechaInicio, String fechaFin, String formatoFecha) {
 
 		if (!(fechaFin == (null))) {
@@ -487,6 +514,16 @@ public class ManipulacionDatos {
 
 	}
 
+	/**
+	 * Autentica el usuario
+	 * 
+	 * @param user
+	 *            - usuario
+	 * @param password
+	 *            - clave
+	 * @return Resultado de la busqueda de usuario
+	 * @throws SQLException
+	 */
 	public ResultSet autenticarUsuario(String user, String password) throws SQLException {
 
 		try {
@@ -506,6 +543,83 @@ public class ManipulacionDatos {
 		cs.setString(2, password);
 
 		return rs = cs.executeQuery();
+	}
+
+	/**
+	 * Agrega nuevos registros a la base de datos
+	 * 
+	 * @param area
+	 *            - registro de nueva area
+	 * @param causa
+	 *            - registro de una nueva causa
+	 * @param disciplina
+	 *            - registro de una nueva disciplina
+	 * @param equipo
+	 *            - registro de un nuevo equipo
+	 * @param subArea
+	 *            - registro de una nueva subArea
+	 * @return true, si la operacion se realizo correctamente. false, si fue lo
+	 *         contrario
+	 * @throws SQLException
+	 */
+	public boolean agregarRegistros(Area area, Causa causa, Disciplina disciplina, Equipo equipo, SubArea subArea)
+			throws SQLException {
+
+		try (Connection con = cbd.conectarABaseDatos();
+				CallableStatement cs = con.prepareCall("{call sp_agregar_registros(?,?,?,?)}");) {
+
+			// Equipo
+			cs.setString(1, equipo.getNombreEquipo());
+			cs.setString(2, "equipo");
+			cs.setString(3, equipo.getCodEquipo());
+			cs.setInt(4, equipo.getIdSubArea());
+			cs.addBatch();
+
+			// Area
+			cs.setString(1, area.getNombreArea());
+			cs.setString(2, "area");
+			cs.setString(3, area.getNombreArea());
+			cs.setInt(4, area.getIdArea());
+			cs.addBatch();
+
+			// SubArea
+			cs.setString(1, subArea.getNombreSubArea());
+			cs.setString(2, "subArea");
+			cs.setString(3, subArea.getNombreSubArea());
+			cs.setInt(4, subArea.getIdArea());
+			cs.addBatch();
+
+			// Disciplina
+			cs.setString(1, disciplina.getNombreDisciplina());
+			cs.setString(2, "disciplina");
+			cs.setString(3, disciplina.getNombreDisciplina());
+			cs.setInt(4, disciplina.getIdDisciplina());
+			cs.addBatch();
+
+			// Causa
+			cs.setString(1, causa.getTipoCausa());
+			cs.setString(2, "causa");
+			cs.setString(3, causa.getTipoCausa());
+			cs.setInt(4, 1);
+			cs.addBatch();
+
+			cs.executeBatch();
+			con.commit();
+
+		} catch (SQLException sqle) {
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+
+			con.rollback();
+			return false;
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+
+			con.rollback();
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
