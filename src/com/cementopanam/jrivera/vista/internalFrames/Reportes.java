@@ -69,7 +69,7 @@ public class Reportes extends JInternalFrame {
 	private JDateChooser informeDCFechaDesde;
 	private JDateChooser informeDCFechaHasta;
 
-	private JComboBox<String> comboBoxTipoReporte;
+	private JComboBox<String> cbTipoReporte;
 
 	private SimpleDateFormat df;
 	private JTable tablaResultado;
@@ -108,66 +108,9 @@ public class Reportes extends JInternalFrame {
 		btnInformeGenerarReporte.setFont(new Font("Verdana", Font.PLAIN, 12));
 		btnInformeGenerarReporte.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
+				generarReporte();
 
-				df = new SimpleDateFormat(formatoFecha);
-
-				String fechaInicio = df.format(informeDCFechaDesde.getDate().getTime());
-				String fechaFin = df.format(informeDCFechaHasta.getDate().getTime());
-
-				ManipulacionDatos md = new ManipulacionDatos();
-				Connection con = md.obtenerConexion();
-				String archivo = "";
-				String titulo = "";
-
-				try (InputStream in = getClass().getResourceAsStream("/properties/paros.properties");) {
-					// Carga las propiedades del archivo
-					Properties pros = new Properties();
-					pros.load(in);
-
-					switch (comboBoxTipoReporte.getSelectedIndex()) {
-					case 0:
-						// Paros por fecha
-						archivo = pros.getProperty("fecha");
-						titulo = "Fecha";
-						break;
-					case 1:
-						// Paros por Frecuencia
-						archivo = pros.getProperty("frecuencia");
-						titulo = "Frecuencia";
-						break;
-					case 2:
-						// Paros por duracion
-						archivo = pros.getProperty("duracion");
-						titulo = "Duracion";
-						break;
-					default:
-						JOptionPane.showMessageDialog(null, "Debe elegir un tipo de Paro");
-						break;
-					}
-
-					JasperReport jr = null;
-					try {
-						Map<String, Object> parametro = new HashMap<String, Object>();
-						parametro.put("fechaInicio", fechaInicio);
-						parametro.put("fechaFin", fechaFin);
-						// Sirve para que el reporte sea de una pagina
-						parametro.put(JRParameter.IS_IGNORE_PAGINATION, true);
-
-						jr = (JasperReport) JRLoader.loadObjectFromFile(archivo);
-						JasperPrint jp = JasperFillManager.fillReport(jr, parametro, con);
-
-						JasperViewer jv = new JasperViewer(jp, false);
-						jv.setVisible(true);
-						jv.setTitle("Reporte de Paros por " + titulo);
-					} catch (JRException ex) {
-						Logger.getLogger(Reportes.class.getName()).log(Level.SEVERE, null, ex);
-						JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(),
-								JOptionPane.ERROR_MESSAGE);
-					}
-				} catch (Exception e) {
-					JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
-							JOptionPane.ERROR_MESSAGE);
-				}
 			}
 		});
 
@@ -179,11 +122,11 @@ public class Reportes extends JInternalFrame {
 		JLabel lblTipoDeReporte = new JLabel("Tipo de Reporte");
 		lblTipoDeReporte.setFont(new Font("Verdana", Font.BOLD, 12));
 
-		comboBoxTipoReporte = new JComboBox<String>();
-		comboBoxTipoReporte.setModel(
-				new DefaultComboBoxModel<String>(new String[] { "Rango de Fecha", "Frecuentes", "Duracion" }));
-		comboBoxTipoReporte.setSelectedIndex(-1);
-		comboBoxTipoReporte.setFont(new Font("Verdana", Font.PLAIN, 12));
+		cbTipoReporte = new JComboBox<String>();
+		cbTipoReporte.setModel(
+				new DefaultComboBoxModel<String>(new String[] {"Rango de Fecha", "Rango de Fecha(excel)", "Frecuentes", "Duracion"}));
+		cbTipoReporte.setSelectedIndex(-1);
+		cbTipoReporte.setFont(new Font("Verdana", Font.PLAIN, 12));
 		GroupLayout gl_panelInformes = new GroupLayout(panelInformes);
 		gl_panelInformes.setHorizontalGroup(gl_panelInformes.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panelInformes.createSequentialGroup().addContainerGap()
@@ -192,13 +135,13 @@ public class Reportes extends JInternalFrame {
 										GroupLayout.PREFERRED_SIZE)
 								.addComponent(btnInformeGenerarReporte)
 								.addGroup(gl_panelInformes.createSequentialGroup().addComponent(lblTipoDeReporte)
-										.addGap(52).addComponent(comboBoxTipoReporte, GroupLayout.PREFERRED_SIZE, 154,
+										.addGap(52).addComponent(cbTipoReporte, GroupLayout.PREFERRED_SIZE, 154,
 												GroupLayout.PREFERRED_SIZE)))
 						.addContainerGap(327, Short.MAX_VALUE)));
 		gl_panelInformes.setVerticalGroup(gl_panelInformes.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panelInformes.createSequentialGroup().addGap(23)
 						.addGroup(gl_panelInformes.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblTipoDeReporte).addComponent(comboBoxTipoReporte,
+								.addComponent(lblTipoDeReporte).addComponent(cbTipoReporte,
 										GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
 						.addGap(18)
 						.addComponent(panelInformeRangoFecha, GroupLayout.PREFERRED_SIZE, 112,
@@ -376,5 +319,76 @@ public class Reportes extends JInternalFrame {
 
 		// Actualiza el JTable
 		modeloParo.fireTableDataChanged();
+	}
+
+	private void generarReporte() {
+		
+		df = new SimpleDateFormat(formatoFecha);
+
+		String fechaInicio = df.format(informeDCFechaDesde.getDate().getTime());
+		String fechaFin = df.format(informeDCFechaHasta.getDate().getTime());
+
+		ManipulacionDatos md = new ManipulacionDatos();
+		Connection con = md.obtenerConexion();
+		Map<String, Object> parametro = new HashMap<String, Object>();
+		JasperReport jr = null;
+		String archivo = "";
+		String titulo = "";
+
+		try (InputStream in = getClass().getResourceAsStream("/properties/paros.properties");) {
+			// Carga las propiedades del archivo
+			Properties pros = new Properties();
+			pros.load(in);
+
+			switch (cbTipoReporte.getSelectedIndex()) {
+			case 0:
+				// Paros por fecha
+				archivo = pros.getProperty("fecha");
+				titulo = "Fecha";
+				break;
+			
+			case 1:
+				// Paros por fecha
+				archivo = pros.getProperty("excel");
+				titulo = "Fecha";
+				// Sirve para que el reporte sea de una pagina
+				parametro.put(JRParameter.IS_IGNORE_PAGINATION, true);
+				break;
+			case 2:
+				// Paros por Frecuencia
+				archivo = pros.getProperty("frecuencia");
+				titulo = "Frecuencia";
+				break;
+			case 3:
+				// Paros por duracion
+				archivo = pros.getProperty("duracion");
+				titulo = "Duracion";
+				break;
+			default:
+				JOptionPane.showMessageDialog(null, "Debe elegir un tipo de Paro");
+				break;
+			}
+
+			try {
+				
+				parametro.put("fechaInicio", fechaInicio);
+				parametro.put("fechaFin", fechaFin);
+
+				jr = (JasperReport) JRLoader.loadObjectFromFile(archivo);
+				JasperPrint jp = JasperFillManager.fillReport(jr, parametro, con);
+
+				JasperViewer jv = new JasperViewer(jp, false);
+				jv.setVisible(true);
+				jv.setTitle("Reporte de Paros por " + titulo);
+			} catch (JRException ex) {
+				Logger.getLogger(Reportes.class.getName()).log(Level.SEVERE, null, ex);
+				JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(),
+						JOptionPane.ERROR_MESSAGE);
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+		}
+		
 	}
 }
