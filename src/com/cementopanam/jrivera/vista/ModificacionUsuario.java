@@ -11,6 +11,8 @@ import java.awt.event.ItemListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -38,6 +40,7 @@ public class ModificacionUsuario extends JDialog {
 	/**
 	 * 
 	 */
+	private static final Logger log = Logger.getLogger(ModificacionUsuario.class.getName());
 	private static final long serialVersionUID = 8299667867069516816L;
 	private final JPanel contentPanel = new JPanel();
 	private JComboBox<String> cbUsuario;
@@ -297,9 +300,11 @@ public class ModificacionUsuario extends JDialog {
 			}
 
 		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -319,6 +324,7 @@ public class ModificacionUsuario extends JDialog {
 				;
 			}
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -347,9 +353,11 @@ public class ModificacionUsuario extends JDialog {
 			}
 
 		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 	}

@@ -54,7 +54,7 @@ public class Autor extends JDialog {
 		lblRegistradorDePacientes.setBounds(6, 18, 270, 22);
 		contentPanel.add(lblRegistradorDePacientes);
 
-		JLabel lblVersion = new JLabel("Version 1.2.1 ");
+		JLabel lblVersion = new JLabel("Version 1.2.3 ");
 		lblVersion.setFont(new Font("Verdana", Font.PLAIN, 14));
 		lblVersion.setBounds(6, 52, 146, 16);
 		contentPanel.add(lblVersion);

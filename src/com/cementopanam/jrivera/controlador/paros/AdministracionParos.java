@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
@@ -13,6 +15,7 @@ import com.cementopanam.jrivera.modelo.ConeccionBD;
 
 public class AdministracionParos extends ManipulacionDatos {
 
+	private static final Logger log= Logger.getLogger( AdministracionParos.class.getName() );
 	private ConeccionBD cbd;
 	private Connection con = null;
 	private CallableStatement cs = null;
@@ -32,19 +35,26 @@ public class AdministracionParos extends ManipulacionDatos {
 				cbd.conectarABaseDatos();
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+				log.log(Level.SEVERE, e.toString(), e);
 			}
 		}
 	}
 
 	/**
+	 * Muestra los paros
 	 * @return el listado de Paros
 	 */
-	public ArrayList<Paro> mostrarParo() {
+	public ArrayList<Paro> mostrarParo(Paro p, String filtro) {
 
 		ArrayList<Paro> lista = new ArrayList<Paro>();
 		try {
 			con = cbd.conectarABaseDatos();
-			cs = con.prepareCall("{call sp_buscar_paro()}");
+			cs = con.prepareCall("{call sp_buscar_paro(?,?,?)}");
+			
+			cs.setString(1, p.getTiempoInicio());
+			cs.setString(2, p.getTiempoFin());
+			cs.setString(3, filtro);
+			
 			rs = cs.executeQuery();
 
 			while (rs.next()) {
@@ -67,12 +77,21 @@ public class AdministracionParos extends ManipulacionDatos {
 		} catch (SQLException sqle) {
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			log.log(Level.SEVERE, e.toString(), e);
 		}
 		return lista;
 	}
 
+	/**
+	 * Modifica el paro seleccionado
+	 * @param p - atributos de la entidad
+	 * @param idCausa - indice de la causa
+	 * @return - true si fue exitoso, false si no se completa la operacion
+	 * @throws SQLException
+	 */
 	public boolean modificarParo(Paro p, int idCausa) throws SQLException {
 
 		if (compararFecha(p.getTiempoInicio(), p.getTiempoFin(), formatoFecha) == false) {
@@ -102,14 +121,49 @@ public class AdministracionParos extends ManipulacionDatos {
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			con.rollback();
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			return false;
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			con.rollback();
+			log.log(Level.SEVERE, e.toString(), e);
 			return false;
 		}
 		return true;
 	}
+	
+	/**
+	 * Elimina el paro seleccionado
+	 * @param idParo - indice del paro a ser eliminar
+	 * @return - true si fue exitoso, false si no se completa la operacion
+	 * @throws SQLException
+	 */
+	public boolean eliminarParo(int idParo) throws SQLException {
+
+		try {
+
+			con = cbd.conectarABaseDatos();
+			cs = con.prepareCall("{call sp_eliminar_paro(?)}");
+
+			cs.setInt(1, idParo);
+
+			cs.execute();
+			con.commit();
+		} catch (SQLException sqle) {
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+			con.rollback();
+			log.log(Level.SEVERE, sqle.toString(), sqle);
+			return false;
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			con.rollback();
+			log.log(Level.SEVERE, e.toString(), e);
+			return false;
+		}
+		return true;
+	}
+	
 
 	/**
 	 * @param causa
@@ -144,8 +198,10 @@ public class AdministracionParos extends ManipulacionDatos {
 		} catch (SQLException sqle) {
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			log.log(Level.SEVERE, e.toString(), e);
 		}
 		return resultado;
 	}

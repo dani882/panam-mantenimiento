@@ -19,6 +19,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -58,6 +60,7 @@ public class Imputaciones extends JInternalFrame {
 	/**
 	 * 
 	 */
+	private static final Logger log = Logger.getLogger(Imputaciones.class.getName());
 	private static final long serialVersionUID = -5302400411757216295L;
 	ManipulacionDatos md;
 	ResultSet rs = null;
@@ -129,7 +132,7 @@ public class Imputaciones extends JInternalFrame {
 
 	int min = 0;
 	int max = 100;
-	private JPanel panel;
+	private JPanel panelParos;
 
 	/**
 	 * Crea el frame
@@ -156,7 +159,7 @@ public class Imputaciones extends JInternalFrame {
 		layeredPane_estatusEquipo = new JLayeredPane();
 		layeredPane_estatusEquipo.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Estatus Equipo",
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
-		layeredPane_estatusEquipo.setBounds(80, 233, 209, 53);
+		layeredPane_estatusEquipo.setBounds(80, 229, 209, 53);
 		getContentPane().add(layeredPane_estatusEquipo);
 		layeredPane_estatusEquipo.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
@@ -254,16 +257,16 @@ public class Imputaciones extends JInternalFrame {
 		comboBoxCausa.setBounds(103, 331, 159, 24);
 		getContentPane().add(comboBoxCausa);
 
-		panel = new JPanel();
-		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Paros Completados",
+		panelParos = new JPanel();
+		panelParos.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Paros Completados",
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel.setBounds(354, 49, 762, 397);
-		getContentPane().add(panel);
-		panel.setLayout(null);
+		panelParos.setBounds(354, 49, 762, 397);
+		getContentPane().add(panelParos);
+		panelParos.setLayout(null);
 
 		scrollPane_tabla = new JScrollPane();
 		scrollPane_tabla.setBounds(6, 16, 750, 375);
-		panel.add(scrollPane_tabla);
+		panelParos.add(scrollPane_tabla);
 
 		tablaParos = new JTable() {
 
@@ -343,13 +346,19 @@ public class Imputaciones extends JInternalFrame {
 								.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 						Principal.lblStatusBar.setText("No se pudo completar la operacion");
 					}
-				} catch (SQLException sqle) {
+				} 
+				catch (SQLException sqle) {
+					log.log(Level.SEVERE, sqle.toString(), sqle);
 					JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
-				} catch (ArrayIndexOutOfBoundsException aiobe) {
+				} 
+				catch (ArrayIndexOutOfBoundsException aiobe) {
+					log.log(Level.SEVERE, aiobe.toString(), aiobe);
 					JOptionPane.showMessageDialog(null, "Debe elegir un paro", aiobe.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
-				} catch (Exception e1) {
+				} 
+				catch (Exception e1) {
+					log.log(Level.SEVERE, e1.toString(), e1);
 					JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
 				} finally {
@@ -375,21 +384,25 @@ public class Imputaciones extends JInternalFrame {
 		getContentPane().add(button_equipo);
 
 		button_subArea = new JButton("+");
+		button_subArea.setEnabled(false);
 		button_subArea.setFont(new Font("Verdana", Font.PLAIN, 12));
 		button_subArea.setBounds(274, 167, 62, 25);
 		getContentPane().add(button_subArea);
 
 		button_area = new JButton("+");
+		button_area.setEnabled(false);
 		button_area.setFont(new Font("Verdana", Font.PLAIN, 12));
 		button_area.setBounds(274, 136, 62, 25);
 		getContentPane().add(button_area);
 
 		button_disciplina = new JButton("+");
+		button_disciplina.setEnabled(false);
 		button_disciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
 		button_disciplina.setBounds(274, 299, 62, 25);
 		getContentPane().add(button_disciplina);
 
 		button_causa = new JButton("+");
+		button_causa.setEnabled(false);
 		button_causa.setFont(new Font("Verdana", Font.PLAIN, 12));
 		button_causa.setBounds(274, 331, 62, 25);
 		getContentPane().add(button_causa);
@@ -408,7 +421,7 @@ public class Imputaciones extends JInternalFrame {
 			formattedTextField_fechaInicio = new JFormattedTextField();
 			dateMask.install(formattedTextField_fechaInicio);
 		} catch (ParseException e1) {
-
+			log.log(Level.SEVERE, e1.toString(), e1);
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 		formattedTextField_fechaInicio.addFocusListener(new FocusAdapter() {
@@ -431,6 +444,7 @@ public class Imputaciones extends JInternalFrame {
 			formattedTextField_fechaFin = new JFormattedTextField();
 			dateMask.install(formattedTextField_fechaFin);
 		} catch (ParseException e1) {
+			log.log(Level.SEVERE, e1.toString(), e1);
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -532,7 +546,7 @@ public class Imputaciones extends JInternalFrame {
 		btnParosPendientes = new JButton("Paros Pendientes");
 		btnParosPendientes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Paros Pendientes",
+				panelParos.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Paros Pendientes",
 						TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 				btnParosPendientesActionPerformed(e);
 			}
@@ -544,7 +558,7 @@ public class Imputaciones extends JInternalFrame {
 		btnParosCompletados = new JButton("Paros Completados");
 		btnParosCompletados.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Paros Completados",
+				panelParos.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Paros Completados",
 						TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 				btnParosCompletadosActionPerformed(e);
 			}
@@ -560,6 +574,7 @@ public class Imputaciones extends JInternalFrame {
 		try {
 			df.parse(fecha);
 		} catch (ParseException e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			return false;
 		}
 		return true;
@@ -574,6 +589,7 @@ public class Imputaciones extends JInternalFrame {
 			rs = md.actualizarTabla(estatus);
 			tablaParos.setModel(DbUtils.resultSetToTableModel(rs));
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		} finally {
 			md.cerrarConexiones();
@@ -650,11 +666,13 @@ public class Imputaciones extends JInternalFrame {
 		}
 
 		catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		}
 
 		catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		} finally {
 			md.cerrarConexiones();
@@ -736,13 +754,16 @@ public class Imputaciones extends JInternalFrame {
 				}
 			}
 		} catch (NumberFormatException nfe) {
+			log.log(Level.SEVERE, nfe.toString(), nfe);
 			JOptionPane.showMessageDialog(null, nfe.getMessage(), nfe.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 
 		catch (NullPointerException npe) {
+			log.log(Level.SEVERE, npe.toString(), npe);
 			JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos", npe.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception ex) {
+			log.log(Level.SEVERE, ex.toString(), ex);
 			JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -878,9 +899,11 @@ public class Imputaciones extends JInternalFrame {
 			}
 
 		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 		return tipoUsuario;

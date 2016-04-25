@@ -8,15 +8,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
@@ -33,6 +39,7 @@ public class AdministracionRegistros extends JInternalFrame {
 	/**
 	 * 
 	 */
+	private static final Logger log = Logger.getLogger(AdministracionRegistros.class.getName());
 	private static final long serialVersionUID = 7802198920491306605L;
 	
 	private ManipulacionDatos md = new ManipulacionDatos();
@@ -188,18 +195,59 @@ public class AdministracionRegistros extends JInternalFrame {
 		btnGuardar.setFont(new Font("Verdana", Font.PLAIN, 12));
 		panelBotones.add(btnGuardar);
 		
-		JPanel panelTitulo = new JPanel();
-		panelTitulo.setBackground(Color.BLACK);
-		panelTitulo.setBounds(0, 11, 562, 36);
-		panelAgregar.add(panelTitulo);
+		JPanel panelTituloAgregar = new JPanel();
+		panelTituloAgregar.setBackground(Color.BLACK);
+		panelTituloAgregar.setBounds(0, 11, 562, 36);
+		panelAgregar.add(panelTituloAgregar);
 		
 		JLabel lblTitulo = new JLabel("Agregar Nuevos Registros");
 		lblTitulo.setForeground(Color.WHITE);
 		lblTitulo.setFont(new Font("Verdana", Font.BOLD, 16));
-		panelTitulo.add(lblTitulo);
+		panelTituloAgregar.add(lblTitulo);
 		
 		JPanel panelBorrar = new JPanel();
 		tabbedPane.addTab("Borrar", null, panelBorrar, null);
+		panelBorrar.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panelTituloBorrar = new JPanel();
+		panelTituloBorrar.setBackground(Color.BLACK);
+		panelBorrar.add(panelTituloBorrar, BorderLayout.NORTH);
+		
+		JLabel lblTituloBorrar = new JLabel("Borrar Registros");
+		lblTituloBorrar.setForeground(Color.WHITE);
+		lblTituloBorrar.setFont(new Font("Verdana", Font.BOLD, 16));
+		panelTituloBorrar.add(lblTituloBorrar);
+		
+		JPanel panelCentroBorrar = new JPanel();
+		panelBorrar.add(panelCentroBorrar, BorderLayout.CENTER);
+		
+		JLabel lblArea = new JLabel("Area");
+		lblArea.setFont(new Font("Verdana", Font.PLAIN, 12));
+		
+		JScrollPane scrollPaneArea = new JScrollPane();
+		
+		JList listArea = new JList();
+		scrollPaneArea.setViewportView(listArea);
+		listArea.setFont(new Font("Verdana", Font.PLAIN, 12));
+		GroupLayout gl_panelCentroBorrar = new GroupLayout(panelCentroBorrar);
+		gl_panelCentroBorrar.setHorizontalGroup(
+			gl_panelCentroBorrar.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panelCentroBorrar.createSequentialGroup()
+					.addGap(10)
+					.addComponent(lblArea))
+				.addGroup(gl_panelCentroBorrar.createSequentialGroup()
+					.addGap(11)
+					.addComponent(scrollPaneArea, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE))
+		);
+		gl_panelCentroBorrar.setVerticalGroup(
+			gl_panelCentroBorrar.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panelCentroBorrar.createSequentialGroup()
+					.addGap(11)
+					.addComponent(lblArea)
+					.addGap(12)
+					.addComponent(scrollPaneArea, GroupLayout.PREFERRED_SIZE, 153, GroupLayout.PREFERRED_SIZE))
+		);
+		panelCentroBorrar.setLayout(gl_panelCentroBorrar);
 		setTitle("Administracion de Registros");
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setBounds(100, 10, 569, 663);
@@ -304,10 +352,12 @@ private void guardarRegistros() {
 			
 			
 		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(), 
 					JOptionPane.ERROR_MESSAGE);
 		}
 		catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), 
 					JOptionPane.ERROR_MESSAGE);
 		}
@@ -352,10 +402,12 @@ private void guardarRegistros() {
 			}
 			
 		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(), 
 					JOptionPane.ERROR_MESSAGE);
 		}
 		catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), 
 					JOptionPane.ERROR_MESSAGE);
 		}

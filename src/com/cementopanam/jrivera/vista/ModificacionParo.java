@@ -6,8 +6,12 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -17,6 +21,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -31,18 +36,17 @@ import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
 import com.cementopanam.jrivera.vista.helper.JComboBoxPersonalizado;
 import com.cementopanam.jrivera.vista.internalFrames.Reportes;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class ModificacionParo extends JDialog {
 
 	/**
 	 * 
 	 */
+	private static final Logger LOG = Logger.getLogger( ModificacionParo.class.getName() );
 	private static final long serialVersionUID = -7239938319668117403L;
 	private final JPanel contentPanel = new JPanel();
-	private JButton okButton;
-	private JButton cancelButton;
+	private JButton btnGuardar;
+	private JButton btnCancelar;
 	private JLabel lblTiempoInicio;
 	private JLabel lblTiempoFin;
 	private JTextField txtTiempoInicio;
@@ -52,12 +56,13 @@ public class ModificacionParo extends JDialog {
 	private JComboBox<String> cbDisciplina;
 	private JTextArea txtAreaSolucion;
 
-	private int codigo;
+	private int codigoParo;
 	private int codigoCausa;
 
 	private AdministracionParos admParo;
 	private JDesktopPane desktopPane;
 	private JLabel label;
+	private JButton btnBorrar;
 
 	public ModificacionParo(Paro modificacion, AdministracionParos paroDB, JDesktopPane desktopPane) {
 
@@ -78,13 +83,17 @@ public class ModificacionParo extends JDialog {
 				cbDisciplina.addItem(rs2.getString("nombre_disciplina"));
 			}
 
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
+			 LOG.log(Level.SEVERE, e.toString(), e);
 		}
 
-		codigo = modificacion.getCodigo();
+		
+		codigoParo = modificacion.getCodigo();
 
 		// Obtiene el codigo de Causa
 		if (modificacion.getDescripcionAdicional().length() == 0) {
+			
 			codigoCausa = Integer.parseInt(admParo.buscarIndiceCausa(modificacion.getCausa(), ""));
 		} else {
 			codigoCausa = Integer.parseInt(
@@ -104,9 +113,9 @@ public class ModificacionParo extends JDialog {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				
+
 				mostrarReporte();
-				
+
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 				Principal.lblStatusBar.setText("Operacion cancelada por el usuario");
 			}
@@ -163,56 +172,58 @@ public class ModificacionParo extends JDialog {
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-						.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-								.addGroup(gl_contentPanel.createSequentialGroup()
-										.addContainerGap()
-										.addComponent(scrollPaneSolucion, GroupLayout.DEFAULT_SIZE,
-												265, Short.MAX_VALUE)
-										.addPreferredGap(ComponentPlacement.UNRELATED)
-										.addComponent(scrollPaneDescripcionAdicional, GroupLayout.PREFERRED_SIZE, 267,
-												GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_contentPanel.createSequentialGroup().addGap(8)
-										.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-												.addComponent(lblTiempoInicio).addComponent(lblDisciplina))
-										.addPreferredGap(ComponentPlacement.UNRELATED)
-										.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
-												.addComponent(cbDisciplina, GroupLayout.DEFAULT_SIZE,
-														GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(txtTiempoInicio, GroupLayout.DEFAULT_SIZE, 155,
-														Short.MAX_VALUE))
-										.addPreferredGap(ComponentPlacement.UNRELATED)
-										.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-												.addComponent(lblCausa)
-												.addGroup(gl_contentPanel.createSequentialGroup()
-														.addComponent(lblTiempoFin).addGap(18).addGroup(
-																gl_contentPanel.createParallelGroup(Alignment.LEADING)
-																		.addComponent(cbCausa, Alignment.TRAILING,
-																				0, 162, Short.MAX_VALUE)
-																		.addComponent(txtTiempoFin,
-																				GroupLayout.DEFAULT_SIZE, 162,
-																				Short.MAX_VALUE))))))
+						.addGroup(
+								gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+										.addGroup(gl_contentPanel.createSequentialGroup().addContainerGap()
+												.addComponent(scrollPaneSolucion, GroupLayout.DEFAULT_SIZE,
+														265, Short.MAX_VALUE)
+												.addPreferredGap(ComponentPlacement.UNRELATED)
+												.addComponent(scrollPaneDescripcionAdicional,
+														GroupLayout.PREFERRED_SIZE, 267, GroupLayout.PREFERRED_SIZE))
+										.addGroup(gl_contentPanel.createSequentialGroup().addGap(8)
+												.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+														.addComponent(lblTiempoInicio).addComponent(lblDisciplina))
+												.addPreferredGap(ComponentPlacement.UNRELATED)
+												.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
+														.addComponent(cbDisciplina, GroupLayout.DEFAULT_SIZE,
+																GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(txtTiempoInicio, GroupLayout.DEFAULT_SIZE, 155,
+																Short.MAX_VALUE))
+												.addPreferredGap(ComponentPlacement.UNRELATED)
+												.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+														.addComponent(lblCausa)
+														.addGroup(gl_contentPanel.createSequentialGroup()
+																.addComponent(lblTiempoFin).addGap(18).addGroup(
+																		gl_contentPanel
+																				.createParallelGroup(Alignment.LEADING)
+																				.addComponent(cbCausa,
+																						Alignment.TRAILING, 0,
+																						162, Short.MAX_VALUE)
+																				.addComponent(txtTiempoFin,
+																						GroupLayout.DEFAULT_SIZE, 162,
+																						Short.MAX_VALUE))))))
 						.addContainerGap()));
-		gl_contentPanel.setVerticalGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING).addGroup(gl_contentPanel
-				.createSequentialGroup().addGap(38)
-				.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblTiempoInicio)
-						.addComponent(txtTiempoInicio, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
-						.addComponent(txtTiempoFin, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblTiempoFin))
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addGroup(
-						gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(cbDisciplina, GroupLayout.PREFERRED_SIZE, 31,
+		gl_contentPanel.setVerticalGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPanel.createSequentialGroup().addGap(38)
+						.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblTiempoInicio)
+								.addComponent(txtTiempoInicio, GroupLayout.PREFERRED_SIZE, 27,
 										GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblDisciplina).addComponent(lblCausa).addComponent(cbCausa,
-										GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE))
-				.addGap(54)
-				.addGroup(
-						gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(txtTiempoFin, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblTiempoFin))
+						.addPreferredGap(ComponentPlacement.UNRELATED)
+						.addGroup(
+								gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+										.addComponent(cbDisciplina, GroupLayout.PREFERRED_SIZE, 31,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(lblDisciplina).addComponent(lblCausa).addComponent(cbCausa,
+												GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE))
+						.addGap(54)
+						.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(scrollPaneSolucion, GroupLayout.PREFERRED_SIZE, 137,
 										GroupLayout.PREFERRED_SIZE)
 								.addComponent(scrollPaneDescripcionAdicional, GroupLayout.PREFERRED_SIZE, 137,
 										GroupLayout.PREFERRED_SIZE))
-				.addContainerGap(25, Short.MAX_VALUE)));
+						.addContainerGap(25, Short.MAX_VALUE)));
 
 		txtDescripcionAdicional = new JTextArea();
 		txtDescripcionAdicional.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -227,9 +238,9 @@ public class ModificacionParo extends JDialog {
 			buttonPaneBotones.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPaneBotones, BorderLayout.SOUTH);
 			{
-				okButton = new JButton("Guardar");
-				okButton.setIcon(new ImageIcon(ModificacionParo.class.getResource("/iconos32x32/ok32x32.png")));
-				okButton.addActionListener(new ActionListener() {
+				btnGuardar = new JButton("Guardar");
+				btnGuardar.setIcon(new ImageIcon(ModificacionParo.class.getResource("/iconos32x32/ok32x32.png")));
+				btnGuardar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 
 						actualizarParo();
@@ -237,35 +248,78 @@ public class ModificacionParo extends JDialog {
 					}
 
 				});
-				okButton.setFont(new Font("Verdana", Font.PLAIN, 12));
-				okButton.setActionCommand("OK");
-				buttonPaneBotones.add(okButton);
-				getRootPane().setDefaultButton(okButton);
+				btnGuardar.setFont(new Font("Verdana", Font.PLAIN, 12));
+				btnGuardar.setActionCommand("OK");
+				buttonPaneBotones.add(btnGuardar);
+				getRootPane().setDefaultButton(btnGuardar);
 			}
 
 			{
-				cancelButton = new JButton("Cancelar");
-				cancelButton.setIcon(new ImageIcon(ModificacionParo.class.getResource("/iconos32x32/fail32x32.png")));
-				cancelButton.addActionListener(new ActionListener() {
+				btnCancelar = new JButton("Cancelar");
+				btnCancelar.setIcon(new ImageIcon(ModificacionParo.class.getResource("/iconos32x32/fail32x32.png")));
+				btnCancelar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 
 						mostrarReporte();
-						
-						Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+
+						Principal.lblStatusBar
+								.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 						Principal.lblStatusBar.setText("Operacion cancelada por el usuario");
 					}
 				});
-				cancelButton.setFont(new Font("Verdana", Font.PLAIN, 12));
-				cancelButton.setActionCommand("Cancel");
-				buttonPaneBotones.add(cancelButton);
+
+				btnBorrar = new JButton("Borrar");
+				btnBorrar.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						eliminarParo(codigoParo);
+					}
+				});
+				btnBorrar.setIcon(new ImageIcon(ModificacionParo.class.getResource("/iconos32x32/delete32x32.png")));
+				btnBorrar.setFont(new Font("Verdana", Font.PLAIN, 12));
+				buttonPaneBotones.add(btnBorrar);
+				btnCancelar.setFont(new Font("Verdana", Font.PLAIN, 12));
+				btnCancelar.setActionCommand("Cancel");
+				buttonPaneBotones.add(btnCancelar);
 			}
-			
+
 			label = new JLabel(" ");
 			buttonPaneBotones.add(label);
 		}
 	}
 
-	protected void mostrarReporte() {
+	private void eliminarParo(int idParo) {
+
+		//Coloca el boton de OptonPane en Espanol
+		UIManager.put("OptionPane.yesButtonText", "Si");
+		int respuesta = JOptionPane.showConfirmDialog(null, "Esta seguro que desea borrar este paro?",
+				"Confirmar Borrado", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+		if (respuesta == JOptionPane.NO_OPTION) {
+			return;
+		} else if (respuesta == JOptionPane.YES_OPTION) {
+
+			try {
+
+				if (admParo.eliminarParo(idParo) == true) {
+
+					Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
+					Principal.lblStatusBar.setText("Paro Eliminado correctamente");
+
+					mostrarReporte();
+				} else {
+					Principal.lblStatusBar
+							.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+					Principal.lblStatusBar.setText("No se pudo completar la operacion");
+				}
+			} catch (SQLException e) {
+				LOG.log(Level.SEVERE, e.toString(), e);
+			}
+		} else if (respuesta == JOptionPane.CLOSED_OPTION) {
+			return;
+		}
+	}
+
+	private void mostrarReporte() {
 
 		Reportes repo = new Reportes();
 		desktopPane.add(repo);
@@ -289,7 +343,7 @@ public class ModificacionParo extends JDialog {
 		// Si el paro fue exitoso
 		try {
 			if (admParo.modificarParo(
-					new Paro(codigo, tiempoInicio, tiempoFin, solucion, causa, descripcionAdicional, disciplina),
+					new Paro(codigoParo, tiempoInicio, tiempoFin, solucion, causa, descripcionAdicional, disciplina),
 					codigoCausa) == true) {
 
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
@@ -301,7 +355,7 @@ public class ModificacionParo extends JDialog {
 				Principal.lblStatusBar.setText("No se pudo completar la operacion");
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			LOG.log(Level.SEVERE, e.toString(), e);
 			e.printStackTrace();
 		}
 	}

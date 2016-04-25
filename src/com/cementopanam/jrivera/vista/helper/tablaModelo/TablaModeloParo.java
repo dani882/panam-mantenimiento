@@ -33,7 +33,7 @@ public class TablaModeloParo extends AbstractTableModel {
 	AdministracionParos paros = new AdministracionParos();
 
 	public TablaModeloParo() {
-		lista = paros.mostrarParo();
+		lista = paros.mostrarParo(new Paro(), "");
 	}
 
 	public void eliminar(int fila) {
@@ -46,8 +46,8 @@ public class TablaModeloParo extends AbstractTableModel {
 		fireTableDataChanged();
 	}
 
-	public void buscar(String codigo) {
-		// lista = paros.mostrarParo(codigo);
+	public void buscar(Paro paro, String filtro) {
+		 lista = paros.mostrarParo(paro, filtro);
 		fireTableDataChanged();
 	}
 

@@ -12,6 +12,8 @@ import java.awt.event.MouseEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -39,6 +41,7 @@ public class Login extends JFrame {
 	/**
 	 * 
 	 */
+	private static final Logger log = Logger.getLogger(Login.class.getName());
 	private static final long serialVersionUID = 1788905256991802788L;
 	private ManipulacionDatos md;
 	private ResultSet rs = null;
@@ -109,6 +112,7 @@ public class Login extends JFrame {
 			// UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 		}
 
 		EventQueue.invokeLater(new Runnable() {
@@ -116,7 +120,8 @@ public class Login extends JFrame {
 				try {
 					new Login().setVisible(true);
 				} catch (Exception e) {
-					JOptionPane.showMessageDialog(null, e);
+					log.log(Level.SEVERE, e.toString(), e);
+					JOptionPane.showMessageDialog(null, e.getMessage());
 				}
 			}
 		});
@@ -152,7 +157,7 @@ public class Login extends JFrame {
 
 				if (tipoUsuario == 1 && estadoUsuario.equalsIgnoreCase("activo")) {
 					// Interfaz de Administrador
-					System.out.println("Es Administrador");
+					log.info("Es Administrador");
 					// guardarUsuario();
 
 					// Ejecuta la Pantalla Principal con el Thread de la Barra
@@ -167,7 +172,7 @@ public class Login extends JFrame {
 					return true;
 				} else if (tipoUsuario == 2 && estadoUsuario.equalsIgnoreCase("activo")) {
 					// Interfaz de el Operador
-					System.out.println("Es Operador");
+					log.info("Es Operador");
 					// guardarUsuario();
 
 					Principal.usuarioActual.setText(getNombreUsuario());
@@ -180,8 +185,7 @@ public class Login extends JFrame {
 					return true;
 				} else if (tipoUsuario == 3 && estadoUsuario.equalsIgnoreCase("activo")) {
 					// Interfaz de el Consultor
-					System.out.println("Es Consultor");
-
+					log.info("Es Consultor");
 					SwingUtilities.invokeLater(p);
 
 					Principal.usuarioActual.setText(getNombreUsuario());
@@ -203,10 +207,12 @@ public class Login extends JFrame {
 				return false;
 			}
 		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			return false;
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			return false;
 		}

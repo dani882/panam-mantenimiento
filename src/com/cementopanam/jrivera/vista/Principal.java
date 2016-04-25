@@ -29,8 +29,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import org.apache.log4j.Logger;
-
 import com.cementopanam.jrivera.vista.helper.BarraEstado;
 import com.cementopanam.jrivera.vista.helper.TimerThread;
 import com.cementopanam.jrivera.vista.internalFrames.AdministracionRegistros;
@@ -59,7 +57,6 @@ public class Principal extends JFrame implements Runnable {
 	public JButton btnAdministrar;
 
 	public static JLabel usuarioActual = new JLabel();
-	private Logger logger = Logger.getLogger(this.getClass());
 
 	private JButton btnCerrarSession;
 
@@ -301,7 +298,14 @@ public class Principal extends JFrame implements Runnable {
 	}
 
 	private void btnReportesActionPerformed(ActionEvent e) {
-		reportes.setVisible(true);
+		if(btnImputaciones.isVisible()) {
+			reportes.setVisible(true);
+		}
+		else {
+			reportes.setVisible(true);
+			reportes.tabbedPane.setEnabledAt(0, false);
+			reportes.tabbedPane.setSelectedIndex(1);
+		}
 	}
 
 	private void btnAuthorActionPerformed(ActionEvent e) {

@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
@@ -18,6 +20,7 @@ import com.cementopanam.jrivera.vista.Principal;
 
 public class ManipulacionDatos {
 
+	private static final Logger log = Logger.getLogger(ManipulacionDatos.class.getName());
 	private ConeccionBD cbd;
 	private Connection con = null;
 	private CallableStatement cs = null;
@@ -34,6 +37,7 @@ public class ManipulacionDatos {
 			try {
 				cbd.conectarABaseDatos();
 			} catch (Exception e) {
+				log.log(Level.SEVERE, e.toString(), e);
 				JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			}
 		}
@@ -46,6 +50,7 @@ public class ManipulacionDatos {
 			cbd = ConeccionBD.getInstance();
 			con = cbd.conectarABaseDatos();
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 		return con;
@@ -111,6 +116,7 @@ public class ManipulacionDatos {
 				}
 			}
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -327,6 +333,7 @@ public class ManipulacionDatos {
 						pstmt.executeUpdate();
 
 					} catch (Exception e) {
+						log.log(Level.SEVERE, e.toString(), e);
 						JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
 								JOptionPane.ERROR_MESSAGE);
 						con.rollback();
@@ -344,17 +351,20 @@ public class ManipulacionDatos {
 
 			} catch (SQLException sqle) {
 
+				log.log(Level.SEVERE, sqle.toString(), sqle);
 				JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 						JOptionPane.ERROR_MESSAGE);
 				con.rollback();
 				resultado = false;
 			}
 		} catch (SQLException e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			try {
 				con.rollback();
 				resultado = false;
 
 			} catch (Exception ex) {
+				log.log(Level.SEVERE, ex.toString(), ex);
 				JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(),
 						JOptionPane.ERROR_MESSAGE);
 			}
@@ -392,6 +402,7 @@ public class ManipulacionDatos {
 
 				return resultado = false;
 			} catch (Exception e) {
+				log.log(Level.SEVERE, e.toString(), e);
 			}
 		}
 
@@ -432,6 +443,7 @@ public class ManipulacionDatos {
 		try {
 			con = cbd.conectarABaseDatos();
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -470,9 +482,11 @@ public class ManipulacionDatos {
 			resultado = cs.getString(3);
 
 		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 		return resultado;
@@ -506,6 +520,7 @@ public class ManipulacionDatos {
 
 					return false;
 				} catch (Exception e) {
+					log.log(Level.SEVERE, e.toString(), e);
 				}
 			}
 
@@ -530,7 +545,7 @@ public class ManipulacionDatos {
 
 			con = cbd.conectarABaseDatos();
 		} catch (Exception e) {
-
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -607,12 +622,14 @@ public class ManipulacionDatos {
 			con.commit();
 
 		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
 			return false;
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
@@ -644,9 +661,12 @@ public class ManipulacionDatos {
 
 			cbd.cerrarConexion();
 		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
+
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 	}

@@ -11,11 +11,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
 public class ConeccionBD {
 
+	private static final Logger log = Logger.getLogger(ConeccionBD.class.getName());
 	private Connection con = null;
 
 	private static ConeccionBD cbd = new ConeccionBD();
@@ -56,6 +59,7 @@ public class ConeccionBD {
 		}
 
 		catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 

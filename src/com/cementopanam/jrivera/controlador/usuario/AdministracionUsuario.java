@@ -4,6 +4,8 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
@@ -16,6 +18,7 @@ import com.cementopanam.jrivera.modelo.ConeccionBD;
  */
 public class AdministracionUsuario extends ManipulacionDatos {
 
+	private static final Logger log = Logger.getLogger(AdministracionUsuario.class.getName());
 	private ConeccionBD cbd;
 	private Connection con;
 	private CallableStatement cs = null;
@@ -29,6 +32,7 @@ public class AdministracionUsuario extends ManipulacionDatos {
 			try {
 				cbd.conectarABaseDatos();
 			} catch (Exception e) {
+				log.log(Level.SEVERE, e.toString(), e);
 				JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			}
 		}
@@ -49,12 +53,14 @@ public class AdministracionUsuario extends ManipulacionDatos {
 			cs.execute();
 			con.commit();
 		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
 			return false;
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
@@ -78,12 +84,14 @@ public class AdministracionUsuario extends ManipulacionDatos {
 			cs.execute();
 			con.commit();
 		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
 			return false;
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
@@ -104,10 +112,12 @@ public class AdministracionUsuario extends ManipulacionDatos {
 		}
 
 		catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 
 		}

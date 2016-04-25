@@ -60,6 +60,7 @@ public class Reportes extends JInternalFrame {
 	/**
 	 * 
 	 */
+	private static final Logger log = Logger.getLogger(Reportes.class.getName());
 	private static final long serialVersionUID = 3425343178839382975L;
 
 	private String formatoFecha = "yyyy-MM-dd";
@@ -75,6 +76,7 @@ public class Reportes extends JInternalFrame {
 	private JTable tablaResultado;
 	private TablaModeloParo modeloParo = new TablaModeloParo();
 	private JButton btnBuscar;
+	public JTabbedPane tabbedPane;
 
 	/**
 	 * Crea el frame.
@@ -93,7 +95,7 @@ public class Reportes extends JInternalFrame {
 		getContentPane().setFont(new Font("Verdana", Font.PLAIN, 12));
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setFont(new Font("Verdana", Font.PLAIN, 12));
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
@@ -150,6 +152,7 @@ public class Reportes extends JInternalFrame {
 						.addComponent(btnInformeGenerarReporte).addContainerGap()));
 
 		informeDCFechaHasta = new JDateChooser();
+		informeDCFechaHasta.getCalendarButton().setFont(new Font("Verdana", Font.PLAIN, 12));
 		informeDCFechaHasta.setBounds(153, 61, 155, 28);
 		panelInformeRangoFecha.add(informeDCFechaHasta);
 
@@ -159,6 +162,7 @@ public class Reportes extends JInternalFrame {
 		panelInformeRangoFecha.add(lblFechaDeInicio);
 
 		informeDCFechaDesde = new JDateChooser();
+		informeDCFechaDesde.getCalendarButton().setFont(new Font("Verdana", Font.PLAIN, 12));
 		informeDCFechaDesde.setBounds(153, 21, 155, 28);
 		panelInformeRangoFecha.add(informeDCFechaDesde);
 
@@ -252,6 +256,10 @@ public class Reportes extends JInternalFrame {
 						disciplina = String.valueOf(tablaResultado.getValueAt(fila, 5));
 						causa = String.valueOf(tablaResultado.getValueAt(fila, 6));
 						descripcionAdicional = String.valueOf(tablaResultado.getValueAt(fila, 7));
+						
+						if(descripcionAdicional.equals(null) || descripcionAdicional.equals("")) {
+							descripcionAdicional = "";;
+						}
 						tiempoInicio = String.valueOf(tablaResultado.getValueAt(fila, 8));
 						tiempoFin = String.valueOf(tablaResultado.getValueAt(fila, 9));
 						solucion = String.valueOf(tablaResultado.getValueAt(fila, 10));
@@ -278,8 +286,8 @@ public class Reportes extends JInternalFrame {
 		btnBuscar = new JButton("Buscar");
 		btnBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				modeloParo.buscar("");
+				
+				buscarParo();
 
 			}
 		});
@@ -295,30 +303,61 @@ public class Reportes extends JInternalFrame {
 		panelRangoFecha.setLayout(null);
 
 		JLabel labelDesde = new JLabel("Desde");
-		labelDesde.setEnabled(false);
 		labelDesde.setFont(new Font("Verdana", Font.PLAIN, 12));
 		labelDesde.setBounds(10, 23, 65, 25);
 		panelRangoFecha.add(labelDesde);
 
 		JLabel labelHasta = new JLabel("Hasta");
-		labelHasta.setEnabled(false);
 		labelHasta.setFont(new Font("Verdana", Font.PLAIN, 12));
 		labelHasta.setBounds(10, 59, 65, 25);
 		panelRangoFecha.add(labelHasta);
 
 		busquedaDCFechaHasta = new JDateChooser();
+		busquedaDCFechaHasta.getCalendarButton().setFont(new Font("Verdana", Font.PLAIN, 12));
 		busquedaDCFechaHasta.setBounds(85, 59, 159, 25);
-		busquedaDCFechaHasta.setEnabled(false);
 		panelRangoFecha.add(busquedaDCFechaHasta);
 
 		busquedaDCFechaDesde = new JDateChooser();
+		busquedaDCFechaDesde.getCalendarButton().setFont(new Font("Verdana", Font.PLAIN, 12));
 		busquedaDCFechaDesde.setBounds(85, 23, 159, 25);
-		busquedaDCFechaDesde.setEnabled(false);
 		panelRangoFecha.add(busquedaDCFechaDesde);
 		setBounds(60, 26, 850, 663);
 
 		// Actualiza el JTable
 		modeloParo.fireTableDataChanged();
+	}
+
+	private void buscarParo() {
+		
+		try{
+			df = new SimpleDateFormat(formatoFecha);
+			
+			String fInicio = df.format(busquedaDCFechaDesde.getDate().getTime());
+			String fFin = df.format(busquedaDCFechaHasta.getDate().getTime());
+			
+			Paro paro = new Paro();
+			paro.setTiempoInicio(fInicio);
+			paro.setTiempoFin(fFin);
+
+			log.info("Tiempo Inicio " + paro.getTiempoInicio());
+			log.info("Tiempo Fin " + paro.getTiempoFin());
+			
+			if(paro.getTiempoInicio().equals(null) || paro.getTiempoFin().equals(null)) {
+				modeloParo.buscar(new Paro(), "");
+			}
+			else {
+				modeloParo.buscar(paro, "fecha");
+			}
+		}
+		
+		catch(NullPointerException npe) {
+			log.log(Level.WARNING, npe.toString(), npe);
+			modeloParo.buscar(new Paro(), "");
+		}
+		catch(Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			log.log(Level.SEVERE, e.toString(), e);
+		}
 	}
 
 	private void generarReporte() {
@@ -328,6 +367,8 @@ public class Reportes extends JInternalFrame {
 		String fechaInicio = df.format(informeDCFechaDesde.getDate().getTime());
 		String fechaFin = df.format(informeDCFechaHasta.getDate().getTime());
 
+		log.info("Feha de Inicio " + fechaInicio);
+		log.info("Feha de Fin " + fechaFin);
 		ManipulacionDatos md = new ManipulacionDatos();
 		Connection con = md.obtenerConexion();
 		Map<String, Object> parametro = new HashMap<String, Object>();
@@ -381,14 +422,14 @@ public class Reportes extends JInternalFrame {
 				jv.setVisible(true);
 				jv.setTitle("Reporte de Paros por " + titulo);
 			} catch (JRException ex) {
-				Logger.getLogger(Reportes.class.getName()).log(Level.SEVERE, null, ex);
+				log.log(Level.SEVERE, ex.toString(), ex);
 				JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(),
 						JOptionPane.ERROR_MESSAGE);
 			}
 		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		}
-		
 	}
 }
