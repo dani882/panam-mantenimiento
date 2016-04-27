@@ -39,9 +39,9 @@ public class AdministracionParos extends ManipulacionDatos {
 			}
 		}
 	}
-
+	
 	/**
-	 * Muestra los paros
+	 * Muestra los paros en la busqueda de paros
 	 * @return el listado de Paros
 	 */
 	public ArrayList<Paro> mostrarParo(Paro p, String filtro) {

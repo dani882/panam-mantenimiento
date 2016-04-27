@@ -388,8 +388,6 @@ public class ManipulacionDatos {
 	 */
 	public boolean actualizarParo(int idParo, String tiempoFin, String tiempoInicio) throws SQLException {
 
-		boolean resultado = false;
-
 		// Verifica si la fecha de Fin es Mayor a Fecha Inicio de Paro
 		ComparacionFechas cf = new ComparacionFechas();
 		boolean comparacionFechas = cf.compararFechas(tiempoInicio, tiempoFin, formatoFecha);
@@ -400,7 +398,7 @@ public class ManipulacionDatos {
 				JOptionPane.showMessageDialog(null, "La fecha Fin no puede ser Mayor a la Fecha de " + "Inicio de Paro",
 						"Comparacion Fechas", JOptionPane.ERROR_MESSAGE);
 
-				return resultado = false;
+				return false;
 			} catch (Exception e) {
 				log.log(Level.SEVERE, e.toString(), e);
 			}
@@ -414,7 +412,7 @@ public class ManipulacionDatos {
 			JOptionPane.showMessageDialog(null, "Debe escribir la solucion del paro", "Solucion de Paro",
 					JOptionPane.WARNING_MESSAGE);
 
-			return resultado;
+			return false;
 		}
 		con = cbd.conectarABaseDatos();
 
@@ -427,7 +425,7 @@ public class ManipulacionDatos {
 		cs.execute();
 		con.commit();
 
-		return resultado = true;
+		return true;
 	}
 
 	/**

@@ -33,7 +33,6 @@ import com.jtattoo.plaf.acryl.AcrylLookAndFeel;
 
 /**
  * @autor Jesus Rivera
- * @version 1.0
  */
 
 public class Login extends JFrame {

@@ -36,6 +36,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
@@ -276,18 +277,20 @@ public class Imputaciones extends JInternalFrame {
 			private static final long serialVersionUID = -6964605111921202585L;
 
 			@Override
-			public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+			public Component prepareRenderer(TableCellRenderer renderizador, int fila, int columna) {
 
 				// Ajusta la columna de la tabla a un tamano adecuado
-				Component componente = super.prepareRenderer(renderer, row, column);
+				Component componente = super.prepareRenderer(renderizador, fila, columna);
 				int archoRenderizador = componente.getPreferredSize().width;
-				TableColumn columnaTabla = getColumnModel().getColumn(column);
+				TableColumn columnaTabla = getColumnModel().getColumn(columna);
 				columnaTabla.setPreferredWidth(
 						Math.max(archoRenderizador + getIntercellSpacing().width, columnaTabla.getPreferredWidth()));
 				return componente;
 			}
 		};
 		tablaParos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		// Sirve para limitar para que sea una sola seleccion
+		tablaParos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		// Sirve para no permitir que el usuario reordene las columnas
 		tablaParos.getTableHeader().setReorderingAllowed(false);
 		tablaParos.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -353,7 +356,7 @@ public class Imputaciones extends JInternalFrame {
 							JOptionPane.ERROR_MESSAGE);
 				} 
 				catch (ArrayIndexOutOfBoundsException aiobe) {
-					log.log(Level.SEVERE, aiobe.toString(), aiobe);
+					log.log(Level.WARNING, aiobe.toString(), aiobe);
 					JOptionPane.showMessageDialog(null, "Debe elegir un paro", aiobe.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
 				} 
@@ -421,7 +424,7 @@ public class Imputaciones extends JInternalFrame {
 			formattedTextField_fechaInicio = new JFormattedTextField();
 			dateMask.install(formattedTextField_fechaInicio);
 		} catch (ParseException e1) {
-			log.log(Level.SEVERE, e1.toString(), e1);
+			log.log(Level.WARNING, e1.toString(), e1);
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 		formattedTextField_fechaInicio.addFocusListener(new FocusAdapter() {
@@ -444,7 +447,7 @@ public class Imputaciones extends JInternalFrame {
 			formattedTextField_fechaFin = new JFormattedTextField();
 			dateMask.install(formattedTextField_fechaFin);
 		} catch (ParseException e1) {
-			log.log(Level.SEVERE, e1.toString(), e1);
+			log.log(Level.WARNING, e1.toString(), e1);
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -759,25 +762,17 @@ public class Imputaciones extends JInternalFrame {
 		}
 
 		catch (NullPointerException npe) {
-			log.log(Level.SEVERE, npe.toString(), npe);
+			log.log(Level.WARNING, npe.toString(), npe);
 			JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos", npe.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, ex.toString(), ex);
 			JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
-
-		/*
-		 * //Barra de progreso Principal.pbar.setStringPainted(true); for (int i
-		 * = min; i <= max; i++) { final int porcentaje = i;
-		 * SwingUtilities.invokeLater(new Runnable() { public void run() {
-		 * Principal.pbar.setValue(porcentaje); Principal.pbar.repaint(); } });
-		 * }
-		 */
 	}
 
 	/**
-	 * Metodo para retornar el Estado de los equipos
+	 * Retorna el Estado de los equipos
 	 * 
 	 * @return Retorna el estado del equipo
 	 */
@@ -789,7 +784,7 @@ public class Imputaciones extends JInternalFrame {
 	}
 
 	/**
-	 * Metodo para retorna el Estado de Paros
+	 * Retorna el Estado de Paro elegido
 	 * 
 	 * @return Retorna el estado del Paro
 	 */
@@ -823,7 +818,7 @@ public class Imputaciones extends JInternalFrame {
 		comboBoxArea.setEnabled(true);
 		btnIniciarParo.setEnabled(true);
 		comboBoxDisciplina.setEnabled(true);
-		;
+		
 		comboBoxCausa.setEnabled(true);
 		scrollPane_MotivoCausa.setEnabled(true);
 		textArea_motivoCausa.setEnabled(true);
@@ -845,7 +840,7 @@ public class Imputaciones extends JInternalFrame {
 	}
 
 	/**
-	 * Metodo para mostrar los Paros Pendientes en una Tabla
+	 * Muestra los Paros Pendientes en una Tabla
 	 * 
 	 * @param e
 	 */

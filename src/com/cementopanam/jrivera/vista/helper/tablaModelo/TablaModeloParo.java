@@ -22,8 +22,8 @@ public class TablaModeloParo extends AbstractTableModel {
 	private static final int DISCIPLINA = 5;
 	private static final int CAUSA = 6;
 	private static final int DESCRIPCION_ADICIONAL = 7;
-	private static final int TINICIO = 8;
-	private static final int TFIN = 9;
+	private static final int TIEMPO_INICIO = 8;
+	private static final int TIEMPO_FIN = 9;
 	private static final int SOLUCION = 10;
 
 	String[] columnas = { "Codigo", "Usuario", "Area", "SubArea", "Equipo", "Disciplina", "Causa",
@@ -97,10 +97,10 @@ public class TablaModeloParo extends AbstractTableModel {
 		case DESCRIPCION_ADICIONAL:
 			retorno = paro.getDescripcionAdicional();
 			break;
-		case TINICIO:
+		case TIEMPO_INICIO:
 			retorno = paro.getTiempoInicio();
 			break;
-		case TFIN:
+		case TIEMPO_FIN:
 			retorno = paro.getTiempoFin();
 			break;
 		case SOLUCION:
