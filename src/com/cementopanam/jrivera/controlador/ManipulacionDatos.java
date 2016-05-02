@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -166,9 +167,7 @@ public class ManipulacionDatos {
 	 */
 	public boolean imputarParo(String fechaInicio, String fechaFin, String equipo, String estadoParo,
 			String estadoEquipo, String subArea, String area, String disciplina, String tipoCausa, String usuario,
-			String otraCausa) {
-
-		boolean resultado = true;
+			String otraCausa) throws ParseException {
 
 		try {
 
@@ -273,8 +272,7 @@ public class ManipulacionDatos {
 				pstmt.setString(1, fechaInicio);
 
 				// Si es seleccionado paro completado entonces se guarda la
-				// fecha de fin,
-				// de lo contrario se guarda un null en la base de datos.
+				// fecha de fin, de lo contrario se guarda un null en la base de datos.
 
 				if (estadoParo.equals("Completado") && (!(fechaFin.equals(null) || fechaFin == ""))) {
 
@@ -320,7 +318,7 @@ public class ManipulacionDatos {
 									"Solucion de Paro", JOptionPane.WARNING_MESSAGE);
 
 							con.rollback();
-							return resultado = false;
+							return false;
 						}
 
 						String sqlInsertSolucion = "INSERT INTO `mantenimientodb`.`solucion` (`solucion_paro`, `id_operacion_imputacion`)"
@@ -332,15 +330,16 @@ public class ManipulacionDatos {
 
 						pstmt.executeUpdate();
 
-					} catch (Exception e) {
+					}
+					catch (Exception e) {
 						log.log(Level.SEVERE, e.toString(), e);
 						JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
 								JOptionPane.ERROR_MESSAGE);
 						con.rollback();
-						resultado = false;
+						return false;
 					}
 				}
-
+		
 				con.commit();
 
 				// Muestra la Barra de Progreso
@@ -355,25 +354,26 @@ public class ManipulacionDatos {
 				JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 						JOptionPane.ERROR_MESSAGE);
 				con.rollback();
-				resultado = false;
+				return false;
 			}
 		} catch (SQLException e) {
 			log.log(Level.SEVERE, e.toString(), e);
 			try {
 				con.rollback();
-				resultado = false;
+				return false;
 
 			} catch (Exception ex) {
 				log.log(Level.SEVERE, ex.toString(), ex);
 				JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(),
 						JOptionPane.ERROR_MESSAGE);
+				return false;
 			}
 		} finally {
 			if (cbd.verificarConexion() == true) {
 				cerrarConexiones();
 			}
 		}
-		return resultado;
+		return true;
 	}
 
 	/**
@@ -395,12 +395,13 @@ public class ManipulacionDatos {
 		if (comparacionFechas == true) {
 
 			try {
-				JOptionPane.showMessageDialog(null, "La fecha Fin no puede ser Mayor a la Fecha de " + "Inicio de Paro",
+				JOptionPane.showMessageDialog(null, "La fecha Fin no puede ser Mayor a la Fecha de Inicio de Paro",
 						"Comparacion Fechas", JOptionPane.ERROR_MESSAGE);
 
 				return false;
 			} catch (Exception e) {
 				log.log(Level.SEVERE, e.toString(), e);
+				return false;
 			}
 		}
 
@@ -556,85 +557,6 @@ public class ManipulacionDatos {
 		cs.setString(2, password);
 
 		return rs = cs.executeQuery();
-	}
-
-	/**
-	 * Agrega nuevos registros a la base de datos
-	 * 
-	 * @param area
-	 *            - registro de nueva area
-	 * @param causa
-	 *            - registro de una nueva causa
-	 * @param disciplina
-	 *            - registro de una nueva disciplina
-	 * @param equipo
-	 *            - registro de un nuevo equipo
-	 * @param subArea
-	 *            - registro de una nueva subArea
-	 * @return true, si la operacion se realizo correctamente. false, si fue lo
-	 *         contrario
-	 * @throws SQLException
-	 */
-	public boolean agregarRegistros(Area area, Causa causa, Disciplina disciplina, Equipo equipo, SubArea subArea)
-			throws SQLException {
-
-		try (Connection con = cbd.conectarABaseDatos();
-				CallableStatement cs = con.prepareCall("{call sp_agregar_registros(?,?,?,?)}");) {
-
-			// Equipo
-			cs.setString(1, equipo.getNombreEquipo());
-			cs.setString(2, "equipo");
-			cs.setString(3, equipo.getCodEquipo());
-			cs.setInt(4, equipo.getIdSubArea());
-			cs.addBatch();
-
-			// Area
-			cs.setString(1, area.getNombreArea());
-			cs.setString(2, "area");
-			cs.setString(3, area.getNombreArea());
-			cs.setInt(4, area.getIdArea());
-			cs.addBatch();
-
-			// SubArea
-			cs.setString(1, subArea.getNombreSubArea());
-			cs.setString(2, "subArea");
-			cs.setString(3, subArea.getNombreSubArea());
-			cs.setInt(4, subArea.getIdArea());
-			cs.addBatch();
-
-			// Disciplina
-			cs.setString(1, disciplina.getNombreDisciplina());
-			cs.setString(2, "disciplina");
-			cs.setString(3, disciplina.getNombreDisciplina());
-			cs.setInt(4, disciplina.getIdDisciplina());
-			cs.addBatch();
-
-			// Causa
-			cs.setString(1, causa.getTipoCausa());
-			cs.setString(2, "causa");
-			cs.setString(3, causa.getTipoCausa());
-			cs.setInt(4, 1);
-			cs.addBatch();
-
-			cs.executeBatch();
-			con.commit();
-
-		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
-			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
-					JOptionPane.ERROR_MESSAGE);
-
-			con.rollback();
-			return false;
-		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-
-			con.rollback();
-			return false;
-		}
-
-		return true;
 	}
 
 	/**

@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,7 +35,11 @@ import com.cementopanam.jrivera.controlador.entidad.Causa;
 import com.cementopanam.jrivera.controlador.entidad.Disciplina;
 import com.cementopanam.jrivera.controlador.entidad.Equipo;
 import com.cementopanam.jrivera.controlador.entidad.SubArea;
+import com.cementopanam.jrivera.controlador.registros.ModificacionRegistros;
 import com.cementopanam.jrivera.vista.Principal;
+import javax.swing.AbstractListModel;
+import javax.swing.border.BevelBorder;
+import javax.swing.JTable;
 
 public class AdministracionRegistros extends JInternalFrame {
 	/**
@@ -42,7 +48,8 @@ public class AdministracionRegistros extends JInternalFrame {
 	private static final Logger log = Logger.getLogger(AdministracionRegistros.class.getName());
 	private static final long serialVersionUID = 7802198920491306605L;
 	
-	private ManipulacionDatos md = new ManipulacionDatos();
+	private ManipulacionDatos manipulacionDatos = new ManipulacionDatos();
+	private ModificacionRegistros modificacionRegistros = new ModificacionRegistros();
 	private JTextField txtNombreEquipo;
 	private JTextField txtCodEquipo;
 	private JTextField txtArea;
@@ -51,6 +58,8 @@ public class AdministracionRegistros extends JInternalFrame {
 	private JTextField txtSubArea;
 	private JComboBox<String> cbArea;
 	private JComboBox<String> cbSubArea;
+	private JList<Object> listBorrarCausa;
+	private JTable table;
 
 	
 	public AdministracionRegistros() {
@@ -60,12 +69,12 @@ public class AdministracionRegistros extends JInternalFrame {
 		getContentPane().setFont(new Font("Verdana", Font.PLAIN, 12));
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setFont(new Font("Verdana", Font.PLAIN, 12));
-		getContentPane().add(tabbedPane, BorderLayout.CENTER);
+		JTabbedPane tpMenu = new JTabbedPane(JTabbedPane.TOP);
+		tpMenu.setFont(new Font("Verdana", Font.PLAIN, 12));
+		getContentPane().add(tpMenu, BorderLayout.CENTER);
 		
 		JPanel panelAgregar = new JPanel();
-		tabbedPane.addTab("Agregar", null, panelAgregar, null);
+		tpMenu.addTab("Agregar", null, panelAgregar, null);
 		panelAgregar.setLayout(null);
 		
 		JPanel panelEquipo = new JPanel();
@@ -197,7 +206,7 @@ public class AdministracionRegistros extends JInternalFrame {
 		
 		JPanel panelTituloAgregar = new JPanel();
 		panelTituloAgregar.setBackground(Color.BLACK);
-		panelTituloAgregar.setBounds(0, 11, 562, 36);
+		panelTituloAgregar.setBounds(0, 0, 562, 36);
 		panelAgregar.add(panelTituloAgregar);
 		
 		JLabel lblTitulo = new JLabel("Agregar Nuevos Registros");
@@ -206,7 +215,7 @@ public class AdministracionRegistros extends JInternalFrame {
 		panelTituloAgregar.add(lblTitulo);
 		
 		JPanel panelBorrar = new JPanel();
-		tabbedPane.addTab("Borrar", null, panelBorrar, null);
+		tpMenu.addTab("Borrar", null, panelBorrar, null);
 		panelBorrar.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panelTituloBorrar = new JPanel();
@@ -221,33 +230,60 @@ public class AdministracionRegistros extends JInternalFrame {
 		JPanel panelCentroBorrar = new JPanel();
 		panelBorrar.add(panelCentroBorrar, BorderLayout.CENTER);
 		
-		JLabel lblArea = new JLabel("Area");
-		lblArea.setFont(new Font("Verdana", Font.PLAIN, 12));
+		JLabel lblBorrarCausa = new JLabel("Causa");
+		lblBorrarCausa.setBounds(21, 19, 40, 16);
+		lblBorrarCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
 		
-		JScrollPane scrollPaneArea = new JScrollPane();
+		JScrollPane scrollPaneBorrarArea = new JScrollPane();
+		scrollPaneBorrarArea.setBounds(22, 47, 192, 153);
 		
-		JList listArea = new JList();
-		scrollPaneArea.setViewportView(listArea);
-		listArea.setFont(new Font("Verdana", Font.PLAIN, 12));
-		GroupLayout gl_panelCentroBorrar = new GroupLayout(panelCentroBorrar);
-		gl_panelCentroBorrar.setHorizontalGroup(
-			gl_panelCentroBorrar.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panelCentroBorrar.createSequentialGroup()
-					.addGap(10)
-					.addComponent(lblArea))
-				.addGroup(gl_panelCentroBorrar.createSequentialGroup()
-					.addGap(11)
-					.addComponent(scrollPaneArea, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE))
-		);
-		gl_panelCentroBorrar.setVerticalGroup(
-			gl_panelCentroBorrar.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panelCentroBorrar.createSequentialGroup()
-					.addGap(11)
-					.addComponent(lblArea)
-					.addGap(12)
-					.addComponent(scrollPaneArea, GroupLayout.PREFERRED_SIZE, 153, GroupLayout.PREFERRED_SIZE))
-		);
-		panelCentroBorrar.setLayout(gl_panelCentroBorrar);
+		listBorrarCausa = new JList<Object>();
+		listBorrarCausa.setModel(new AbstractListModel() {
+			String[] values = new String[] {};
+			public int getSize() {
+				return values.length;
+			}
+			public Object getElementAt(int index) {
+				return values[index];
+			}
+		});
+		scrollPaneBorrarArea.setViewportView(listBorrarCausa);
+		listBorrarCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
+		
+		JButton btnRegistros = new JButton("Borrar Registros");
+		btnRegistros.setBounds(366, 520, 172, 41);
+		btnRegistros.setIcon(new ImageIcon(AdministracionRegistros.class.getResource("/iconos32x32/delete32x32.png")));
+		btnRegistros.setFont(new Font("Verdana", Font.PLAIN, 12));
+		btnRegistros.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				borrarSeleccionados();
+			}
+		});
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(265, 47, 190, 151);
+		
+		JList<Object> listBorrarDisciplina = new JList<Object>();
+		scrollPane.setViewportView(listBorrarDisciplina);
+		listBorrarDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
+		
+		JLabel lblBorrarSubArea = new JLabel("SubArea");
+		lblBorrarSubArea.setBounds(265, 19, 53, 16);
+		lblBorrarSubArea.setFont(new Font("Verdana", Font.PLAIN, 12));
+		panelCentroBorrar.setLayout(null);
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(22, 283, 192, 101);
+		panelCentroBorrar.add(scrollPane_1);
+		
+		table = new JTable();
+		table.setBounds(0, 0, 190, 0);
+		panelCentroBorrar.add(table);
+		panelCentroBorrar.add(scrollPaneBorrarArea);
+		panelCentroBorrar.add(lblBorrarCausa);
+		panelCentroBorrar.add(lblBorrarSubArea);
+		panelCentroBorrar.add(scrollPane);
+		panelCentroBorrar.add(btnRegistros);
 		setTitle("Administracion de Registros");
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setBounds(100, 10, 569, 663);
@@ -255,8 +291,58 @@ public class AdministracionRegistros extends JInternalFrame {
 		rellenarCombo();
 		cbSubArea.setSelectedIndex(-1);
 		cbArea.setSelectedIndex(-1);
+		
+		JPanel panelModificar = new JPanel();
+		tpMenu.addTab("Modificar", null, panelModificar, null);
 	}
 	
+	/**
+	 * 
+	 */
+	protected void borrarSeleccionados() {
+		
+		// Obtiene el indice de todos los elementos seleccionados
+	    int[] selectedIx = listBorrarCausa.getSelectedIndices();
+
+	    // Lista de las Areas seleccionadas
+	    List<Area> listaArea = new ArrayList<Area>();
+	    // Obtiene todos los elementos seleccionados usando los indices
+	    for (int i = 0; i < selectedIx.length; i++) {
+	    	String sel = String.valueOf(listBorrarCausa.getModel().getElementAt(selectedIx[i]));
+	    	listaArea.add(new Area(sel));
+	    }
+	    
+	    try {
+			
+	    	// Si el resultado es satisfactorio, notifica que se agregaron nuevos registros a la Base de Datos
+			if (modificacionRegistros.borrarRegistros(listaArea) == true) {
+							
+				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
+				Principal.lblStatusBar.setText("Registro(s) borrado(s) correctamente");
+				rellenarCombo();
+				limpiarCampos();
+			}
+			else {
+					
+				Principal.lblStatusBar
+								.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+				Principal.lblStatusBar.setText("No se pudo completar la operacion");
+				
+			}
+			
+		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(), 
+					JOptionPane.ERROR_MESSAGE);
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), 
+					JOptionPane.ERROR_MESSAGE);
+		}
+		
+	}
+
 private void guardarRegistros() {
 		
 		String nombreArea = txtArea.getText();
@@ -295,7 +381,7 @@ private void guardarRegistros() {
 						"Seleccione Area", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
-			int idArea = Integer.parseInt(md.buscarIndice(areaAQuePertenece, "area"));
+			int idArea = Integer.parseInt(manipulacionDatos.buscarIndice(areaAQuePertenece, "area"));
 			subArea.setIdArea(idArea);
 		}
 
@@ -313,7 +399,7 @@ private void guardarRegistros() {
 				return;
 			}
 			//Busca el indice de la SubArea seleccciona
-			int idSubArea = Integer.parseInt(md.buscarIndice(subAreaAQuePertenece, "sub_area"));
+			int idSubArea = Integer.parseInt(manipulacionDatos.buscarIndice(subAreaAQuePertenece, "sub_area"));
 			equipo = new Equipo(0, codEquipo, nombreEquipo, idSubArea);
 		}
 
@@ -338,7 +424,7 @@ private void guardarRegistros() {
 
 		try {
 			// Si el resultado es satisfactorio, notifica que se agregaron nuevos registros a la Base de Datos
-			if (md.agregarRegistros(area, causa, disciplina, equipo, subArea) == true) {
+			if (modificacionRegistros.agregarRegistros(area, causa, disciplina, equipo, subArea) == true) {
 				
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Registro(s) agregado(s) correctamente");
@@ -390,13 +476,13 @@ private void guardarRegistros() {
 		try {
 			
 			//Rellena ComboBox Area
-			rs = md.rellenarCombo("area", 0);
+			rs = manipulacionDatos.rellenarCombo("area", 0);
 			while (rs.next()) {
 				cbArea.addItem(rs.getString("nombre_area"));
 			}
 			
 			//Rellena ComboBox SubArea
-			rs = md.rellenarCombo("subArea", 0);
+			rs = manipulacionDatos.rellenarCombo("subArea", 0);
 			while (rs.next()) {
 				cbSubArea.addItem(rs.getString(2));
 			}

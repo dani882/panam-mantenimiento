@@ -315,58 +315,10 @@ public class Imputaciones extends JInternalFrame {
 		btnDetenerParo.setEnabled(false);
 		btnDetenerParo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				actualizarEstadoParo();
 
-				boolean resultado;
-				String usuarioActual = Principal.usuarioActual.getText();
 
-				try {
-
-					int fila = tablaParos.getSelectedRow();
-					int idParo = Integer.parseInt(String.valueOf(tablaParos.getValueAt(fila, 0)));
-
-					String usuarioTabla = String.valueOf(tablaParos.getValueAt(fila, 1));
-					String fechaFin = formattedTextField_fechaFin.getText();
-					String fechaInicio = String.valueOf(tablaParos.getValueAt(fila, 5));
-
-					String tipoUsuario = mostrarUsuario(usuarioActual);
-
-					if (usuarioActual.equals(usuarioTabla) || tipoUsuario.equals("administrador")) {
-						System.out.println("");
-					} else {
-						JOptionPane.showMessageDialog(null, "No tiene privilegios para modificar este paro");
-						return;
-					}
-
-					resultado = md.actualizarParo(idParo, fechaFin, fechaInicio);
-
-					if (resultado == true) {
-						Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
-						Principal.lblStatusBar.setText("Paro Imputado correctamente");
-						limpiarCampos();
-						actualizarTabla(estatus[1]);
-					} else {
-						Principal.lblStatusBar
-								.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
-						Principal.lblStatusBar.setText("No se pudo completar la operacion");
-					}
-				} 
-				catch (SQLException sqle) {
-					log.log(Level.SEVERE, sqle.toString(), sqle);
-					JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
-							JOptionPane.ERROR_MESSAGE);
-				} 
-				catch (ArrayIndexOutOfBoundsException aiobe) {
-					log.log(Level.WARNING, aiobe.toString(), aiobe);
-					JOptionPane.showMessageDialog(null, "Debe elegir un paro", aiobe.getClass().toString(),
-							JOptionPane.ERROR_MESSAGE);
-				} 
-				catch (Exception e1) {
-					log.log(Level.SEVERE, e1.toString(), e1);
-					JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(),
-							JOptionPane.ERROR_MESSAGE);
-				} finally {
-					md.cerrarConexiones();
-				}
 			}
 		});
 		btnDetenerParo.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -572,12 +524,75 @@ public class Imputaciones extends JInternalFrame {
 		setBounds(27, 26, 775, 570);
 	}
 
+	/**
+	 * Actualiza el paro de Pendiente a Completado
+	 */
+	private void actualizarEstadoParo() {
+		
+		boolean resultado;
+		String usuarioActual = Principal.usuarioActual.getText();
+
+		try {
+
+			int fila = tablaParos.getSelectedRow();
+			int idParo = Integer.parseInt(String.valueOf(tablaParos.getValueAt(fila, 0)));
+
+			String usuarioTabla = String.valueOf(tablaParos.getValueAt(fila, 1));
+			String fechaFin = formattedTextField_fechaFin.getText();
+			String fechaInicio = String.valueOf(tablaParos.getValueAt(fila, 5));
+
+			String tipoUsuario = mostrarUsuario(usuarioActual);
+
+			if (usuarioActual.equals(usuarioTabla) || tipoUsuario.equals("administrador")) {
+				System.out.println("");
+			} else {
+				JOptionPane.showMessageDialog(null, "No tiene privilegios para modificar este paro");
+				return;
+			}
+
+			resultado = md.actualizarParo(idParo, fechaFin, fechaInicio);
+
+			if (resultado == true) {
+				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
+				Principal.lblStatusBar.setText("Paro Imputado correctamente");
+				limpiarCampos();
+				actualizarTabla(estatus[1]);
+			} else {
+				Principal.lblStatusBar
+						.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+				Principal.lblStatusBar.setText("No se pudo completar la operacion");
+				return;
+			}
+		}
+		catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		catch (ArrayIndexOutOfBoundsException aiobe) {
+			log.log(Level.WARNING, aiobe.toString(), aiobe);
+			JOptionPane.showMessageDialog(null, "Debe elegir un paro", aiobe.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		catch (Exception e1) {
+			log.log(Level.SEVERE, e1.toString(), e1);
+			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		} finally {
+			md.cerrarConexiones();
+		}
+		
+	}
+
 	private boolean esFechaValida(String fecha) {
 
 		try {
 			df.parse(fecha);
 		} catch (ParseException e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			log.log(Level.WARNING, e.toString(), e);
 			return false;
 		}
 		return true;

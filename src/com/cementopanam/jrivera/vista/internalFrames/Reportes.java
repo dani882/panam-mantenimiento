@@ -13,7 +13,9 @@ import java.awt.event.MouseEvent;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -41,6 +43,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
+import com.cementopanam.jrivera.controlador.entidad.Area;
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
 import com.cementopanam.jrivera.vista.ModificacionParo;
@@ -177,12 +180,12 @@ public class Reportes extends JInternalFrame {
 		lblFiltrarPor.setBounds(10, 16, 66, 30);
 		lblFiltrarPor.setFont(new Font("Verdana", Font.PLAIN, 12));
 
-		JComboBox<Object> comboBoxFiltrar = new JComboBox<Object>();
-		comboBoxFiltrar.setEnabled(false);
-		comboBoxFiltrar.setBounds(121, 16, 128, 30);
-		comboBoxFiltrar.setModel(new DefaultComboBoxModel<Object>(new String[] { "Tiempo", "Estado" }));
-		comboBoxFiltrar.setSelectedIndex(-1);
-		comboBoxFiltrar.setFont(new Font("Verdana", Font.PLAIN, 12));
+		JComboBox<Object> cbFiltrar = new JComboBox<Object>();
+		cbFiltrar.setEnabled(false);
+		cbFiltrar.setBounds(121, 16, 128, 30);
+		cbFiltrar.setModel(new DefaultComboBoxModel<Object>(new String[] { "Tiempo", "Estado" }));
+		cbFiltrar.setSelectedIndex(-1);
+		cbFiltrar.setFont(new Font("Verdana", Font.PLAIN, 12));
 
 		JPanel panelEstado = new JPanel();
 		panelEstado.setBounds(259, 11, 232, 56);
@@ -201,7 +204,7 @@ public class Reportes extends JInternalFrame {
 		panelEstado.add(rdbtnPendiente);
 		panelBusqueda.setLayout(null);
 		panelBusqueda.add(lblFiltrarPor);
-		panelBusqueda.add(comboBoxFiltrar);
+		panelBusqueda.add(cbFiltrar);
 		panelBusqueda.add(panelEstado);
 
 		JPanel panel_Resultado = new JPanel();

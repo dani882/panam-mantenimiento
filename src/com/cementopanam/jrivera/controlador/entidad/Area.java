@@ -37,6 +37,13 @@ public class Area {
 		this.nombreArea = nombreArea;
 	}
 	
+	/**
+	 * @param nombreArea
+	 */
+	public Area(String nombreArea) {
+		this.nombreArea = nombreArea;
+	}
+	
 	public Area() {}
 	
 }
