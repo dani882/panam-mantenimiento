@@ -70,6 +70,7 @@ public class ModificacionParo extends JDialog {
 		admParo = paroDB;
 		this.desktopPane = desktopPane;
 
+		System.out.println("Causa elegida: " + modificacion.getCausa());
 		try {
 
 			// Rellena combo Causa
@@ -100,12 +101,12 @@ public class ModificacionParo extends JDialog {
 					admParo.buscarIndiceCausa(modificacion.getCausa(), modificacion.getDescripcionAdicional()));
 		}
 
+		cbCausa.setSelectedItem(modificacion.getCausa());
 		txtAreaSolucion.setText(modificacion.getSolucion());
 		txtDescripcionAdicional.setText(modificacion.getDescripcionAdicional());
 		txtTiempoInicio.setText(modificacion.getTiempoInicio());
 		txtTiempoFin.setText(modificacion.getTiempoFin());
-		cbCausa.setSelectedItem(String.valueOf(modificacion.getCausa()));
-		cbDisciplina.setSelectedItem(String.valueOf(modificacion.getDisciplina()));
+		cbDisciplina.setSelectedItem(modificacion.getDisciplina());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -127,7 +128,7 @@ public class ModificacionParo extends JDialog {
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setFont(new Font("Verdana", Font.PLAIN, 12));
-		setBounds(100, 100, 588, 421);
+		setBounds(100, 100, 666, 421);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.NORTH);
@@ -137,7 +138,7 @@ public class ModificacionParo extends JDialog {
 		}
 		{
 			lblTiempoFin = new JLabel("Tiempo de Fin");
-			lblTiempoFin.setHorizontalAlignment(SwingConstants.RIGHT);
+			lblTiempoFin.setHorizontalAlignment(SwingConstants.LEFT);
 			lblTiempoFin.setFont(new Font("Verdana", Font.PLAIN, 12));
 		}
 
@@ -150,7 +151,7 @@ public class ModificacionParo extends JDialog {
 		txtTiempoFin.setColumns(10);
 
 		JLabel lblCausa = new JLabel("Causa");
-		lblCausa.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblCausa.setHorizontalAlignment(SwingConstants.LEFT);
 		lblCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
 
 		cbCausa = new JComboBoxPersonalizado();
@@ -170,60 +171,62 @@ public class ModificacionParo extends JDialog {
 		scrollPaneDescripcionAdicional.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"),
 				"Descripcion Adicional", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
-		gl_contentPanel.setHorizontalGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+		gl_contentPanel.setHorizontalGroup(
+			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-						.addGroup(
-								gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-										.addGroup(gl_contentPanel.createSequentialGroup().addContainerGap()
-												.addComponent(scrollPaneSolucion, GroupLayout.DEFAULT_SIZE,
-														265, Short.MAX_VALUE)
-												.addPreferredGap(ComponentPlacement.UNRELATED)
-												.addComponent(scrollPaneDescripcionAdicional,
-														GroupLayout.PREFERRED_SIZE, 267, GroupLayout.PREFERRED_SIZE))
-										.addGroup(gl_contentPanel.createSequentialGroup().addGap(8)
-												.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-														.addComponent(lblTiempoInicio).addComponent(lblDisciplina))
-												.addPreferredGap(ComponentPlacement.UNRELATED)
-												.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
-														.addComponent(cbDisciplina, GroupLayout.DEFAULT_SIZE,
-																GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-														.addComponent(txtTiempoInicio, GroupLayout.DEFAULT_SIZE, 155,
-																Short.MAX_VALUE))
-												.addPreferredGap(ComponentPlacement.UNRELATED)
-												.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-														.addComponent(lblCausa)
-														.addGroup(gl_contentPanel.createSequentialGroup()
-																.addComponent(lblTiempoFin).addGap(18).addGroup(
-																		gl_contentPanel
-																				.createParallelGroup(Alignment.LEADING)
-																				.addComponent(cbCausa,
-																						Alignment.TRAILING, 0,
-																						162, Short.MAX_VALUE)
-																				.addComponent(txtTiempoFin,
-																						GroupLayout.DEFAULT_SIZE, 162,
-																						Short.MAX_VALUE))))))
-						.addContainerGap()));
-		gl_contentPanel.setVerticalGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPanel.createSequentialGroup().addGap(38)
-						.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblTiempoInicio)
-								.addComponent(txtTiempoInicio, GroupLayout.PREFERRED_SIZE, 27,
-										GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(scrollPaneSolucion, GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE))
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addGap(8)
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblTiempoInicio)
+								.addComponent(lblDisciplina))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+								.addComponent(cbDisciplina, GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
+								.addComponent(txtTiempoInicio, GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE))))
+					.addGap(18)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(lblCausa, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(lblTiempoFin, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(cbCausa, Alignment.TRAILING, 0, 182, Short.MAX_VALUE)
+								.addComponent(txtTiempoFin, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)))
+						.addComponent(scrollPaneDescripcionAdicional, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
+					.addContainerGap())
+		);
+		gl_contentPanel.setVerticalGroup(
+			gl_contentPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPanel.createSequentialGroup()
+					.addGap(38)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblTiempoInicio)
+								.addComponent(txtTiempoInicio, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(cbDisciplina, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblDisciplina)))
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(txtTiempoFin, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
 								.addComponent(lblTiempoFin))
-						.addPreferredGap(ComponentPlacement.UNRELATED)
-						.addGroup(
-								gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-										.addComponent(cbDisciplina, GroupLayout.PREFERRED_SIZE, 31,
-												GroupLayout.PREFERRED_SIZE)
-										.addComponent(lblDisciplina).addComponent(lblCausa).addComponent(cbCausa,
-												GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE))
-						.addGap(54)
-						.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(scrollPaneSolucion, GroupLayout.PREFERRED_SIZE, 137,
-										GroupLayout.PREFERRED_SIZE)
-								.addComponent(scrollPaneDescripcionAdicional, GroupLayout.PREFERRED_SIZE, 137,
-										GroupLayout.PREFERRED_SIZE))
-						.addContainerGap(25, Short.MAX_VALUE)));
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(cbCausa, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblCausa))))
+					.addGap(54)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(scrollPaneSolucion, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
+						.addComponent(scrollPaneDescripcionAdicional, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(25, Short.MAX_VALUE))
+		);
 
 		txtDescripcionAdicional = new JTextArea();
 		txtDescripcionAdicional.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -271,7 +274,7 @@ public class ModificacionParo extends JDialog {
 				btnBorrar = new JButton("Borrar");
 				btnBorrar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						eliminarParo(codigoParo);
+						eliminarParo(codigoCausa);
 					}
 				});
 				btnBorrar.setIcon(new ImageIcon(ModificacionParo.class.getResource("/iconos32x32/delete32x32.png")));
@@ -287,7 +290,11 @@ public class ModificacionParo extends JDialog {
 		}
 	}
 
-	private void eliminarParo(int idParo) {
+	/**
+	 * Elimina el paro seleccionado
+	 * @param idCausa - codigo del paro que se eliminara
+	 */
+	private void eliminarParo(int idCausa) {
 
 		//Coloca el boton de OptonPane en Espanol
 		UIManager.put("OptionPane.yesButtonText", "Si");
@@ -300,7 +307,7 @@ public class ModificacionParo extends JDialog {
 
 			try {
 
-				if (admParo.eliminarParo(idParo) == true) {
+				if (admParo.eliminarParo(idCausa) == true) {
 
 					Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 					Principal.lblStatusBar.setText("Paro Eliminado correctamente");
@@ -319,6 +326,9 @@ public class ModificacionParo extends JDialog {
 		}
 	}
 
+	/**
+	 * Retorna a la interfaz de reporte
+	 */
 	private void mostrarReporte() {
 
 		Reportes repo = new Reportes();
@@ -329,7 +339,7 @@ public class ModificacionParo extends JDialog {
 	}
 
 	/**
-	 * Metodo utilizado para actualizar Datos de los Paros
+	 * Modifica la informacion de los Paros
 	 */
 	private void actualizarParo() {
 

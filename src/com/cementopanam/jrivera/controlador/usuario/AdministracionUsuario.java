@@ -46,7 +46,7 @@ public class AdministracionUsuario extends ManipulacionDatos {
 			cs.setString(1, usuario.getNombreUsuario());
 			cs.setString(2, usuario.getPassword());
 			cs.setInt(3, usuario.getTipoUsuario());
-			cs.setInt(4, usuario.getCodEmpleado());
+			cs.setInt(4, Integer.parseInt(usuario.getCodEmpleado()));
 			cs.setString(5, usuario.getNombreEmpleado());
 			cs.setString(6, usuario.getApellidoEmpleado());
 
@@ -79,7 +79,7 @@ public class AdministracionUsuario extends ManipulacionDatos {
 			cs.setString(2, usuario.getPassword());
 			cs.setInt(3, usuario.getTipoUsuario());
 			cs.setString(4, usuario.getEstadoUsuario());
-			cs.setInt(5, usuario.getCodEmpleado());
+			cs.setString(5, usuario.getCodEmpleado());
 
 			cs.execute();
 			con.commit();

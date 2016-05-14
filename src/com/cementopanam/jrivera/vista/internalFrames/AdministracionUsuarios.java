@@ -237,7 +237,7 @@ public class AdministracionUsuarios extends JInternalFrame {
 		// TODO Realizar la comprobacion de si estan todos los campos rellenados
 		try {
 
-			int codEmpleado = Integer.parseInt(txtCodEmpleado.getText());
+			String codEmpleado = txtCodEmpleado.getText();
 			String nombreEmpleado = txtNombre.getText();
 			String apellidoEmpleado = txtApellido.getText();
 			String nombreUsuario = txtNombreUsuario.getText().toLowerCase().trim();

@@ -6,7 +6,7 @@ package com.cementopanam.jrivera.controlador.usuario;
  */
 public class Usuario {
 
-	private int codEmpleado;
+	private String codEmpleado;
 	private int tipoUsuario;
 	private String nombreEmpleado;
 	private String apellidoEmpleado;
@@ -17,7 +17,7 @@ public class Usuario {
 	/**
 	 * @return the codEmpleado
 	 */
-	public int getCodEmpleado() {
+	public String getCodEmpleado() {
 		return codEmpleado;
 	}
 
@@ -25,7 +25,7 @@ public class Usuario {
 	 * @param codEmpleado
 	 *            the codEmpleado to set
 	 */
-	public void setCodEmpleado(int codEmpleado) {
+	public void setCodEmpleado(String codEmpleado) {
 		this.codEmpleado = codEmpleado;
 	}
 
@@ -129,7 +129,7 @@ public class Usuario {
 	 * @param password
 	 * @param tipoUsuario
 	 */
-	public Usuario(int codEmpleado, String nombreEmpleado, String apellidoEmpleado, String nombreUsuario,
+	public Usuario(String codEmpleado, String nombreEmpleado, String apellidoEmpleado, String nombreUsuario,
 			String password, int tipoUsuario) {
 
 		this.codEmpleado = codEmpleado;
@@ -149,7 +149,7 @@ public class Usuario {
 	 * @param password
 	 * @param estadoUsuario
 	 */
-	public Usuario(int codEmpleado, int tipoUsuario, String nombreUsuario, String password, String estadoUsuario) {
+	public Usuario(String codEmpleado, int tipoUsuario, String nombreUsuario, String password, String estadoUsuario) {
 
 		this.codEmpleado = codEmpleado;
 		this.tipoUsuario = tipoUsuario;

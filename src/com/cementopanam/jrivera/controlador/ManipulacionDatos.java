@@ -5,19 +5,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import com.cementopanam.jrivera.controlador.entidad.Area;
-import com.cementopanam.jrivera.controlador.entidad.Causa;
-import com.cementopanam.jrivera.controlador.entidad.Disciplina;
-import com.cementopanam.jrivera.controlador.entidad.Equipo;
-import com.cementopanam.jrivera.controlador.entidad.SubArea;
 import com.cementopanam.jrivera.modelo.ConeccionBD;
-import com.cementopanam.jrivera.vista.Principal;
 
 public class ManipulacionDatos {
 
@@ -72,22 +65,20 @@ public class ManipulacionDatos {
 
 			if (sentencia.equalsIgnoreCase("area") && indice == 0) {
 
-				sql = "SELECT * FROM mantenimientodb.area;";
+				sql = "SELECT * FROM mantenimientodb_nuevo.area;";
 				pstmt = con.prepareStatement(sql);
 				rs = pstmt.executeQuery();
-			} else if (sentencia.equalsIgnoreCase("causa") && indice == 0) {
+			}  
+			else if (sentencia.equalsIgnoreCase("disciplina") && indice == 0) {
 
-				sql = "SELECT * FROM mantenimientodb.causa WHERE id_usuario=1;";
+				sql = "SELECT * FROM mantenimientodb_nuevo.disciplina;";
 				pstmt = con.prepareStatement(sql);
 				rs = pstmt.executeQuery();
-			} else if (sentencia.equalsIgnoreCase("disciplina") && indice == 0) {
+			}
+			
+			else if (sentencia.equalsIgnoreCase("causa") && indice == 0) {
 
-				sql = "SELECT * FROM mantenimientodb.disciplina;";
-				pstmt = con.prepareStatement(sql);
-				rs = pstmt.executeQuery();
-			} else if (sentencia.equalsIgnoreCase("subArea") && indice == 0) {
-
-				sql = "SELECT * FROM mantenimientodb.sub_area;";
+				sql = "SELECT * FROM mantenimientodb_nuevo.causa WHERE id_usuario=1;";
 				pstmt = con.prepareStatement(sql);
 				rs = pstmt.executeQuery();
 			}
@@ -97,14 +88,21 @@ public class ManipulacionDatos {
 				switch (sentencia) {
 
 				case "subArea":
-					sql = "SELECT * FROM mantenimientodb.sub_area WHERE id_area = ?;";
+					sql = "SELECT * FROM mantenimientodb_nuevo.sub_area WHERE id_area = ?;";
 					pstmt = con.prepareStatement(sql);
 					pstmt.setInt(1, indice);
 					rs = pstmt.executeQuery();
 					break;
 
 				case "equipo":
-					sql = "SELECT * FROM mantenimientodb.equipo WHERE idSubArea = ?;";
+					sql = "SELECT * FROM mantenimientodb_nuevo.equipo WHERE idSubArea = ?;";
+					pstmt = con.prepareStatement(sql);
+					pstmt.setInt(1, indice);
+					rs = pstmt.executeQuery();
+					break;
+				
+				case "causa":
+					sql = "SELECT * FROM mantenimientodb_nuevo.causa WHERE id_usuario=1 AND id_disciplina = ?;";
 					pstmt = con.prepareStatement(sql);
 					pstmt.setInt(1, indice);
 					rs = pstmt.executeQuery();
@@ -150,233 +148,6 @@ public class ManipulacionDatos {
 	}
 
 	/**
-	 * Agrega nuevos paros a la base de datos
-	 * 
-	 * @param fechaInicio
-	 * @param fechaFin
-	 * @param equipo
-	 * @param estadoParo
-	 * @param estadoEquipo
-	 * @param subArea
-	 * @param area
-	 * @param disciplina
-	 * @param tipoCausa
-	 * @param usuario
-	 * @param otraCausa
-	 * @return boolean
-	 */
-	public boolean imputarParo(String fechaInicio, String fechaFin, String equipo, String estadoParo,
-			String estadoEquipo, String subArea, String area, String disciplina, String tipoCausa, String usuario,
-			String otraCausa) throws ParseException {
-
-		try {
-
-			if (compararFecha(fechaInicio, fechaFin, formatoFecha) == false) {
-				return false;
-			}
-
-			// Conecta a la base de datos
-			con = cbd.conectarABaseDatos();
-			con.setAutoCommit(false);
-
-			try {
-
-				// Busca indice de Equipo
-				int idEquipo = Integer.parseInt(buscarIndice(equipo, "equipo"));
-
-				/*
-				 * //Busca indice de SubArea int idSubArea =
-				 * Integer.parseInt(buscarIndice(subArea, "sub_area"));
-				 * System.out.println("Valor de SubArea " + idSubArea);
-				 */
-
-				// Busca indice de Usuario
-				int idUsuario = Integer.parseInt(buscarIndice(usuario, "usuario"));
-
-				// Busca indice de Disciplina
-				int idDisciplina = Integer.parseInt(buscarIndice(disciplina, "disciplina"));
-
-				/*
-				 * //Busca indice de Area int idArea =
-				 * Integer.parseInt(buscarIndice(area, "area"));
-				 * System.out.println("Valor de Area " + idArea);
-				 */
-
-				// Busca indice de Causa
-				// int idCausa = Integer.parseInt(buscarIndice(tipoCausa,
-				// "causa"));
-
-				/*
-				 * Causa
-				 */
-
-				String sqlInsertCausa = "INSERT INTO `mantenimientodb`.`causa` "
-						+ "(`tipo_causa`, `descripcion_adicional`, `id_usuario`) VALUES (?, ?, ?);";
-
-				pstmt = con.prepareStatement(sqlInsertCausa, PreparedStatement.RETURN_GENERATED_KEYS);
-
-				pstmt.setString(1, tipoCausa);
-				pstmt.setString(2, otraCausa);
-				pstmt.setInt(3, idUsuario);
-
-				pstmt.executeUpdate();
-
-				// Variable para obtener la clave del ultimo registro generado
-				int claveCausaGenerada = 0;
-				rs = pstmt.getGeneratedKeys();
-				while (rs.next()) {
-					claveCausaGenerada = rs.getInt(1);
-				}
-
-				/*
-				 * Equipo_Causa
-				 */
-
-				String sqlInsertEquipoCausa = "INSERT INTO `mantenimientodb`.`equipo_causa` "
-						+ "(`id_equipo`, `id_causa`, `estatus_equipo`) VALUES (?, ?, ?);";
-
-				pstmt = con.prepareStatement(sqlInsertEquipoCausa, PreparedStatement.RETURN_GENERATED_KEYS);
-
-				pstmt.setInt(1, idEquipo);
-				// TODO Crear un verificador para cuando exista un registro
-				// igual, no insertar
-				// TODO Hacerlo con Stored Procedure, busca condicion if...
-				if (estadoEquipo.equals("Activo")) {
-					pstmt.setInt(2, claveCausaGenerada);
-					pstmt.setString(3, "Activo");
-
-					pstmt.executeUpdate();
-				} else {
-					pstmt.setInt(2, claveCausaGenerada);
-					pstmt.setString(3, "Inactivo");
-
-					pstmt.executeUpdate();
-				}
-
-				// Variable para obtener la clave del ultimo registro generado
-				int claveEquipoCausaGenerada = 0;
-				rs = pstmt.getGeneratedKeys();
-				while (rs.next()) {
-					claveEquipoCausaGenerada = rs.getInt(1);
-				}
-
-				/*
-				 * Operacion Imputacion
-				 */
-				String sqlInsertOperacionImputacion = "INSERT INTO `mantenimientodb`.`operacion_imputacion` "
-						+ "(`tiempo_inicio_paro`, `tiempo_fin_paro`, `estatus_paro`, `id_disciplina`, "
-						+ "`id_equipo_causa`) " + "VALUES (?, ?, ?, ?, ?);";
-
-				pstmt = con.prepareStatement(sqlInsertOperacionImputacion, PreparedStatement.RETURN_GENERATED_KEYS);
-
-				pstmt.setString(1, fechaInicio);
-
-				// Si es seleccionado paro completado entonces se guarda la
-				// fecha de fin, de lo contrario se guarda un null en la base de datos.
-
-				if (estadoParo.equals("Completado") && (!(fechaFin.equals(null) || fechaFin == ""))) {
-
-					pstmt.setString(2, fechaFin);
-					pstmt.setString(3, estadoParo);
-					pstmt.setInt(4, idDisciplina);
-					pstmt.setInt(5, claveEquipoCausaGenerada);
-
-					pstmt.executeUpdate();
-
-				}
-				// En caso del Paro estar Pendiente de Completar
-				else {
-					pstmt.setString(2, null);
-					pstmt.setString(3, estadoParo);
-					pstmt.setInt(4, idDisciplina);
-					pstmt.setInt(5, claveEquipoCausaGenerada);
-
-					pstmt.executeUpdate();
-				}
-
-				// Variable para obtener la clave del ultimo registro generado
-				int claveParoGenerada = 0;
-				rs = pstmt.getGeneratedKeys();
-				while (rs.next()) {
-					claveParoGenerada = rs.getInt(1);
-				}
-
-				/*
-				 * Solucion
-				 */
-
-				if (estadoParo.equals("Completado")) {
-					try {
-
-						String detalleSolucion = JOptionPane.showInputDialog(null,
-								"¿Que se tuvo que hacer para solucionar este paro?", "Solucion de paro",
-								JOptionPane.INFORMATION_MESSAGE);
-
-						if (detalleSolucion == null || detalleSolucion.equals(null) || detalleSolucion == ""
-								|| detalleSolucion.equals("")) {
-							JOptionPane.showMessageDialog(null, "Debe escribir la solucion del paro",
-									"Solucion de Paro", JOptionPane.WARNING_MESSAGE);
-
-							con.rollback();
-							return false;
-						}
-
-						String sqlInsertSolucion = "INSERT INTO `mantenimientodb`.`solucion` (`solucion_paro`, `id_operacion_imputacion`)"
-								+ " VALUES (?, ?);";
-
-						pstmt = con.prepareStatement(sqlInsertSolucion, PreparedStatement.RETURN_GENERATED_KEYS);
-						pstmt.setString(1, detalleSolucion);
-						pstmt.setInt(2, claveParoGenerada);
-
-						pstmt.executeUpdate();
-
-					}
-					catch (Exception e) {
-						log.log(Level.SEVERE, e.toString(), e);
-						JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
-								JOptionPane.ERROR_MESSAGE);
-						con.rollback();
-						return false;
-					}
-				}
-		
-				con.commit();
-
-				// Muestra la Barra de Progreso
-				// if (SwingUtilities.isEventDispatchThread()) {
-				Principal.mostrarProgreso(5);
-
-				// }
-
-			} catch (SQLException sqle) {
-
-				log.log(Level.SEVERE, sqle.toString(), sqle);
-				JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
-						JOptionPane.ERROR_MESSAGE);
-				con.rollback();
-				return false;
-			}
-		} catch (SQLException e) {
-			log.log(Level.SEVERE, e.toString(), e);
-			try {
-				con.rollback();
-				return false;
-
-			} catch (Exception ex) {
-				log.log(Level.SEVERE, ex.toString(), ex);
-				JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(),
-						JOptionPane.ERROR_MESSAGE);
-				return false;
-			}
-		} finally {
-			if (cbd.verificarConexion() == true) {
-				cerrarConexiones();
-			}
-		}
-		return true;
-	}
-
-	/**
 	 * Actualiza el paro de Pendiente a Completado
 	 * 
 	 * @param idParo
@@ -400,7 +171,7 @@ public class ManipulacionDatos {
 
 				return false;
 			} catch (Exception e) {
-				log.log(Level.SEVERE, e.toString(), e);
+				log.log(Level.WARNING, e.toString(), e);
 				return false;
 			}
 		}
@@ -416,7 +187,6 @@ public class ManipulacionDatos {
 			return false;
 		}
 		con = cbd.conectarABaseDatos();
-
 		cs = con.prepareCall("{call sp_actualizar_paro(?,?,?)}");
 
 		cs.setInt(1, idParo);

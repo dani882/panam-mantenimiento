@@ -247,6 +247,8 @@ public class ModificacionUsuario extends JDialog {
 	private void modificarUsuario() {
 
 		String usuario = String.valueOf(cbUsuario.getSelectedItem());
+		// Busca ID de Usuario
+		String idUsuario = String.valueOf(cbUsuario.getSelectedItem());
 		int tipoUsuario = obtenerTipoUsuario();
 		String estadoUsuario = obtenerEstadoUsuario();
 		char[] password = pwdClave.getPassword();
@@ -274,10 +276,6 @@ public class ModificacionUsuario extends JDialog {
 			JOptionPane.showMessageDialog(null, "Debe elegir un Estado de Usuario");
 			return;
 		}
-
-		// Busca ID de Usuario
-		int idUsuario = Integer
-				.parseInt(admUsuario.buscarIndice(String.valueOf(cbUsuario.getSelectedItem()), "usuario"));
 
 		try {
 			boolean resultado = false;

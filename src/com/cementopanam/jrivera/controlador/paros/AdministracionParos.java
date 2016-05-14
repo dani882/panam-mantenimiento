@@ -10,12 +10,13 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import com.cementopanam.jrivera.controlador.Imputacion;
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.modelo.ConeccionBD;
 
 public class AdministracionParos extends ManipulacionDatos {
 
-	private static final Logger log= Logger.getLogger( AdministracionParos.class.getName() );
+	private static final Logger log = Logger.getLogger( AdministracionParos.class.getName() );
 	private ConeccionBD cbd;
 	private Connection con = null;
 	private CallableStatement cs = null;
@@ -59,17 +60,17 @@ public class AdministracionParos extends ManipulacionDatos {
 
 			while (rs.next()) {
 
-				int codigo = rs.getInt(1);
-				String usuario = rs.getString(2);
-				String area = rs.getString(3);
-				String subArea = rs.getString(4);
-				String equipo = rs.getString(5);
-				String disciplina = rs.getString(6);
-				String causa = rs.getString(7);
-				String descripcionAdicional = rs.getString(8);
-				String tiempoInicio = rs.getString(9);
-				String tiempoFin = rs.getString(10);
-				String solucion = rs.getString(11);
+				int codigo = rs.getInt("Codigo");
+				String usuario = rs.getString("Usuario");
+				String area = rs.getString("Area");
+				String subArea = rs.getString("SubArea");
+				String equipo = rs.getString("Equipo");
+				String disciplina = rs.getString("Disciplina");
+				String causa = rs.getString("Causa");
+				String descripcionAdicional = rs.getString("Descripcion Adicional");
+				String tiempoInicio = rs.getString("Tiempo de Inicio");
+				String tiempoFin = rs.getString("Tiempo Final");
+				String solucion = rs.getString("Solucion");
 
 				lista.add(new Paro(codigo, usuario, area, subArea, equipo, tiempoInicio, tiempoFin, solucion, causa,
 						descripcionAdicional, disciplina));
@@ -85,6 +86,67 @@ public class AdministracionParos extends ManipulacionDatos {
 		return lista;
 	}
 
+	
+	/**
+	 * Guarda los paros
+	 * @param imp
+	 * @return - true si la operacion fue exitosa, false - si no se compleeto la operacion
+	 * @throws SQLException
+	 */
+	public boolean imputarParo(Imputacion imp) throws SQLException{
+		
+		//Verifica si el tiempo de inicio es superior al tiempo de fin
+		if (compararFecha(imp.getTiempoInicio(), imp.getTiempoFin(), formatoFecha) == false) {
+			return false;
+		}
+
+		try {
+
+			con = cbd.conectarABaseDatos();
+			cs = con.prepareCall("{call sp_insertar_paro(?,?,?,?,?,?,?,?,?,?)}");
+
+			cs.setString(1, imp.getCausa()); // Causa
+			cs.setString(2, imp.getCausaExtendida()); // Causa Extendida
+			cs.setString(3, imp.getEquipo()); // Codigo de Equipo
+			cs.setString(4, imp.getUsuario()); // Nombre de Usuario
+			cs.setString(5, imp.getDisciplina()); // Disciplina
+			cs.setString(6, imp.getTiempoInicio()); // Tiempo de Inicio
+			cs.setString(7, imp.getTiempoFin()); // Tiempo de Fin
+			cs.setString(8, imp.getEstadoEquipo()); // Estado del Equipo (Activo o Inactivo)
+			cs.setString(9, imp.getEstadoParo()); // Estado del Paro (Completado o Pendiente)
+			cs.setString(10, imp.getSolucion()); // Solucion del paro, null si paro esta Pendiente
+
+			cs.execute();
+			con.commit();
+			
+			log.info("Causa: " + imp.getCausa());
+			log.info("Causa Extendida: " + imp.getCausaExtendida());
+			log.info("Codigo Equipo: " + imp.getEquipo());
+			log.info("Nombre de Usuario: " + imp.getUsuario());
+			log.info("Disciplina: " + imp.getDisciplina());
+			log.info("Tiempo de Inicio: " + imp.getTiempoInicio());
+			log.info("Tiempo de Fin: " + imp.getTiempoFin());
+			log.info("Estado de Equipo: " + imp.getEstadoEquipo());
+			log.info("Estado de Paro: " + imp.getEstadoParo());
+			log.info("Solucion: " + imp.getSolucion());
+			
+		} catch (SQLException sqle) {
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+			con.rollback();
+			log.log(Level.SEVERE, sqle.toString(), sqle);
+			return false;
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			con.rollback();
+			log.log(Level.SEVERE, e.toString(), e);
+			return false;
+		}
+		return true;
+		
+	}
+	
+	
 	/**
 	 * Modifica el paro seleccionado
 	 * @param p - atributos de la entidad
@@ -98,9 +160,6 @@ public class AdministracionParos extends ManipulacionDatos {
 			return false;
 		}
 
-		// Busca ID de Disciplina
-		int idDisciplina = Integer.parseInt(buscarIndice(p.getDisciplina(), "disciplina"));
-
 		try {
 
 			con = cbd.conectarABaseDatos();
@@ -110,7 +169,7 @@ public class AdministracionParos extends ManipulacionDatos {
 			cs.setString(2, p.getSolucion());
 			cs.setString(3, p.getTiempoInicio());
 			cs.setString(4, p.getTiempoFin());
-			cs.setInt(5, idDisciplina);
+			cs.setString(5, p.getDisciplina());
 			cs.setString(6, p.getCausa());
 			cs.setString(7, p.getDescripcionAdicional());
 			cs.setInt(8, idCausa);
@@ -138,14 +197,14 @@ public class AdministracionParos extends ManipulacionDatos {
 	 * @return - true si fue exitoso, false si no se completa la operacion
 	 * @throws SQLException
 	 */
-	public boolean eliminarParo(int idParo) throws SQLException {
+	public boolean eliminarParo(int idCausa) throws SQLException {
 
 		try {
 
 			con = cbd.conectarABaseDatos();
 			cs = con.prepareCall("{call sp_eliminar_paro(?)}");
 
-			cs.setInt(1, idParo);
+			cs.setInt(1, idCausa);
 
 			cs.execute();
 			con.commit();

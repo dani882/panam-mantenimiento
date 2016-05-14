@@ -1,85 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="resources"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="forms-1.3.0.jar" sourcepath="forms-1.3.0-src.zip"/>
-	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
-	<classpathentry kind="lib" path="resources/librerias/JTattoo-1.6.11.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/mysql-connector-java-5.1.36-bin.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jcalendar-1.4.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jasperreports-6.1.0.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jasperreports-fonts-6.1.0.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jasperreports-functions-6.1.0.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jasperreports-javaflow-6.1.0.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/commons-logging-1.2.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/commons-collections-3.2.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/commons-beanutils-1.9.0.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/commons-codec-1.5.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/commons-digester-2.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/commons-javaflow-20060411.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/joda-time-2.0.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/ant-1.7.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/antlr-2.7.5.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/barbecue-1.5-beta1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/barcode4j-2.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-anim.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-awt-util.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-bridge.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-css.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-dom.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-ext.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-gvt.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-parser.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-script.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-svg-dom.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-svggen.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-util.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/batik-xml.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/bcel-5.2.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/bsh-2.0b4.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/castor-core-1.3.3.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/castor-xml-1.3.3.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/core-2.3.0.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/ecj-4.3.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/groovy-all-2.0.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/hibernate3.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/hsqldb-1.8.0-10.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/httpclient-4.3.4.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/httpcore-4.3.2.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/iText-2.1.7.js2.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jackson-annotations-2.1.4.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jackson-core-2.1.4.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jackson-databind-2.1.4.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jaxen-1.1.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jcommon-1.0.15.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jfreechart-1.0.12.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jpa.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/jxl-2.6.10.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/lucene-analyzers-common-4.5.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/lucene-core-4.5.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/lucene-queryparser-4.5.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/mondrian-3.1.1.12687.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/olap4j-0.9.7.309-JS-3.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/png-encoder-1.5.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/poi-3.10.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/poi-ooxml-3.10.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/poi-ooxml-schemas-3.10.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/rhino-1.7R3.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/saaj-api-1.3.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/serializer.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/servlet-api-2.4.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/spring-beans-2.5.5.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/spring-core-2.5.5.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/velocity-1.7-dep.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/xalan-2.7.1.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/xercesImpl-2.10.0.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/xml-apis-ext.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/xml-apis.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/xmlbeans-2.5.0.jar"/>
-	<classpathentry kind="lib" path="resources/librerias/rs2xml.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="src" path="src" />
+	<classpathentry kind="src" path="resources" />
+	<classpathentry kind="con"
+		path="org.eclipse.jdt.launching.JRE_CONTAINER" />
+	<classpathentry kind="lib" path="forms-1.3.0.jar"
+		sourcepath="forms-1.3.0-src.zip" />
+	<classpathentry kind="lib" path="miglayout15-swing.jar"
+		sourcepath="miglayout-src.zip" />
+	<classpathentry kind="lib" path="resources/lib/ant-1.7.1.jar" />
+	<classpathentry kind="lib" path="resources/lib/antlr-2.7.5.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/barbecue-1.5-beta1.jar" />
+	<classpathentry kind="lib" path="resources/lib/barcode4j-2.1.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-anim.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-awt-util.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-bridge.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-css.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-dom.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-ext.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-gvt.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-parser.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-script.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-svg-dom.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-svggen.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-util.jar" />
+	<classpathentry kind="lib" path="resources/lib/batik-xml.jar" />
+	<classpathentry kind="lib" path="resources/lib/bcel-5.2.jar" />
+	<classpathentry kind="lib" path="resources/lib/bsh-2.0b4.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/castor-core-1.3.3.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/castor-xml-1.3.3.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/commons-beanutils-1.9.0.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/commons-codec-1.5.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/commons-collections-3.2.1.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/commons-digester-2.1.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/commons-javaflow-20060411.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/commons-logging-1.1.1.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/commons-logging-1.2.jar" />
+	<classpathentry kind="lib" path="resources/lib/core-2.3.0.jar" />
+	<classpathentry kind="lib" path="resources/lib/dom4j-1.6.1.jar" />
+	<classpathentry kind="lib" path="resources/lib/ecj-4.3.1.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/groovy-all-2.0.1.jar" />
+	<classpathentry kind="lib" path="resources/lib/hibernate3.jar" />
+	<classpathentry kind="lib" path="resources/lib/hsqldb-1.8.0-10.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/httpclient-4.3.4.jar" />
+	<classpathentry kind="lib" path="resources/lib/httpcore-4.3.2.jar" />
+	<classpathentry kind="lib" path="resources/lib/iText-2.1.7.js2.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/jackson-annotations-2.1.4.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/jackson-core-2.1.4.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/jackson-databind-2.1.4.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/jasperreports-6.1.0.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/jasperreports-fonts-6.1.0.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/jasperreports-functions-6.1.0.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/jasperreports-javaflow-6.1.0.jar" />
+	<classpathentry kind="lib" path="resources/lib/jaxen-1.1.1.jar" />
+	<classpathentry kind="lib" path="resources/lib/jcalendar-1.4.jar" />
+	<classpathentry kind="lib" path="resources/lib/jcommon-1.0.15.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/jfreechart-1.0.12.jar" />
+	<classpathentry kind="lib" path="resources/lib/joda-time-2.0.jar" />
+	<classpathentry kind="lib" path="resources/lib/jpa.jar" />
+	<classpathentry kind="lib" path="resources/lib/JTattoo-1.6.11.jar" />
+	<classpathentry kind="lib" path="resources/lib/jxl-2.6.10.jar" />
+	<classpathentry kind="lib" path="resources/lib/log4j-1.2.15.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/lucene-analyzers-common-4.5.1.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/lucene-core-4.5.1.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/lucene-queryparser-4.5.1.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/mondrian-3.1.1.12687.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/mysql-connector-java-5.1.36-bin.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/olap4j-0.9.7.309-JS-3.jar" />
+	<classpathentry kind="lib" path="resources/lib/png-encoder-1.5.jar" />
+	<classpathentry kind="lib" path="resources/lib/poi-3.10.1.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/poi-ooxml-3.10.1.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/poi-ooxml-schemas-3.10.1.jar" />
+	<classpathentry kind="lib" path="resources/lib/rhino-1.7R3.jar" />
+	<classpathentry kind="lib" path="resources/lib/rs2xml.jar" />
+	<classpathentry kind="lib" path="resources/lib/saaj-api-1.3.jar" />
+	<classpathentry kind="lib" path="resources/lib/serializer.jar" />
+	<classpathentry kind="lib" path="resources/lib/servlet-api-2.4.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/spring-beans-2.5.5.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/spring-core-2.5.5.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/velocity-1.7-dep.jar" />
+	<classpathentry kind="lib" path="resources/lib/xalan-2.7.1.jar" />
+	<classpathentry kind="lib"
+		path="resources/lib/xercesImpl-2.10.0.jar" />
+	<classpathentry kind="lib" path="resources/lib/xml-apis-ext.jar" />
+	<classpathentry kind="lib" path="resources/lib/xml-apis.jar" />
+	<classpathentry kind="lib" path="resources/lib/xmlbeans-2.5.0.jar" />
+	<classpathentry kind="output" path="bin" />
 </classpath>
