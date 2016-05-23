@@ -195,7 +195,6 @@ public class Paro {
 	public Paro(int codigo, String usuario, String area, String subArea, String equipo, String tiempoInicio,
 			String tiempoFin, String solucion, String causa, String descripcionAdicional, String disciplina) {
 
-		super();
 		this.codigo = codigo;
 		this.usuario = usuario;
 		this.area = area;
@@ -220,7 +219,6 @@ public class Paro {
 	public Paro(int codigo, String tiempoInicio, String tiempoFin, String solucion, String causa,
 			String descripcionAdicional, String disciplina) {
 
-		super();
 		this.codigo = codigo;
 		this.tiempoInicio = tiempoInicio;
 		this.tiempoFin = tiempoFin;
@@ -230,6 +228,20 @@ public class Paro {
 		this.disciplina = disciplina;
 	}
 
-	public Paro() {
+	/**
+	 * Constructor de paros Pendientes a Completados
+	 * @param codigo - codigo de la imputacion que se completara
+	 * @param tiempoInicio - Tiempo en que inicio el paro
+	 * @param tiempoFin - Tiempo en que finalizo el paro
+	 * @param solucion - Solucion del paro a completarse
+	 */
+	public Paro(int codigo, String tiempoInicio, String tiempoFin, String solucion) {
+	
+		this.codigo = codigo;
+		this.tiempoInicio = tiempoInicio;
+		this.tiempoFin = tiempoFin;
+		this.solucion = solucion;
 	}
+
+	public Paro() {}
 }

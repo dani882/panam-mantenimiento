@@ -4,7 +4,7 @@ public class SubArea {
 
 	private int idSubArea;
 	private String nombreSubArea;
-	private int idArea;
+	private String idArea;
 	/**
 	 * @return the idSubArea
 	 */
@@ -32,13 +32,13 @@ public class SubArea {
 	/**
 	 * @return the idArea
 	 */
-	public int getIdArea() {
+	public String getIdArea() {
 		return idArea;
 	}
 	/**
 	 * @param idArea the idArea to set
 	 */
-	public void setIdArea(int idArea) {
+	public void setIdArea(String idArea) {
 		this.idArea = idArea;
 	}
 	/**
@@ -46,7 +46,7 @@ public class SubArea {
 	 * @param nombreSubArea
 	 * @param idArea
 	 */
-	public SubArea(int idSubArea, String nombreSubArea, int idArea) {
+	public SubArea(int idSubArea, String nombreSubArea, String idArea) {
 		this.idSubArea = idSubArea;
 		this.nombreSubArea = nombreSubArea;
 		this.idArea = idArea;

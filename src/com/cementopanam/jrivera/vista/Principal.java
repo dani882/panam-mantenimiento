@@ -7,11 +7,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -41,24 +43,29 @@ public class Principal extends JFrame implements Runnable {
 	/**
 	 * 
 	 */
+	private static final Logger log = Logger.getLogger(Principal.class.getName());
 	private static final long serialVersionUID = 5631455790428057770L;
+	
 	private AdministracionUsuarios admUsuario;
 	private AdministracionRegistros admRegistros;
 	private Imputaciones imputaciones;
 	private Reportes reportes;
 	private Autor author;
 
-	final JPopupMenu menu = new JPopupMenu();
+	final JPopupMenu menuRegistros = new JPopupMenu();
 	private JMenuItem itemRegistros;
 	private JMenuItem itemUsuario;
 
+	final JPopupMenu menuUsuario = new JPopupMenu();
+	private JMenuItem itemCerrarSession;
+	private JMenuItem itemModificarUsuario;
+	
 	public JButton btnImputaciones;
 	public JButton btnReportes;
 	public JButton btnAdministrar;
-
-	public static JLabel usuarioActual = new JLabel();
-
 	private JButton btnCerrarSession;
+
+	public static JButton usuarioActual = new JButton();
 
 	protected TimerThread timerThread;
 
@@ -129,6 +136,22 @@ public class Principal extends JFrame implements Runnable {
 		// Centra la ventana
 		setLocation(x, y);
 
+		//Personaliza el JButton del Usuario Autenticado
+		usuarioActual.setBackground(null);
+		usuarioActual.setMargin(new Insets(0, 0, 0, 0));
+		usuarioActual.setContentAreaFilled(false);
+		usuarioActual.setBorderPainted(false);
+		usuarioActual.setOpaque(false);
+		
+		usuarioActual.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent evt) {
+				// Muestra el popup Menu
+				if (!evt.isPopupTrigger()) {
+					menuUsuario.show(evt.getComponent(), evt.getX(), evt.getY() - 90);
+				}
+			}
+		});
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -174,19 +197,52 @@ public class Principal extends JFrame implements Runnable {
 			}
 		});
 
-		menu.setLightWeightPopupEnabled(false);
+		// Menu Credenciales de Usuario
+		menuUsuario.setLightWeightPopupEnabled(false);
+		
+		// Popup Menu item Usuario
+		itemModificarUsuario = new JMenuItem("Cambiar contraseña");
+		itemModificarUsuario.setIcon(new ImageIcon(Principal.class.getResource("/iconos32x32/user32x32.png")));
+		menuUsuario.add(itemModificarUsuario);
+		
+		menuUsuario.addSeparator();
+		// Popup Menu item Cerrar Session
+		itemCerrarSession = new JMenuItem("Cerrar Session");
+		itemCerrarSession.setFont(new Font("Verdana", Font.PLAIN, 12));
+		itemCerrarSession.setIcon(new ImageIcon(Principal.class.getResource("/iconos32x32/logout-icon32x32.png")));
+		menuUsuario.add(itemCerrarSession);
+
+		itemModificarUsuario.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				ModificacionUsuario modificacionUsuario = new ModificacionUsuario();
+				modificacionUsuario.setVisible(true);
+			}
+		});
+
+		itemCerrarSession.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				Login login = new Login();
+				login.setVisible(true);
+				setVisible(false);
+			}
+		});
+		
+		// Menu Registros y Usuarios
+		menuRegistros.setLightWeightPopupEnabled(false);
 		// Popup Menu item Registros
 		itemRegistros = new JMenuItem("Registros");
 		itemRegistros.setFont(new Font("Verdana", Font.PLAIN, 12));
 		itemRegistros.setIcon(new ImageIcon(Principal.class.getResource("/iconos32x32/excavadora32x32.png")));
-		menu.add(itemRegistros);
+		menuRegistros.add(itemRegistros);
 
-		menu.addSeparator();
+		menuRegistros.addSeparator();
 		// Popup Menu item Usuario
 		itemUsuario = new JMenuItem("Usuario");
 		itemRegistros.setFont(new Font("Verdana", Font.PLAIN, 12));
 		itemUsuario.setIcon(new ImageIcon(Principal.class.getResource("/iconos32x32/user32x32.png")));
-		menu.add(itemUsuario);
+		menuRegistros.add(itemUsuario);
 
 		itemUsuario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -209,7 +265,7 @@ public class Principal extends JFrame implements Runnable {
 			public void mousePressed(MouseEvent evt) {
 				// Muestra el popup Menu
 				if (!evt.isPopupTrigger()) {
-					menu.show(evt.getComponent(), evt.getX() + 20, evt.getY());
+					menuRegistros.show(evt.getComponent(), evt.getX() + 20, evt.getY());
 				}
 			}
 		});
@@ -377,7 +433,7 @@ public class Principal extends JFrame implements Runnable {
 		timerThread = new TimerThread(dateLabel, timeLabel);
 		timerThread.start();
 	}
-
+	
 	// Muestra Barra de Progreso
 	public static void mostrarProgreso(int duracion) {
 

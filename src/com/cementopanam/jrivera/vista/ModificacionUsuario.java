@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
+import javax.swing.UIManager;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
@@ -43,10 +44,13 @@ public class ModificacionUsuario extends JDialog {
 	private static final Logger log = Logger.getLogger(ModificacionUsuario.class.getName());
 	private static final long serialVersionUID = 8299667867069516816L;
 	private final JPanel contentPanel = new JPanel();
+	
 	private JComboBox<String> cbUsuario;
+	
 	private JPasswordField pwdClave;
 	private JPasswordField pwdRepetirClave;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
+	
 	private JComboBox<Object> cbTipoUsuario;
 
 	private String usuarioActual = Principal.usuarioActual.getText();
@@ -55,17 +59,20 @@ public class ModificacionUsuario extends JDialog {
 
 	private ResultSet rs = null;
 	private AdministracionUsuario admUsuario = new AdministracionUsuario();
+	
+	private JButton btnBorrar;
 
 	/**
-	 * Create the dialog.
+	 * Crea el dialogo.
 	 */
 	public ModificacionUsuario() {
 
+				
 		setModal(true);
-		setLocationRelativeTo(null);
+		
 		setFont(new Font("Verdana", Font.PLAIN, 12));
 		setTitle("Modificacion de Usuario");
-		setBounds(100, 100, 401, 343);
+		setSize(401, 343);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -82,7 +89,6 @@ public class ModificacionUsuario extends JDialog {
 
 					mostrarUsuario(String.valueOf(e.getItem()));
 					mostrarUsuario();
-
 				}
 			}
 		});
@@ -177,41 +183,68 @@ public class ModificacionUsuario extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("Modificar");
-				okButton.setIcon(new ImageIcon(
+				JButton btnModificar = new JButton("Modificar");
+				btnModificar.setIcon(new ImageIcon(
 						ModificacionUsuario.class.getResource("/iconos32x32/edit-male-user-icon32x32.png")));
-				okButton.addActionListener(new ActionListener() {
+				btnModificar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						modificarUsuario();
 					}
 				});
-				okButton.setFont(new Font("Verdana", Font.PLAIN, 12));
-				okButton.setActionCommand("OK");
-				buttonPane.add(okButton);
-				getRootPane().setDefaultButton(okButton);
+				btnModificar.setFont(new Font("Verdana", Font.PLAIN, 12));
+				btnModificar.setActionCommand("OK");
+				buttonPane.add(btnModificar);
+				getRootPane().setDefaultButton(btnModificar);
 			}
 			{
-				JButton cancelButton = new JButton("Cancelar");
-				cancelButton
+				JButton btnCancelar = new JButton("Cancelar");
+				btnCancelar
 						.setIcon(new ImageIcon(ModificacionUsuario.class.getResource("/iconos32x32/fail32x32.png")));
-				cancelButton.addActionListener(new ActionListener() {
+				btnCancelar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						dispose();
 					}
 				});
-				cancelButton.setFont(new Font("Verdana", Font.PLAIN, 12));
-				cancelButton.setActionCommand("Cancel");
-				buttonPane.add(cancelButton);
+				
+				btnBorrar = new JButton("Borrar");
+				btnBorrar.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						
+						//TODO Agregar pantalla de validacion de Eliminacion. Ver Codigo en Eliminar Paro
+						eliminarUsuario();
+						
+					}
+				});
+				btnBorrar.setIcon(new ImageIcon(ModificacionUsuario.class.getResource("/iconos32x32/delete32x32.png")));
+				btnBorrar.setFont(new Font("Verdana", Font.PLAIN, 12));
+				buttonPane.add(btnBorrar);
+				btnCancelar.setFont(new Font("Verdana", Font.PLAIN, 12));
+				btnCancelar.setActionCommand("Cancel");
+				buttonPane.add(btnCancelar);
 			}
 		}
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		mostrarUsuario();
 		cbUsuario.setSelectedItem(usuarioActual);
+		
+		pack();
+		setLocationRelativeTo(null);
 	}
 
+	/**
+	 * Verifica si las claves introducidas coinciden y si son mayores que cuatro caracteres
+	 * @return - true si la clave coincide, false si no coinciden
+	 */
 	private boolean validarPassword() {
 
+		// Verifica si la clave introducida tiene cuatro o mas caracteres
+		if(pwdClave.getPassword().length < 4) {
+			JOptionPane.showMessageDialog(null, "Debe escribir una clave de minimo cuatro caracteres", "Clave corta",
+					JOptionPane.INFORMATION_MESSAGE);
+			return false;
+		}
+		
 		if (Arrays.equals(pwdClave.getPassword(), pwdRepetirClave.getPassword())) {
 			return true;
 		} else
@@ -260,6 +293,7 @@ public class ModificacionUsuario extends JDialog {
 
 		// Valida si las claves coinciden
 		if (validarPassword() == false) {
+			log.info("La clave de usuario no coincide");
 			JOptionPane.showMessageDialog(null, "La clave de usuario no coincide", "Clave de Usuario",
 					JOptionPane.WARNING_MESSAGE);
 			return;
@@ -306,7 +340,8 @@ public class ModificacionUsuario extends JDialog {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 	}
-
+	
+	
 	private void mostrarUsuario() {
 
 		try {
@@ -315,31 +350,58 @@ public class ModificacionUsuario extends JDialog {
 			while (rs.next()) {
 
 				cbUsuario.addItem(rs.getString("nombre_usuario"));
+				
 			}
 			// Elimina el item duplicado
 			if (cbUsuario.getItemAt(1).equals("admin")) {
 				cbUsuario.removeItemAt(1);
-				;
 			}
+
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
-	private void mostrarUsuario(String usuarioSeleccionado) {
+	public void mostrarUsuario(String usuarioSeleccionado) {
 
+		String usuarioAutenticado = Principal.usuarioActual.getText();
 		try {
 			rs = admUsuario.mostrarUsuario(usuarioSeleccionado);
+			ResultSet rs2 = admUsuario.mostrarUsuario(usuarioAutenticado);
 
-			if (rs.next()) {
+			while (rs.next()) {
 
+				// Administrador
 				if (rs.getString("tipo_usuario").equalsIgnoreCase("administrador")) {
 					cbTipoUsuario.setSelectedIndex(0);
+				
+				// Operador
 				} else if (rs.getString("tipo_usuario").equalsIgnoreCase("operador")) {
-					cbTipoUsuario.setSelectedIndex(1);
+					while (rs2.next()) {
+						
+						if (rs2.getString("tipo_usuario").equalsIgnoreCase("administrador")){
+							cbTipoUsuario.setSelectedIndex(1);
+						}
+						else {
+							cbTipoUsuario.setSelectedIndex(1);
+							ocultarBotones(false);
+						}
+					}
+
+					// Consultor
 				} else if (rs.getString("tipo_usuario").equalsIgnoreCase("consultor")) {
-					cbTipoUsuario.setSelectedIndex(2);
+					
+					while (rs2.next()) {
+						
+						if (rs2.getString("tipo_usuario").equalsIgnoreCase("administrador")) {
+							cbTipoUsuario.setSelectedIndex(2);
+						}
+						else {
+							cbTipoUsuario.setSelectedIndex(2);
+							ocultarBotones(false);
+						}
+					}
 				}
 
 				// Verifica el estado del usuario
@@ -357,6 +419,59 @@ public class ModificacionUsuario extends JDialog {
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	/**
+	 * Desabilita los botones si el usuario no es Administrador
+	 */
+	private void ocultarBotones(boolean estaActivo) {
+		// Oculta los botones en caso el usuario no ser administrador
+		btnBorrar.setEnabled(estaActivo);
+		cbTipoUsuario.setEnabled(estaActivo);
+		cbUsuario.setEnabled(estaActivo);
+		rdbtnActivo.setEnabled(estaActivo);
+		rdbtnInactivo.setEnabled(estaActivo);
+	}
+
+	/**
+	 * Elimina el usuario seleccionado
+	 */
+	private void eliminarUsuario() {
+		
+		boolean resultado = false;
+
+		//Coloca el boton de OptonPane en Espanol
+		UIManager.put("OptionPane.yesButtonText", "Si");
+		int respuesta = JOptionPane.showConfirmDialog(null, "¿Esta seguro que desea borrar este Usuario?",
+				"Confirmar Borrado", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+		if (respuesta == JOptionPane.NO_OPTION) {
+			return;
+		} else if (respuesta == JOptionPane.YES_OPTION) {
+
+			try {
+
+				Usuario usuario = new Usuario();
+				usuario.setNombreUsuario(String.valueOf(cbUsuario.getSelectedItem()));
+				
+				resultado = admUsuario.eliminarUsuario(usuario);
+				
+				if (resultado == true) {
+					Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
+					Principal.lblStatusBar.setText("Usuario " + usuario.getNombreUsuario() + " eliminado correctamente");
+					dispose();
+				} else {
+					Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+					Principal.lblStatusBar.setText("No se pudo completar la operacion");
+				}
+			}
+			catch (SQLException e1) {
+					log.log(Level.SEVERE, e1.toString(), e1);
+			}
+				
+		} else if (respuesta == JOptionPane.CLOSED_OPTION) {
+			return;
 		}
 	}
 }

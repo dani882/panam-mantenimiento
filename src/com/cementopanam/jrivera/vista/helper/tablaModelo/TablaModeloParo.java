@@ -46,7 +46,7 @@ public class TablaModeloParo extends AbstractTableModel {
 		fireTableDataChanged();
 	}
 
-	public void buscar(Paro paro, String filtro) {
+	public void buscarParo(Paro paro, String filtro) {
 		 lista = paros.mostrarParo(paro, filtro);
 		fireTableDataChanged();
 	}

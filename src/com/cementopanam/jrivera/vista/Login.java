@@ -134,6 +134,84 @@ public class Login extends JFrame {
 		initComponents();
 	}
 
+	private void initComponents() {
+
+		setTitle("Iniciar Session");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(552, 305);
+		setResizable(false);
+		contentPane = new JPanel();
+
+		// Obtiene la dimension de la pantalla
+		dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+		// Determina la nueva localizacion de la ventana
+		w = getSize().width;
+		h = getSize().height;
+		x = (dim.width - w) / 2;
+		y = (dim.height - h) / 2;
+
+		// Centra la ventana
+		setLocation(x, y);
+
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		lblContrasena = new JLabel("Contrase\u00F1a");
+		lblContrasena.setFont(new Font("Verdana", Font.PLAIN, 12));
+		lblContrasena.setBounds(267, 118, 103, 21);
+		contentPane.add(lblContrasena);
+
+		lblLogo = new JLabel("");
+		lblLogo.setIcon(new ImageIcon(Login.class.getResource("/imagenes/logo-panam.png")));
+		lblLogo.setBounds(12, 12, 234, 180);
+		contentPane.add(lblLogo);
+
+		lblIncorrecto = new JLabel("");
+		lblIncorrecto.setForeground(Color.RED);
+		lblIncorrecto.setVisible(false);
+		lblIncorrecto.setFont(new Font("Nimbus Roman No9 L", Font.BOLD, 16));
+		lblIncorrecto.setBounds(12, 178, 518, 21);
+		contentPane.add(lblIncorrecto);
+
+		txtUsuario = new JTextField();
+		txtUsuario.setBounds(363, 76, 167, 30);
+		contentPane.add(txtUsuario);
+		txtUsuario.setColumns(10);
+
+		lblUsuario = new JLabel("Usuario");
+		lblUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
+		lblUsuario.setBounds(267, 80, 63, 21);
+		contentPane.add(lblUsuario);
+
+		pwdClave = new JPasswordField();
+		pwdClave.setEchoChar('*');
+		pwdClave.setBounds(363, 111, 167, 30);
+		contentPane.add(pwdClave);
+		pwdClave.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				passwordFieldKeyPressed(e);
+			}
+		});
+
+		separator = new JSeparator();
+		separator.setBounds(12, 211, 518, 2);
+		contentPane.add(separator);
+
+		btnAcceder = new JButton("Acceder");
+		btnAcceder.setFont(new Font("Verdana", Font.PLAIN, 12));
+		btnAcceder.setIcon(new ImageIcon(Login.class.getResource("/iconos32x32/ok32x32.png")));
+		btnAcceder.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				btnAccederMouseClicked(e);
+			}
+		});
+
+		btnAcceder.setBounds(363, 224, 167, 42);
+		contentPane.add(btnAcceder);
+	}
+	
 	public boolean validarUsuario() {
 
 		String usuario = txtUsuario.getText();
@@ -221,83 +299,7 @@ public class Login extends JFrame {
 		return txtUsuario.getText().toLowerCase();
 	}
 
-	private void initComponents() {
 
-		setTitle("Iniciar Session");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(552, 305);
-		setResizable(false);
-		contentPane = new JPanel();
-
-		// Obtiene la dimension de la pantalla
-		dim = Toolkit.getDefaultToolkit().getScreenSize();
-
-		// Determina la nueva localizacion de la ventana
-		w = getSize().width;
-		h = getSize().height;
-		x = (dim.width - w) / 2;
-		y = (dim.height - h) / 2;
-
-		// Centra la ventana
-		setLocation(x, y);
-
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
-
-		lblContrasena = new JLabel("Contrase\u00F1a");
-		lblContrasena.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblContrasena.setBounds(267, 118, 103, 21);
-		contentPane.add(lblContrasena);
-
-		lblLogo = new JLabel("");
-		lblLogo.setIcon(new ImageIcon(Login.class.getResource("/imagenes/logo-panam.png")));
-		lblLogo.setBounds(12, 12, 234, 180);
-		contentPane.add(lblLogo);
-
-		lblIncorrecto = new JLabel("");
-		lblIncorrecto.setForeground(Color.RED);
-		lblIncorrecto.setVisible(false);
-		lblIncorrecto.setFont(new Font("Nimbus Roman No9 L", Font.BOLD, 16));
-		lblIncorrecto.setBounds(12, 178, 518, 21);
-		contentPane.add(lblIncorrecto);
-
-		txtUsuario = new JTextField();
-		txtUsuario.setBounds(363, 76, 167, 30);
-		contentPane.add(txtUsuario);
-		txtUsuario.setColumns(10);
-
-		lblUsuario = new JLabel("Usuario");
-		lblUsuario.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblUsuario.setBounds(267, 80, 63, 21);
-		contentPane.add(lblUsuario);
-
-		pwdClave = new JPasswordField();
-		pwdClave.setEchoChar('*');
-		pwdClave.setBounds(363, 111, 167, 30);
-		contentPane.add(pwdClave);
-		pwdClave.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				passwordFieldKeyPressed(e);
-			}
-		});
-
-		separator = new JSeparator();
-		separator.setBounds(12, 211, 518, 2);
-		contentPane.add(separator);
-
-		btnAcceder = new JButton("Acceder");
-		btnAcceder.setFont(new Font("Verdana", Font.PLAIN, 12));
-		btnAcceder.setIcon(new ImageIcon(Login.class.getResource("/iconos32x32/ok32x32.png")));
-		btnAcceder.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				btnAccederMouseClicked(e);
-			}
-		});
-
-		btnAcceder.setBounds(363, 224, 167, 42);
-		contentPane.add(btnAcceder);
-	}
 
 	private void passwordFieldKeyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {

@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
+import javax.swing.AbstractListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -26,7 +25,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
@@ -37,9 +39,6 @@ import com.cementopanam.jrivera.controlador.entidad.Equipo;
 import com.cementopanam.jrivera.controlador.entidad.SubArea;
 import com.cementopanam.jrivera.controlador.registros.ModificacionRegistros;
 import com.cementopanam.jrivera.vista.Principal;
-import javax.swing.AbstractListModel;
-import javax.swing.border.BevelBorder;
-import javax.swing.JTable;
 
 public class AdministracionRegistros extends JInternalFrame {
 	/**
@@ -53,16 +52,17 @@ public class AdministracionRegistros extends JInternalFrame {
 	private JTextField txtNombreEquipo;
 	private JTextField txtCodEquipo;
 	private JTextField txtArea;
-	private JTextField txtCausa;
-	private JTextField txtDisciplina;
 	private JTextField txtSubArea;
 	private JComboBox<String> cbArea;
 	private JComboBox<String> cbSubArea;
 	private JList<Object> listBorrarCausa;
 	private JTable table;
-
+	private JTextField txtCausa;
+	private JTextField txtDisciplina;
+	private JList<String> listDisciplina;
 	
 	public AdministracionRegistros() {
+		
 		setFrameIcon(null);
 		setIconifiable(true);
 		setClosable(true);
@@ -80,7 +80,7 @@ public class AdministracionRegistros extends JInternalFrame {
 		JPanel panelEquipo = new JPanel();
 		panelEquipo.setLayout(null);
 		panelEquipo.setBorder(new TitledBorder(null, "Equipo", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panelEquipo.setBounds(20, 231, 518, 181);
+		panelEquipo.setBounds(20, 231, 495, 181);
 		panelAgregar.add(panelEquipo);
 		
 		JLabel lblCodEquipo = new JLabel("Codigo de Equipo");
@@ -94,22 +94,25 @@ public class AdministracionRegistros extends JInternalFrame {
 		panelEquipo.add(lblSubAreaAQuepertenece);
 		
 		cbSubArea = new JComboBox<String>();
+		cbSubArea.setToolTipText("SubArea a la que pertenecera el equipo nuevo");
 		cbSubArea.setFont(new Font("Verdana", Font.PLAIN, 12));
-		cbSubArea.setBounds(20, 116, 459, 33);
+		cbSubArea.setBounds(20, 116, 448, 30);
 		panelEquipo.add(cbSubArea);
 		
 		JLabel lblNombreEquipo = new JLabel("Nombre de Equipo");
 		lblNombreEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblNombreEquipo.setBounds(280, 23, 191, 23);
+		lblNombreEquipo.setBounds(277, 23, 191, 23);
 		panelEquipo.add(lblNombreEquipo);
 		
 		txtNombreEquipo = new JTextField();
+		txtNombreEquipo.setToolTipText("Nombre del nuevo equipo");
 		txtNombreEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
 		txtNombreEquipo.setColumns(10);
-		txtNombreEquipo.setBounds(280, 49, 199, 30);
+		txtNombreEquipo.setBounds(277, 49, 191, 30);
 		panelEquipo.add(txtNombreEquipo);
 		
 		txtCodEquipo = new JTextField();
+		txtCodEquipo.setToolTipText("Codigo del nuevo equipo");
 		txtCodEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
 		txtCodEquipo.setColumns(10);
 		txtCodEquipo.setBounds(20, 49, 191, 30);
@@ -127,6 +130,7 @@ public class AdministracionRegistros extends JInternalFrame {
 		panelArea.add(lblNombreArea);
 		
 		txtArea = new JTextField();
+		txtArea.setToolTipText("Agrega una nueva Area");
 		txtArea.setFont(new Font("Verdana", Font.PLAIN, 12));
 		txtArea.setColumns(10);
 		txtArea.setBounds(20, 53, 191, 30);
@@ -135,7 +139,7 @@ public class AdministracionRegistros extends JInternalFrame {
 		JPanel panelSubArea = new JPanel();
 		panelSubArea.setLayout(null);
 		panelSubArea.setBorder(new TitledBorder(null, "SubArea", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panelSubArea.setBounds(290, 58, 248, 164);
+		panelSubArea.setBounds(279, 58, 238, 164);
 		panelAgregar.add(panelSubArea);
 		
 		JLabel lblAreaAQuePertenece = new JLabel("Area a que pertenece");
@@ -149,48 +153,22 @@ public class AdministracionRegistros extends JInternalFrame {
 		panelSubArea.add(lblNombreSubArea);
 		
 		cbArea = new JComboBox<String>();
+		cbArea.setToolTipText("Area a la que pertenecera");
 		cbArea.setFont(new Font("Verdana", Font.PLAIN, 12));
-		cbArea.setBounds(20, 120, 191, 33);
+		cbArea.setBounds(20, 120, 191, 30);
 		panelSubArea.add(cbArea);
 		
 		txtSubArea = new JTextField();
+		txtSubArea.setToolTipText("Agrega nueva SubArea");
 		txtSubArea.setFont(new Font("Verdana", Font.PLAIN, 12));
 		txtSubArea.setColumns(10);
 		txtSubArea.setBounds(20, 52, 191, 30);
 		panelSubArea.add(txtSubArea);
 		
-		JPanel panelCausa = new JPanel();
-		panelCausa.setLayout(null);
-		panelCausa.setBorder(new TitledBorder(null, "Causa y Disciplina", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panelCausa.setBounds(20, 423, 518, 111);
-		panelAgregar.add(panelCausa);
-		
-		JLabel lblCausa = new JLabel("Causa");
-		lblCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblCausa.setBounds(234, 31, 46, 24);
-		panelCausa.add(lblCausa);
-		
-		txtCausa = new JTextField();
-		txtCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
-		txtCausa.setColumns(10);
-		txtCausa.setBounds(234, 56, 274, 30);
-		panelCausa.add(txtCausa);
-		
-		JLabel lblDisciplina = new JLabel("Disciplina");
-		lblDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblDisciplina.setBounds(20, 31, 69, 24);
-		panelCausa.add(lblDisciplina);
-		
-		txtDisciplina = new JTextField();
-		txtDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
-		txtDisciplina.setColumns(10);
-		txtDisciplina.setBounds(20, 56, 191, 30);
-		panelCausa.add(txtDisciplina);
-		
 		JPanel panelBotones = new JPanel();
 		FlowLayout fl_panelBotones = (FlowLayout) panelBotones.getLayout();
 		fl_panelBotones.setAlignment(FlowLayout.RIGHT);
-		panelBotones.setBounds(20, 545, 518, 52);
+		panelBotones.setBounds(20, 423, 784, 52);
 		panelAgregar.add(panelBotones);
 		
 		JButton btnGuardar = new JButton("Guardar Registros");
@@ -206,7 +184,7 @@ public class AdministracionRegistros extends JInternalFrame {
 		
 		JPanel panelTituloAgregar = new JPanel();
 		panelTituloAgregar.setBackground(Color.BLACK);
-		panelTituloAgregar.setBounds(0, 0, 562, 36);
+		panelTituloAgregar.setBounds(0, 0, 830, 36);
 		panelAgregar.add(panelTituloAgregar);
 		
 		JLabel lblTitulo = new JLabel("Agregar Nuevos Registros");
@@ -286,11 +264,69 @@ public class AdministracionRegistros extends JInternalFrame {
 		panelCentroBorrar.add(btnRegistros);
 		setTitle("Administracion de Registros");
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		setBounds(100, 10, 569, 663);
+		setBounds(100, 10, 835, 540);
 		
 		rellenarCombo();
 		cbSubArea.setSelectedIndex(-1);
 		cbArea.setSelectedIndex(-1);
+		
+		JPanel panelCausa = new JPanel();
+		panelCausa.setLayout(null);
+		panelCausa.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Causa", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panelCausa.setBounds(538, 58, 265, 232);
+		panelAgregar.add(panelCausa);
+		
+		JLabel label = new JLabel("Causa");
+		label.setFont(new Font("Verdana", Font.PLAIN, 12));
+		label.setBounds(29, 21, 46, 24);
+		panelCausa.add(label);
+		
+		txtCausa = new JTextField();
+		txtCausa.setToolTipText("Agrega una nueva causa");
+		txtCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
+		txtCausa.setColumns(10);
+		txtCausa.setBounds(29, 46, 214, 30);
+		panelCausa.add(txtCausa);
+		
+		JLabel lblDisciplinaAQue = new JLabel("Disciplina(s) a que pertenece");
+		lblDisciplinaAQue.setFont(new Font("Verdana", Font.PLAIN, 12));
+		lblDisciplinaAQue.setBounds(29, 93, 200, 14);
+		panelCausa.add(lblDisciplinaAQue);
+		
+		JScrollPane scrollPaneDisciplina = new JScrollPane();
+		scrollPaneDisciplina.setBounds(29, 118, 214, 103);
+		panelCausa.add(scrollPaneDisciplina);
+		
+		listDisciplina = new JList<String>();
+		scrollPaneDisciplina.setViewportView(listDisciplina);
+		listDisciplina.setBorder(new LineBorder(new Color(0, 0, 0)));
+		listDisciplina.setToolTipText("Disciplinas a que pertenece la nueva causa");
+		//Pobla la lista con los resultados de la Base de Datos
+		try {
+			manipulacionDatos.poblarJList(listDisciplina);
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		listDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
+		
+		JPanel panelDisciplina = new JPanel();
+		panelDisciplina.setBorder(new TitledBorder(null, "Disciplina", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelDisciplina.setBounds(538, 301, 265, 111);
+		panelAgregar.add(panelDisciplina);
+		panelDisciplina.setLayout(null);
+		
+		JLabel lblDisciplina = new JLabel("Disciplina");
+		lblDisciplina.setBounds(29, 24, 58, 16);
+		lblDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
+		panelDisciplina.add(lblDisciplina);
+		
+		txtDisciplina = new JTextField();
+		txtDisciplina.setToolTipText("Agrega nueva Disciplina");
+		txtDisciplina.setBounds(29, 51, 214, 30);
+		txtDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
+		txtDisciplina.setColumns(10);
+		panelDisciplina.add(txtDisciplina);
 		
 		JPanel panelModificar = new JPanel();
 		tpMenu.addTab("Modificar", null, panelModificar, null);
@@ -342,8 +378,8 @@ public class AdministracionRegistros extends JInternalFrame {
 		}
 		
 	}
-
-private void guardarRegistros() {
+	
+	private void guardarRegistros() {
 		
 		String nombreArea = txtArea.getText();
 		String nombreSubArea = txtSubArea.getText();
@@ -354,14 +390,9 @@ private void guardarRegistros() {
 		String nombreDisciplina = txtDisciplina.getText();
 		String nombreCausa = txtCausa.getText();
 		
-	//	for (Component c : this.getRootPane().getComponents()) {
-			
-	//		System.out.println("Los componentes son: " +c.getName());
-			
-	//	}
 		//Guardar informacion de una nueva Area
 		Area area = new Area();
-		if(nombreArea.trim().length() == 0) {
+		if(nombreArea.length() == 0) {
 			area.setNombreArea(null);
 		}
 		else {
@@ -370,7 +401,7 @@ private void guardarRegistros() {
 		
 		//Guarda informacion de una nueva SubArea
 		SubArea subArea = new SubArea();
-		if(nombreSubArea.trim().length() == 0) {
+		if(nombreSubArea.length() == 0) {
 			subArea.setNombreSubArea(null);
 		}
 		else {
@@ -381,15 +412,15 @@ private void guardarRegistros() {
 						"Seleccione Area", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
-			int idArea = Integer.parseInt(manipulacionDatos.buscarIndice(areaAQuePertenece, "area"));
-			subArea.setIdArea(idArea);
+
+			subArea.setIdArea(areaAQuePertenece);
 		}
 
 		//Guarda informacion de un nuevo Equipo
-		Equipo equipo = null;
+		Equipo equipo;
 		//si no se escribe el nombre del equipo.
-		if(codEquipo.trim().length() == 0 || nombreEquipo.trim().length() == 0) {
-			equipo = new Equipo(0, null, null, 0);
+		if(codEquipo.length() == 0) {
+			equipo = new Equipo(0, null, null, null);
 		}
 		else {
 			
@@ -398,24 +429,39 @@ private void guardarRegistros() {
 						"Seleccione SubArea", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
-			//Busca el indice de la SubArea seleccciona
-			int idSubArea = Integer.parseInt(manipulacionDatos.buscarIndice(subAreaAQuePertenece, "sub_area"));
-			equipo = new Equipo(0, codEquipo, nombreEquipo, idSubArea);
+			
+			equipo = new Equipo(0, codEquipo, nombreEquipo, subAreaAQuePertenece);
 		}
-
 		
 		//Guarda informacion de una nueva causa
-		Causa causa = new Causa();
-		if(nombreCausa.trim().length() == 0) {
+	
+		List<Causa> listaCausa = null;
+		if(nombreCausa.length() == 0) {
+			
+			listaCausa = new ArrayList<Causa>();
+			Causa causa = new Causa();
 			causa.setTipoCausa(null);
+			listaCausa.add(causa);
 		}
 		else {
-			causa.setTipoCausa(nombreCausa);
+			
+			// Obtiene el indice de todos los elementos seleccionados
+		    int[] indicesSeleccionados = listDisciplina.getSelectedIndices();
+
+		    // Lista de las Areas seleccionadas
+		    listaCausa = new ArrayList<Causa>();
+		    // Obtiene todos los elementos seleccionados usando los indices
+		    for (int i = 0; i < indicesSeleccionados.length; i++) {
+		    	String seleccionDisciplina = String.valueOf(listDisciplina.getModel()
+		    			.getElementAt(indicesSeleccionados[i]));
+		    	
+		    	listaCausa.add(new Causa(nombreCausa, seleccionDisciplina));
+		    }
 		}
 		
 		//Guarda informacion de una nueva Disciplina
 		Disciplina disciplina = new Disciplina();
-		if(nombreDisciplina.trim().length() == 0) {
+		if(nombreDisciplina.length() == 0) {
 			disciplina.setNombreDisciplina(null);
 		}
 		else {
@@ -424,7 +470,7 @@ private void guardarRegistros() {
 
 		try {
 			// Si el resultado es satisfactorio, notifica que se agregaron nuevos registros a la Base de Datos
-			if (modificacionRegistros.agregarRegistros(area, causa, disciplina, equipo, subArea) == true) {
+			if (modificacionRegistros.agregarRegistros(area, listaCausa, disciplina, equipo, subArea) == true) {
 				
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Registro(s) agregado(s) correctamente");
@@ -435,7 +481,6 @@ private void guardarRegistros() {
 						.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 				Principal.lblStatusBar.setText("No se pudo completar la operacion");
 			}
-			
 			
 		} catch (SQLException sqle) {
 			log.log(Level.SEVERE, sqle.toString(), sqle);
@@ -448,7 +493,6 @@ private void guardarRegistros() {
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}
-	
 	
 	/**
 	 * Limpia los componentes luego de agregar nuevos registros
@@ -476,13 +520,13 @@ private void guardarRegistros() {
 		try {
 			
 			//Rellena ComboBox Area
-			rs = manipulacionDatos.rellenarCombo("area", 0);
+			rs = manipulacionDatos.rellenarCombo("area", null);
 			while (rs.next()) {
 				cbArea.addItem(rs.getString("nombre_area"));
 			}
 			
 			//Rellena ComboBox SubArea
-			rs = manipulacionDatos.rellenarCombo("subArea", 0);
+			rs = manipulacionDatos.rellenarCombo("subArea", null);
 			while (rs.next()) {
 				cbSubArea.addItem(rs.getString(2));
 			}

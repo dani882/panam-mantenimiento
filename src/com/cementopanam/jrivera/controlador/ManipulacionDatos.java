@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 
 import com.cementopanam.jrivera.modelo.ConeccionBD;
@@ -20,8 +22,6 @@ public class ManipulacionDatos {
 	private CallableStatement cs = null;
 	private PreparedStatement pstmt = null;
 	private ResultSet rs = null;
-
-	private String formatoFecha = "yyyy-MM-dd HH:mm:ss";
 
 	public ManipulacionDatos() {
 
@@ -37,6 +37,10 @@ public class ManipulacionDatos {
 		}
 	}
 
+	/**
+	 * Conecta a la Base de Datos
+	 * @return la conexion a la base de datos
+	 */
 	public Connection obtenerConexion() {
 
 		try {
@@ -53,151 +57,33 @@ public class ManipulacionDatos {
 	/**
 	 * Agrega elementos a los comboBox
 	 * 
-	 * @param sentencia
-	 * @param indice
-	 * @return Lista de elementos para el comboBox
+	 * @param sentencia - condicion para saber que elemento para que comboBox rellenar
+	 * @param indice - indice solicitado por un elemento
+	 * @return ResultSet de elementos para el comboBox
 	 */
-	public ResultSet rellenarCombo(String sentencia, int indice) throws SQLException {
-
-		String sql = "";
+	public ResultSet rellenarCombo(String sentencia, String indice) throws SQLException {
+		
 		try {
-			con = cbd.conectarABaseDatos();
-
-			if (sentencia.equalsIgnoreCase("area") && indice == 0) {
-
-				sql = "SELECT * FROM mantenimientodb_nuevo.area;";
-				pstmt = con.prepareStatement(sql);
-				rs = pstmt.executeQuery();
-			}  
-			else if (sentencia.equalsIgnoreCase("disciplina") && indice == 0) {
-
-				sql = "SELECT * FROM mantenimientodb_nuevo.disciplina;";
-				pstmt = con.prepareStatement(sql);
-				rs = pstmt.executeQuery();
-			}
 			
-			else if (sentencia.equalsIgnoreCase("causa") && indice == 0) {
-
-				sql = "SELECT * FROM mantenimientodb_nuevo.causa WHERE id_usuario=1;";
-				pstmt = con.prepareStatement(sql);
-				rs = pstmt.executeQuery();
-			}
-
-			else {
-
-				switch (sentencia) {
-
-				case "subArea":
-					sql = "SELECT * FROM mantenimientodb_nuevo.sub_area WHERE id_area = ?;";
-					pstmt = con.prepareStatement(sql);
-					pstmt.setInt(1, indice);
-					rs = pstmt.executeQuery();
-					break;
-
-				case "equipo":
-					sql = "SELECT * FROM mantenimientodb_nuevo.equipo WHERE idSubArea = ?;";
-					pstmt = con.prepareStatement(sql);
-					pstmt.setInt(1, indice);
-					rs = pstmt.executeQuery();
-					break;
-				
-				case "causa":
-					sql = "SELECT * FROM mantenimientodb_nuevo.causa WHERE id_usuario=1 AND id_disciplina = ?;";
-					pstmt = con.prepareStatement(sql);
-					pstmt.setInt(1, indice);
-					rs = pstmt.executeQuery();
-					break;
-
-				default:
-					JOptionPane.showMessageDialog(null, "Debe seleccionar todos los campos", "Seleccione campos",
-							JOptionPane.WARNING_MESSAGE);
-					break;
-				}
-			}
-		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			con = cbd.conectarABaseDatos();
+			cs = con.prepareCall("{call sp_rellenar_comboBox(?,?)}");
+			
+			cs.setString(1, sentencia);
+			cs.setString(2, indice);
+			
 		}
-
-		return rs;
-
-		/*
-		 * String resultado = "";
-		 * 
-		 * try { con = cbd.conectarABaseDatos();
-		 * 
-		 * cs = con.prepareCall("{call rellenarcomboBox(?,?,?)}");
-		 * 
-		 * cs.setString(1, sentencia); cs.setString(2, indice);
-		 * 
-		 * cs.registerOutParameter(3, java.sql.Types.VARCHAR);
-		 * cs.executeUpdate();
-		 * 
-		 * resultado = cs.getString(3);
-		 * 
-		 * System.out.println("Se uso el metodo rellenarCombo");
-		 * 
-		 * } catch (SQLException sqle) { JOptionPane.showMessageDialog(null,
-		 * sqle.getMessage()); } catch (Exception e) {
-		 * JOptionPane.showMessageDialog(null, e.getMessage()); }
-		 * System.out.println(
-		 * "Conectado a la Base de Datos desde metodo rellenarCombo");
-		 * 
-		 * return resultado;
-		 */
+		catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
+			JOptionPane.showMessageDialog(null, sqle.getMessage()); 
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e); 
+			JOptionPane.showMessageDialog(null, e.getMessage()); }
+	
+		return rs = cs.executeQuery();
 	}
+	 
 
-	/**
-	 * Actualiza el paro de Pendiente a Completado
-	 * 
-	 * @param idParo
-	 * @param tiempoFin
-	 * @param tiempoInicio
-	 * @return true - si se realizado con exito la operacion, false - si no se
-	 *         completo la operacion
-	 * @throws SQLException
-	 */
-	public boolean actualizarParo(int idParo, String tiempoFin, String tiempoInicio) throws SQLException {
-
-		// Verifica si la fecha de Fin es Mayor a Fecha Inicio de Paro
-		ComparacionFechas cf = new ComparacionFechas();
-		boolean comparacionFechas = cf.compararFechas(tiempoInicio, tiempoFin, formatoFecha);
-
-		if (comparacionFechas == true) {
-
-			try {
-				JOptionPane.showMessageDialog(null, "La fecha Fin no puede ser Mayor a la Fecha de Inicio de Paro",
-						"Comparacion Fechas", JOptionPane.ERROR_MESSAGE);
-
-				return false;
-			} catch (Exception e) {
-				log.log(Level.WARNING, e.toString(), e);
-				return false;
-			}
-		}
-
-		String detalleSolucion = JOptionPane.showInputDialog(null, "¿Que se tuvo que hacer para solucionar este paro?",
-				"Solucion de paro", JOptionPane.INFORMATION_MESSAGE);
-
-		if (detalleSolucion == null || detalleSolucion.equals(null) || detalleSolucion == ""
-				|| detalleSolucion.equals("")) {
-			JOptionPane.showMessageDialog(null, "Debe escribir la solucion del paro", "Solucion de Paro",
-					JOptionPane.WARNING_MESSAGE);
-
-			return false;
-		}
-		con = cbd.conectarABaseDatos();
-		cs = con.prepareCall("{call sp_actualizar_paro(?,?,?)}");
-
-		cs.setInt(1, idParo);
-		cs.setString(2, tiempoFin);
-		cs.setString(3, detalleSolucion);
-
-		cs.execute();
-		con.commit();
-
-		return true;
-	}
 
 	/**
 	 * Visualiza el estado de los paros
@@ -220,9 +106,7 @@ public class ManipulacionDatos {
 
 		cs.setString(1, estatus);
 
-		rs = cs.executeQuery();
-
-		return rs;
+		return rs = cs.executeQuery();
 	}
 
 	/**
@@ -234,9 +118,9 @@ public class ManipulacionDatos {
 	 *            - ejecuta la consulta de la condicion proporcionada
 	 * @return Retorna el indice de un atributo
 	 */
-	public String buscarIndice(String indice, String sentencia) {
+	public int buscarIndice(String indice, String sentencia) {
 
-		String resultado = "";
+		int resultado = 0;
 
 		try {
 			con = cbd.conectarABaseDatos();
@@ -245,15 +129,16 @@ public class ManipulacionDatos {
 			cs.setString(1, indice);
 			cs.setString(2, sentencia);
 
-			cs.registerOutParameter(3, java.sql.Types.VARCHAR);
+			cs.registerOutParameter(3, java.sql.Types.INTEGER);
 			cs.executeUpdate();
 
-			resultado = cs.getString(3);
+			resultado = cs.getInt(3);
 
 		} catch (SQLException sqle) {
 			log.log(Level.SEVERE, sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
+			
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
@@ -284,18 +169,49 @@ public class ManipulacionDatos {
 
 				try {
 					JOptionPane.showMessageDialog(null,
-							"La fecha Fin no puede ser Mayor a la Fecha de " + "Inicio de Paro", "Comparacion Fechas",
+							"La fecha Fin no puede ser Mayor a la Fecha de Inicio de Paro", "Comparacion Fechas",
 							JOptionPane.ERROR_MESSAGE);
 
 					return false;
 				} catch (Exception e) {
-					log.log(Level.SEVERE, e.toString(), e);
+					log.log(Level.WARNING, e.toString(), e);
 				}
 			}
-
 		}
 		return true;
+	}
+	
+	/**
+	 * Genera el listado de las disciplinas para mostrarlas en un JList
+	 * @param lista - JList que se va a poblar
+	 * @throws SQLException
+	 */
+	public void poblarJList(JList<String> lista) throws SQLException {
+		
+		DefaultListModel<String> modelo = new DefaultListModel<String>();
+		
+		try(Connection  con = cbd.conectarABaseDatos();
+			    CallableStatement cs = con.prepareCall("{call sp_listar_disciplina()}");) {
 
+		    ResultSet resultSet = cs.executeQuery();
+
+		    while (resultSet.next()) {
+		    	
+		        String nombreDisciplina = resultSet.getString("nombre_disciplina"); 
+		        modelo.addElement(nombreDisciplina);
+		    }
+		    lista.setModel(modelo);
+
+		}
+		catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	/**
@@ -357,7 +273,8 @@ public class ManipulacionDatos {
 
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), 
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }

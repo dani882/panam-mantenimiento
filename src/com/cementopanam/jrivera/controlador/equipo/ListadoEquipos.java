@@ -1,4 +1,4 @@
-package com.cementopanam.jrivera.controlador.listadoEquipos;
+package com.cementopanam.jrivera.controlador.equipo;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -35,10 +35,8 @@ public class ListadoEquipos {
 
 		ArrayList<NombreEquipo> listaEquipo = new ArrayList<NombreEquipo>();
 
-		try {
-
-			con = cbd.conectarABaseDatos();
-			cs = con.prepareCall("{call sp_buscar_equipo(?)}");
+		try(Connection con = cbd.conectarABaseDatos();
+				CallableStatement cs = con.prepareCall("{call sp_buscar_equipo(?)}");) {
 
 			cs.setString(1, codigo);
 			rs = cs.executeQuery();

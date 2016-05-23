@@ -1,4 +1,4 @@
-package com.cementopanam.jrivera.controlador.listadoEquipos;
+package com.cementopanam.jrivera.controlador.equipo;
 
 public class NombreEquipo {
 
@@ -6,6 +6,7 @@ public class NombreEquipo {
 	private String nombreEquipo;
 	private String nombreArea;
 	private String nombreSubArea;
+	private String solucion;
 
 	/**
 	 * @return the codigoEquipo
@@ -68,16 +69,50 @@ public class NombreEquipo {
 	}
 
 	/**
+	 * @return the solucion
+	 */
+	public String getSolucion() {
+		return solucion;
+	}
+
+	/**
+	 * @param solucion the solucion to set
+	 */
+	public void setSolucion(String solucion) {
+		this.solucion = solucion;
+	}
+
+	/**
+	 * Constructor para visualizar la informacion de los equipos
 	 * @param codigoEquipo
 	 * @param nombreEquipo
 	 * @param nombreArea
 	 * @param nombreSubArea
 	 */
 	public NombreEquipo(String codigoEquipo, String nombreEquipo, String nombreArea, String nombreSubArea) {
-		super();
+
 		this.codigoEquipo = codigoEquipo;
 		this.nombreEquipo = nombreEquipo;
 		this.nombreArea = nombreArea;
 		this.nombreSubArea = nombreSubArea;
 	}
+
+	/**
+	 * Constructor para visualizar las soluciones de los equipos
+	 * @param codigoEquipo
+	 * @param nombreEquipo
+	 * @param nombreArea
+	 * @param nombreSubArea
+	 * @param solucion
+	 */
+	public NombreEquipo(String codigoEquipo, String nombreEquipo, String nombreArea, String nombreSubArea,
+			String solucion) {
+		
+		this.codigoEquipo = codigoEquipo;
+		this.nombreEquipo = nombreEquipo;
+		this.nombreArea = nombreArea;
+		this.nombreSubArea = nombreSubArea;
+		this.solucion = solucion;
+	}
+	
 }

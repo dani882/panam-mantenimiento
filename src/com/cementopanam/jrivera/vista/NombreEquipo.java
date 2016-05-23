@@ -37,7 +37,7 @@ public class NombreEquipo extends JDialog {
 	ResultSet rs = null;
 	private JTable tblEquipo;
 	private TablaModeloEquipos tablaModeloEquipos = new TablaModeloEquipos();
-	private JTextField textField;
+	private JTextField txtCodigoEquipo;
 
 	/**
 	 * Create the panel.
@@ -57,20 +57,21 @@ public class NombreEquipo extends JDialog {
 		getContentPane().add(panelSuperior, BorderLayout.NORTH);
 		panelSuperior.setLayout(new BorderLayout(0, 0));
 
-		JLabel lblNewLabel = new JLabel("Buscar Codigo:");
-		lblNewLabel.setFont(new Font("Verdana", Font.PLAIN, 12));
-		panelSuperior.add(lblNewLabel, BorderLayout.WEST);
+		JLabel lblCodigoEquipo = new JLabel("Buscar Codigo:");
+		lblCodigoEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
+		panelSuperior.add(lblCodigoEquipo, BorderLayout.WEST);
 
-		textField = new JTextField();
-		textField.addKeyListener(new KeyAdapter() {
+		txtCodigoEquipo = new JTextField();
+		txtCodigoEquipo.setToolTipText("Escriba el codigo del Equipo que este buscando");
+		txtCodigoEquipo.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				tablaModeloEquipos.buscar(textField.getText());
+				tablaModeloEquipos.buscarEquipo(txtCodigoEquipo.getText());
 			}
 		});
-		textField.setFont(new Font("Verdana", Font.PLAIN, 12));
-		panelSuperior.add(textField, BorderLayout.CENTER);
-		textField.setColumns(10);
+		txtCodigoEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
+		panelSuperior.add(txtCodigoEquipo, BorderLayout.CENTER);
+		txtCodigoEquipo.setColumns(10);
 
 		JPanel panelCentral = new JPanel();
 		getContentPane().add(panelCentral, BorderLayout.CENTER);

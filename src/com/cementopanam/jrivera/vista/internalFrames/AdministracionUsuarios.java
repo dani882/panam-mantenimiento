@@ -6,11 +6,15 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
@@ -21,6 +25,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.MaskFormatter;
 
 import com.cementopanam.jrivera.controlador.usuario.AdministracionUsuario;
 import com.cementopanam.jrivera.controlador.usuario.Usuario;
@@ -32,16 +37,19 @@ public class AdministracionUsuarios extends JInternalFrame {
 	/**
 	 * 
 	 */
+	private static final Logger log = Logger.getLogger(AdministracionUsuarios.class.getName());
 	private static final long serialVersionUID = -6053479021274723939L;
 	private JTextField txtNombre;
 	private JTextField txtApellido;
-	private JTextField txtCodEmpleado;
+	private JFormattedTextField  txtCodEmpleado;
 	private JTextField txtNombreUsuario;
 	private JPasswordField pwdClave;
 	private JPasswordField pwdConfirmarClave;
 	private JButton btnLimpiar;
 	private JButton btnEditar;
 	private JComboBox<Object> cbTipoUsuario;
+	
+	private MaskFormatter formateador;
 
 	private AdministracionUsuario admUsuario = new AdministracionUsuario();
 
@@ -49,6 +57,7 @@ public class AdministracionUsuarios extends JInternalFrame {
 	 * Create the frame.
 	 */
 	public AdministracionUsuarios() {
+		
 		getContentPane().setFont(new Font("Verdana", Font.PLAIN, 12));
 		setFrameIcon(null);
 		setClosable(true);
@@ -92,7 +101,21 @@ public class AdministracionUsuarios extends JInternalFrame {
 		txtApellido.setBounds(192, 118, 147, 30);
 		layeredPaneDatosEmpleado.add(txtApellido);
 
-		txtCodEmpleado = new JTextField();
+		/*
+		 * Restringe el uso de solo numeros en el codigo empleado
+		 */
+		
+		try {
+			formateador = new MaskFormatter("######");
+			
+			txtCodEmpleado = new JFormattedTextField();
+			formateador.install(txtCodEmpleado);
+		}
+		
+		catch(ParseException e1) {
+			log.log(Level.WARNING, e1.toString(), e1);
+		}
+		
 		txtCodEmpleado.setFont(new Font("Verdana", Font.PLAIN, 12));
 		txtCodEmpleado.setColumns(10);
 		txtCodEmpleado.setBounds(35, 55, 147, 30);

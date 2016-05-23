@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import com.cementopanam.jrivera.controlador.ComparacionFechas;
 import com.cementopanam.jrivera.controlador.Imputacion;
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.modelo.ConeccionBD;
@@ -19,7 +20,6 @@ public class AdministracionParos extends ManipulacionDatos {
 	private static final Logger log = Logger.getLogger( AdministracionParos.class.getName() );
 	private ConeccionBD cbd;
 	private Connection con = null;
-	private CallableStatement cs = null;
 	private ResultSet rs = null;
 
 	private String formatoFecha = "yyyy-MM-dd HH:mm:ss";
@@ -48,10 +48,10 @@ public class AdministracionParos extends ManipulacionDatos {
 	public ArrayList<Paro> mostrarParo(Paro p, String filtro) {
 
 		ArrayList<Paro> lista = new ArrayList<Paro>();
-		try {
-			con = cbd.conectarABaseDatos();
-			cs = con.prepareCall("{call sp_buscar_paro(?,?,?)}");
-			
+		
+		try(Connection con = cbd.conectarABaseDatos();
+				CallableStatement cs = con.prepareCall("{call sp_buscar_paro(?,?,?)}");) {
+
 			cs.setString(1, p.getTiempoInicio());
 			cs.setString(2, p.getTiempoFin());
 			cs.setString(3, filtro);
@@ -88,8 +88,8 @@ public class AdministracionParos extends ManipulacionDatos {
 
 	
 	/**
-	 * Guarda los paros
-	 * @param imp
+	 * Guarda los paros a la base de datos
+	 * @param imp - informaciones del paro para guardar al sistema
 	 * @return - true si la operacion fue exitosa, false - si no se compleeto la operacion
 	 * @throws SQLException
 	 */
@@ -100,10 +100,8 @@ public class AdministracionParos extends ManipulacionDatos {
 			return false;
 		}
 
-		try {
-
-			con = cbd.conectarABaseDatos();
-			cs = con.prepareCall("{call sp_insertar_paro(?,?,?,?,?,?,?,?,?,?)}");
+		try(Connection con = cbd.conectarABaseDatos();
+				CallableStatement cs = con.prepareCall("{call sp_insertar_paro(?,?,?,?,?,?,?,?,?,?)}");) {
 
 			cs.setString(1, imp.getCausa()); // Causa
 			cs.setString(2, imp.getCausaExtendida()); // Causa Extendida
@@ -160,11 +158,9 @@ public class AdministracionParos extends ManipulacionDatos {
 			return false;
 		}
 
-		try {
-
-			con = cbd.conectarABaseDatos();
-			cs = con.prepareCall("{call sp_modificar_paro(?,?,?,?,?,?,?,?)}");
-
+		try(Connection con = cbd.conectarABaseDatos();
+				CallableStatement cs = con.prepareCall("{call sp_modificar_paro(?,?,?,?,?,?,?,?)}");) {
+			
 			cs.setInt(1, p.getCodigo());
 			cs.setString(2, p.getSolucion());
 			cs.setString(3, p.getTiempoInicio());
@@ -176,17 +172,65 @@ public class AdministracionParos extends ManipulacionDatos {
 
 			cs.execute();
 			con.commit();
-		} catch (SQLException sqle) {
+		} 
+		catch (SQLException sqle) {
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			con.rollback();
 			log.log(Level.SEVERE, sqle.toString(), sqle);
 			return false;
-		} catch (Exception e) {
+			
+		} 
+		catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			con.rollback();
 			log.log(Level.SEVERE, e.toString(), e);
 			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Actualiza el paro de Pendiente a Completado
+	 * 
+	 * @param idParo
+	 * @param tiempoFin
+	 * @param tiempoInicio
+	 * @return true - si se realizado con exito la operacion, false - si no se
+	 *         completo la operacion
+	 * @throws SQLException
+	 */
+	public boolean actualizarParo(Paro paro) throws SQLException {
+		
+		// Verifica si la fecha de Fin es Mayor a Fecha Inicio de Paro
+		ComparacionFechas cf = new ComparacionFechas();
+		boolean comparacionFechas = cf.compararFechas(paro.getTiempoInicio(), paro.getTiempoFin(), formatoFecha);
+
+		if (comparacionFechas == true) {
+
+			try {
+				JOptionPane.showMessageDialog(null, "La fecha Fin no puede ser Mayor a la Fecha de Inicio de Paro",
+						"Comparacion Fechas", JOptionPane.ERROR_MESSAGE);
+
+				return false;
+			} catch (Exception e) {
+				log.log(Level.WARNING, e.toString(), e);
+				return false;
+			}
+		}
+
+		else {
+			
+			try(Connection con = cbd.conectarABaseDatos();
+					CallableStatement cs = con.prepareCall("{call sp_actualizar_paro(?,?,?)}");) {
+				
+				cs.setInt(1, paro.getCodigo());
+				cs.setString(2, paro.getTiempoFin());
+				cs.setString(3, paro.getSolucion());
+		
+				cs.execute();
+				con.commit();
+			}
 		}
 		return true;
 	}
@@ -199,10 +243,8 @@ public class AdministracionParos extends ManipulacionDatos {
 	 */
 	public boolean eliminarParo(int idCausa) throws SQLException {
 
-		try {
-
-			con = cbd.conectarABaseDatos();
-			cs = con.prepareCall("{call sp_eliminar_paro(?)}");
+		try(Connection con = cbd.conectarABaseDatos();
+				CallableStatement cs = con.prepareCall("{call sp_eliminar_paro(?)}");) {
 
 			cs.setInt(1, idCausa);
 
@@ -214,7 +256,9 @@ public class AdministracionParos extends ManipulacionDatos {
 			con.rollback();
 			log.log(Level.SEVERE, sqle.toString(), sqle);
 			return false;
-		} catch (Exception e) {
+			
+		}
+		catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			con.rollback();
 			log.log(Level.SEVERE, e.toString(), e);
@@ -231,9 +275,9 @@ public class AdministracionParos extends ManipulacionDatos {
 	 *            - Descripcion Adicional del Paro
 	 * @return el indice de la Causa Seleccionada
 	 */
-	public String buscarIndiceCausa(String causa, String descripcion) {
+	public int buscarIndiceCausa(String causa, String descripcion) {
 
-		String resultado = "";
+		int resultado = 0;
 
 		// Valida si la descripcion adicional esta vacia o nula
 		int longitud = causa.length();
@@ -242,17 +286,16 @@ public class AdministracionParos extends ManipulacionDatos {
 			return resultado = buscarIndice(causa, "causa");
 		}
 
-		try {
-			con = cbd.conectarABaseDatos();
-
-			cs = con.prepareCall("{call sp_buscar_causa(?,?,?)}");
-
+		try(Connection con = cbd.conectarABaseDatos();
+				CallableStatement cs = con.prepareCall("{call sp_buscar_causa(?,?,?)}");) {
+			
 			cs.setString(1, causa);
 			cs.setString(2, descripcion);
-			cs.registerOutParameter(3, java.sql.Types.VARCHAR);
+			cs.registerOutParameter(3, java.sql.Types.INTEGER);
 
 			cs.executeQuery();
-			resultado = cs.getString(3);
+			//Muestra el ID de causa obtenida de la Base de Datos
+			resultado = cs.getInt(3);
 
 		} catch (SQLException sqle) {
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),

@@ -18,7 +18,29 @@ public class Test {
 	ResultSet rs = null;
 
 	public static void main(String[] args) {
-		long currentTime = System.currentTimeMillis();
+		
+	    String version = System.getProperty("java.version");
+	    char minor = version.charAt(2);
+	    char point = version.charAt(4);
+	    
+	    System.out.println(minor);
+	    System.out.println(point);
+	    
+	    if(minor != '9' || point < '1')
+	      throw new RuntimeException("JDK 1.4.1 or higher " +
+	        "is required to run the examples in this book.");
+	    System.out.println("JDK version "+ version + " found");
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		/*long currentTime = System.currentTimeMillis();
 
 		System.out.println("Tiempo" + currentTime);
 		int year2 = Calendar.getInstance().get(Calendar.YEAR);
@@ -26,7 +48,7 @@ public class Test {
 		t.testDB();
 
 		System.out.println(year2);
-	}
+*/	}
 
 	private void testDB() {
 

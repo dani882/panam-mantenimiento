@@ -3,7 +3,7 @@ package com.cementopanam.jrivera.modelo;
 /**
  * Entidad para manipular la Base de Datos
  * @author Jesus Rivera
- * @version 1.0
+ * @version 1.3.0
  */
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +50,6 @@ public class ConeccionBD {
 			String usuario = pros.getProperty("usuario");
 			String password = pros.getProperty("password");
 			String driverBD = pros.getProperty("driverBD");
-			;
 
 			// Crea la conexion a la Base de Datos
 			Class.forName(driverBD).newInstance();
@@ -75,9 +74,9 @@ public class ConeccionBD {
 
 		if (verificarConexion() == true) {
 			con.close();
-			System.out.println("Desconectado");
+			log.info("Desconectado");
 		} else {
-			System.out.println("Conexion abierta");
+			log.info("Conexion abierta");
 		}
 	}
 

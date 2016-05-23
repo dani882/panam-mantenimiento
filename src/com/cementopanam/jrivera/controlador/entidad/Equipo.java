@@ -5,7 +5,7 @@ public class Equipo {
 	private int idEquipo;
 	private String codEquipo;
 	private String nombreEquipo;
-	private int idSubArea;
+	private String idSubArea;
 	/**
 	 * @return the idEquipo
 	 */
@@ -45,13 +45,13 @@ public class Equipo {
 	/**
 	 * @return the idSubArea
 	 */
-	public int getIdSubArea() {
+	public String getIdSubArea() {
 		return idSubArea;
 	}
 	/**
 	 * @param idSubArea the idSubArea to set
 	 */
-	public void setIdSubArea(int idSubArea) {
+	public void setIdSubArea(String idSubArea) {
 		this.idSubArea = idSubArea;
 	}
 	/**
@@ -60,7 +60,7 @@ public class Equipo {
 	 * @param nombreEquipo
 	 * @param idSubArea
 	 */
-	public Equipo(int idEquipo, String codEquipo, String nombreEquipo, int idSubArea) {
+	public Equipo(int idEquipo, String codEquipo, String nombreEquipo, String idSubArea) {
 		this.idEquipo = idEquipo;
 		this.codEquipo = codEquipo;
 		this.nombreEquipo = nombreEquipo;

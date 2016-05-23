@@ -8,9 +8,14 @@ import javax.swing.JOptionPane;
 
 public class ComparacionFechas {
 
+	/**
+	 * Compara las fechas proporcionadas
+	 * @param fechaInicio - fecha de inicio a ser comparada
+	 * @param fechaFin - fecha de fin a ser comparada
+	 * @param formatoFecha - formato de fecha para hacer la comparacion
+	 * @return true si la fecha de fin es mayor que la fecha inicio, false si la fecha inicio es mayor que la de fin
+	 */
 	public boolean compararFechas(String fechaInicio, String fechaFin, String formatoFecha) {
-
-		boolean resultado = false;
 
 		try {
 			/** Obtenemos las fechas enviadas en el formato a comparar */
@@ -20,12 +25,14 @@ public class ComparacionFechas {
 
 			if (fechaDate2.before(fechaDate1)) {
 
-				resultado = true;
+				return true;
 			}
 
 		} catch (ParseException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "La fecha introducida no es valida",
+					"Fecha invalida", JOptionPane.ERROR_MESSAGE);
 		}
-		return resultado;
+
+		return false;
 	}
 }

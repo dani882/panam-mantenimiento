@@ -70,16 +70,15 @@ public class ModificacionParo extends JDialog {
 		admParo = paroDB;
 		this.desktopPane = desktopPane;
 
-		System.out.println("Causa elegida: " + modificacion.getCausa());
 		try {
 
 			// Rellena combo Causa
-			ResultSet rs = admParo.rellenarCombo("causa", 0);
+			ResultSet rs = admParo.rellenarCombo("causa", null);
 			while (rs.next()) {
 				cbCausa.addItem(rs.getString("tipo_causa"));
 			}
 			// Rellena combo Disciplina
-			ResultSet rs2 = admParo.rellenarCombo("disciplina", 0);
+			ResultSet rs2 = admParo.rellenarCombo("disciplina", null);
 			while (rs2.next()) {
 				cbDisciplina.addItem(rs2.getString("nombre_disciplina"));
 			}
@@ -95,10 +94,9 @@ public class ModificacionParo extends JDialog {
 		// Obtiene el codigo de Causa
 		if (modificacion.getDescripcionAdicional().length() == 0) {
 			
-			codigoCausa = Integer.parseInt(admParo.buscarIndiceCausa(modificacion.getCausa(), ""));
+			codigoCausa = admParo.buscarIndiceCausa(modificacion.getCausa(), "");
 		} else {
-			codigoCausa = Integer.parseInt(
-					admParo.buscarIndiceCausa(modificacion.getCausa(), modificacion.getDescripcionAdicional()));
+			codigoCausa = admParo.buscarIndiceCausa(modificacion.getCausa(), modificacion.getDescripcionAdicional());
 		}
 
 		cbCausa.setSelectedItem(modificacion.getCausa());
@@ -366,7 +364,6 @@ public class ModificacionParo extends JDialog {
 			}
 		} catch (SQLException e) {
 			LOG.log(Level.SEVERE, e.toString(), e);
-			e.printStackTrace();
 		}
 	}
 }

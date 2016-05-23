@@ -5,7 +5,20 @@ public class Causa {
 	private int idCausa;
 	private String tipoCausa;
 	private String idUsuario;
-	//TODO Agregar ID Disciplina cuando se haya modificado la BD y relacionado con tabla causa
+	private String idDisciplina;
+	
+	/**
+	 * @return the idDisciplina
+	 */
+	public String getIdDisciplina() {
+		return idDisciplina;
+	}
+	/**
+	 * @param idDisciplina the idDisciplina to set
+	 */
+	public void setIdDisciplina(String idDisciplina) {
+		this.idDisciplina = idDisciplina;
+	}
 	/**
 	 * @return the idCausa
 	 */
@@ -46,11 +59,22 @@ public class Causa {
 	 * @param idCausa
 	 * @param tipoCausa
 	 * @param idUsuario
+	 * @param idDisciplina
 	 */
-	public Causa(int idCausa, String tipoCausa, String idUsuario) {
+	public Causa(int idCausa, String tipoCausa, String idUsuario, String idDisciplina) {
 		this.idCausa = idCausa;
 		this.tipoCausa = tipoCausa;
 		this.idUsuario = idUsuario;
+		this.idDisciplina = idDisciplina;
+	}
+	
+	/**
+	 * @param tipoCausa
+	 * @param idDisciplina
+	 */
+	public Causa(String tipoCausa, String idDisciplina) {
+		this.tipoCausa = tipoCausa;
+		this.idDisciplina = idDisciplina;
 	}
 	
 	public Causa() {}

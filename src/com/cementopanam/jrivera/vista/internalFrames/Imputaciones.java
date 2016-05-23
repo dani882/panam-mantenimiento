@@ -49,6 +49,7 @@ import com.cementopanam.jrivera.controlador.ComparacionFechas;
 import com.cementopanam.jrivera.controlador.Imputacion;
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
+import com.cementopanam.jrivera.controlador.paros.Paro;
 import com.cementopanam.jrivera.controlador.usuario.AdministracionUsuario;
 import com.cementopanam.jrivera.vista.NombreEquipo;
 import com.cementopanam.jrivera.vista.Principal;
@@ -310,6 +311,8 @@ public class Imputaciones extends JInternalFrame {
 		tablaParos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		// Sirve para limitar para que sea una sola seleccion
 		tablaParos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		//Sirve para no permitir la edicion por columnas
+		tablaParos.setDefaultEditor(Object.class, null);
 		// Sirve para no permitir que el usuario reordene las columnas
 		tablaParos.getTableHeader().setReorderingAllowed(false);
 		tablaParos.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -322,7 +325,7 @@ public class Imputaciones extends JInternalFrame {
 		btnIniciarParo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				btnIniciarParoActionPerformed(e);
+				imputarParo();
 			}
 		});
 		btnIniciarParo.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -391,6 +394,7 @@ public class Imputaciones extends JInternalFrame {
 
 		try {
 			dateMask = new MaskFormatter("####-##-## ##:##:##");
+			dateMask.setAllowsInvalid(false);
 
 			formattedTextField_fechaInicio = new JFormattedTextField();
 			dateMask.install(formattedTextField_fechaInicio);
@@ -414,6 +418,7 @@ public class Imputaciones extends JInternalFrame {
 
 		try {
 			dateMask = new MaskFormatter("####-##-## ##:##:##");
+			dateMask.setAllowsInvalid(false);
 
 			formattedTextField_fechaFin = new JFormattedTextField();
 			dateMask.install(formattedTextField_fechaFin);
@@ -550,6 +555,7 @@ public class Imputaciones extends JInternalFrame {
 		
 		boolean resultado;
 		String usuarioActual = Principal.usuarioActual.getText();
+		Date pruebaFecha = null;
 
 		try {
 
@@ -557,21 +563,38 @@ public class Imputaciones extends JInternalFrame {
 			int idParo = Integer.parseInt(String.valueOf(tablaParos.getValueAt(fila, 0)));
 
 			String usuarioTabla = String.valueOf(tablaParos.getValueAt(fila, 1));
-			String fechaFin = formattedTextField_fechaFin.getText();
 			String fechaInicio = String.valueOf(tablaParos.getValueAt(fila, 5));
+			String fechaFin = formattedTextField_fechaFin.getText();
 
 			String tipoUsuario = mostrarUsuario(usuarioActual);
 
-			if (usuarioActual.equals(usuarioTabla) || tipoUsuario.equals("administrador")) {
-				System.out.println("");
-			} else {
+			// Verifica si el usuario autenticado tiene privilegios para modificar el paro seleccionado
+			if (!(usuarioActual.equals(usuarioTabla) || tipoUsuario.equals("administrador"))) {
 				JOptionPane.showMessageDialog(null, "No tiene privilegios para modificar este paro", 
 						"Privilegios de Usuario", JOptionPane.INFORMATION_MESSAGE);
 				
 				return;
 			}
-
-			resultado = md.actualizarParo(idParo, fechaFin, fechaInicio);
+			
+			 pruebaFecha = df.parse(fechaFin);
+			 if (!df.format(pruebaFecha).equals(fechaFin)) {
+				 JOptionPane.showMessageDialog(null, "La Fecha introducida es invalida",
+						 "Fecha de Fin", JOptionPane.INFORMATION_MESSAGE);
+				 
+				 return;
+			}
+			
+			String solucion = escribirSolucion();
+			
+			if(solucion == null) {
+				
+				JOptionPane.showMessageDialog(null, "Debe escribir la solucion del paro",
+						"Solucion de Paro", JOptionPane.WARNING_MESSAGE);
+				
+				return;
+			}
+			admParos = new AdministracionParos();
+			resultado = admParos.actualizarParo(new Paro(idParo, fechaInicio, fechaFin, solucion));
 
 			if (resultado == true) {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
@@ -591,21 +614,25 @@ public class Imputaciones extends JInternalFrame {
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+		catch (ParseException pe) {
+			JOptionPane.showMessageDialog(null, "La Fecha introducida es invalida", 
+					"Fecha invalida", JOptionPane.ERROR_MESSAGE);
+		}
 		catch (ArrayIndexOutOfBoundsException aiobe) {
-			log.log(Level.WARNING, aiobe.toString(), aiobe);
-			JOptionPane.showMessageDialog(null, "Debe elegir un paro", aiobe.getClass().toString(),
+			JOptionPane.showMessageDialog(null, "Debe elegir un paro", "Seleccionar paro",
 					JOptionPane.ERROR_MESSAGE);
 			return;
+		}
+		catch (NumberFormatException nfe) {
+			log.log(Level.SEVERE, nfe.toString(), nfe);
+			JOptionPane.showMessageDialog(null, nfe.getMessage(), nfe.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 		catch (Exception e1) {
 			log.log(Level.SEVERE, e1.toString(), e1);
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			return;
-		} finally {
-			md.cerrarConexiones();
 		}
-		
 	}
 
 	private boolean esFechaValida(String fecha) {
@@ -613,13 +640,12 @@ public class Imputaciones extends JInternalFrame {
 		try {
 			df.parse(fecha);
 		} catch (ParseException e) {
-			log.log(Level.WARNING, e.toString(), e);
 			return false;
 		}
 		return true;
 	}
 
-	// Metodo para mostrar los paros en un JTable
+	// Muestra los paros en un JTable
 	private void actualizarTabla(String estatus) {
 
 		try {
@@ -648,7 +674,7 @@ public class Imputaciones extends JInternalFrame {
 		try {
 			// Rellena comboBox Area
 			if (campo.equals("area")) {
-				rs2 = md.rellenarCombo("area", 0);
+				rs2 = md.rellenarCombo("area", null);
 
 				while (rs2.next()) {
 					comboBoxArea.addItem(rs2.getString("nombre_area"));
@@ -659,21 +685,19 @@ public class Imputaciones extends JInternalFrame {
 			// Rellena comboBox SubArea
 			else if (campo.equals("subArea")) {
 				// Busca el indice de area seleccionado
-				String area = comboBoxArea.getSelectedItem().toString();
-				int idArea = Integer.parseInt(md.buscarIndice(area, "area"));
+				String area = String.valueOf(comboBoxArea.getSelectedItem());
 
-				rs2 = md.rellenarCombo("subArea", idArea);
+				rs2 = md.rellenarCombo("subArea", area);
 				while (rs2.next()) {
-					String subArea = rs2.getString(2);
+					String subArea = rs2.getString("nombre_sub_area");
 					comboBoxSubArea.addItem(subArea);
 				}
 				comboBoxSubArea.setSelectedIndex(-1);
 			} else if (campo.equals("equipo")) {
 				// Busca el indice de subArea seleccionado
 				String subArea = String.valueOf(comboBoxSubArea.getSelectedItem());
-				int idSubArea = Integer.parseInt(md.buscarIndice(subArea, "sub_area"));
 
-				rs2 = md.rellenarCombo("equipo", idSubArea);
+				rs2 = md.rellenarCombo("equipo", subArea);
 				while (rs2.next()) {
 					String cod_equipo = rs2.getString("cod_equipo");
 					comboBoxEquipo.addItem(cod_equipo);
@@ -683,7 +707,7 @@ public class Imputaciones extends JInternalFrame {
 
 			// Rellena comboBox Area
 			if (campo.equals("disciplina")) {
-				rs2 = md.rellenarCombo("disciplina", 0);
+				rs2 = md.rellenarCombo("disciplina", null);
 
 				while (rs2.next()) {
 					comboBoxDisciplina.addItem(rs2.getString("nombre_disciplina"));
@@ -695,8 +719,7 @@ public class Imputaciones extends JInternalFrame {
 			else if (campo.equals("causa")) {
 				// Rellena comboBox Area
 				String disciplina = String.valueOf(comboBoxDisciplina.getSelectedItem());
-				int idDisciplina = Integer.parseInt(md.buscarIndice(disciplina, "disciplina"));
-				rs2 = md.rellenarCombo("causa", idDisciplina);
+				rs2 = md.rellenarCombo("causa", disciplina);
 
 				while (rs2.next()) {
 					comboBoxCausa.addItem(rs2.getString("tipo_causa"));
@@ -720,12 +743,14 @@ public class Imputaciones extends JInternalFrame {
 			try {
 				rs2.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.log(Level.SEVERE, e.toString(), e);
 			}
 		}
 	}
 
+	/**
+	 * Limpia los campos una vez se complete una imputacion exitosa
+	 */
 	private void limpiarCampos() {
 
 		comboBoxEquipo.setSelectedIndex(-1);
@@ -742,13 +767,6 @@ public class Imputaciones extends JInternalFrame {
 		textArea_motivoCausa.setText("");
 	}
 
-	// Metodos de Accion
-	// Metodo para guardar en la Base de Datos la informacion de los paros.
-	private void btnIniciarParoActionPerformed(ActionEvent e) {
-
-		imputarParo();
-	}
-
 	/**
 	 * Guarda la informacion suministrada
 	 */
@@ -756,7 +774,8 @@ public class Imputaciones extends JInternalFrame {
 
 			admParos = new AdministracionParos();
 			boolean resultado = false;
-
+			Date pruebaFecha = null;
+			
 			try {
 
 				String fechaInicio = formattedTextField_fechaInicio.getText();
@@ -769,6 +788,15 @@ public class Imputaciones extends JInternalFrame {
 				String usuario = Principal.usuarioActual.getText();
 				String otraCausa = textArea_motivoCausa.getText();
 
+				
+				 pruebaFecha = df.parse(fechaFin);
+				 if (!df.format(pruebaFecha).equals(fechaFin)) {
+					 JOptionPane.showMessageDialog(null, "La Fecha introducida es invalida",
+							 "Fecha de Fin", JOptionPane.INFORMATION_MESSAGE);
+					 
+					 return;
+				}
+				 
 				if (estadoParo.equals(null)) {
 					JOptionPane.showMessageDialog(null, "Debe seleccionar el estado de Paro", "Seleccionar Paro",
 							JOptionPane.ERROR_MESSAGE);
@@ -776,7 +804,7 @@ public class Imputaciones extends JInternalFrame {
 					return;
 				}
 
-				else if (otraCausa.equals(null) || otraCausa.length() == 0) {
+				else if (otraCausa.equals(null) || otraCausa.trim().length() == 0) {
 
 					JOptionPane.showMessageDialog(null, "Debe escribir Descripcional Adicional de Paro",
 							"Descripcion Adicional", JOptionPane.ERROR_MESSAGE);
@@ -788,17 +816,8 @@ public class Imputaciones extends JInternalFrame {
 					// Verifica si el Paro es Compleado o Pendiente
 					if (estadoParo.equals("Completado")) {
 						
-						solucion = JOptionPane.showInputDialog(null,
-								"¿Que se tuvo que hacer para solucionar este paro?", "Solucion de paro",
-								JOptionPane.INFORMATION_MESSAGE);
-
-						if (solucion == null || solucion.equals(null) || solucion == ""
-								|| solucion.equals("")) {
-							JOptionPane.showMessageDialog(null, "Debe escribir la solucion del paro",
-									"Solucion de Paro", JOptionPane.WARNING_MESSAGE);
-
-							return;
-						}
+						solucion = escribirSolucion();
+						
 						// En caso de que el paro este Completado		
 						resultado = admParos.imputarParo(new Imputacion(equipo, usuario, disciplina, 
 								tipoCausa, otraCausa, fechaInicio, fechaFin, estadoParo, estadoEquipo, solucion));
@@ -815,6 +834,7 @@ public class Imputaciones extends JInternalFrame {
 						Principal.lblStatusBar.setText("Paro Imputado correctamente");
 						limpiarCampos();
 						actualizarTabla(estatus[0]);
+						
 					} else {
 						Principal.lblStatusBar
 								.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
@@ -825,7 +845,11 @@ public class Imputaciones extends JInternalFrame {
 				log.log(Level.SEVERE, nfe.toString(), nfe);
 				JOptionPane.showMessageDialog(null, nfe.getMessage(), nfe.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			}
-
+			catch (ParseException pe) {
+				log.log(Level.SEVERE, pe.toString(), pe);
+				JOptionPane.showMessageDialog(null, "Formato de fecha incorrecto", 
+						"Fecha invalida", JOptionPane.ERROR_MESSAGE);
+			}
 			catch (NullPointerException npe) {
 				log.log(Level.WARNING, npe.toString(), npe);
 				JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos", npe.getClass().toString(),
@@ -834,6 +858,22 @@ public class Imputaciones extends JInternalFrame {
 				log.log(Level.SEVERE, ex.toString(), ex);
 				JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			}
+	}
+
+	/**
+	 * @return
+	 */
+	private String escribirSolucion() {
+		
+		String solucion = JOptionPane.showInputDialog(null,
+				"¿Que se tuvo que hacer para solucionar este paro?", "Solucion de paro",
+				JOptionPane.INFORMATION_MESSAGE);
+
+		if (solucion == null || solucion.equals(null) || solucion == ""
+				|| solucion.equals("")) {
+			return null;
+		}
+		return solucion;
 	}
 
 	/**
@@ -968,7 +1008,7 @@ public class Imputaciones extends JInternalFrame {
 		return tipoUsuario;
 	}
 
-	public void updateBar(int newValue) {
-		Principal.pbar.setValue(newValue);
+	public void actualizarBarraEstado(int nuevoValor) {
+		Principal.pbar.setValue(nuevoValor);
 	}
 }
