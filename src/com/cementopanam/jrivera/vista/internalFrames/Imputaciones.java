@@ -161,7 +161,7 @@ public class Imputaciones extends JInternalFrame {
 		setBounds(27, 26, 775, 533);
 
 		layeredPane_estatusEquipo = new JLayeredPane();
-		layeredPane_estatusEquipo.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Estatus Equipo",
+		layeredPane_estatusEquipo.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Estado de Equipo",
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
 		layeredPane_estatusEquipo.setBounds(80, 229, 209, 53);
 		getContentPane().add(layeredPane_estatusEquipo);
@@ -456,7 +456,7 @@ public class Imputaciones extends JInternalFrame {
 		scrollPane_MotivoCausa.setViewportView(textArea_motivoCausa);
 
 		layeredPane_estatusParo = new JLayeredPane();
-		layeredPane_estatusParo.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Estatus de Paro",
+		layeredPane_estatusParo.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Estado de Paro",
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
 		layeredPane_estatusParo.setBounds(55, 72, 234, 53);
 		getContentPane().add(layeredPane_estatusParo);
@@ -768,7 +768,7 @@ public class Imputaciones extends JInternalFrame {
 	}
 
 	/**
-	 * Guarda la informacion suministrada
+	 * Guarda la informacion suministrado de un paro
 	 */
 	private void imputarParo() {
 
@@ -788,7 +788,7 @@ public class Imputaciones extends JInternalFrame {
 				String usuario = Principal.usuarioActual.getText();
 				String otraCausa = textArea_motivoCausa.getText();
 
-				
+				//Valida si las fechas introducidas tienen un formato correcto
 				 pruebaFecha = df.parse(fechaFin);
 				 if (!df.format(pruebaFecha).equals(fechaFin)) {
 					 JOptionPane.showMessageDialog(null, "La Fecha introducida es invalida",
@@ -817,6 +817,14 @@ public class Imputaciones extends JInternalFrame {
 					if (estadoParo.equals("Completado")) {
 						
 						solucion = escribirSolucion();
+						
+						if(solucion == null) {
+							
+							JOptionPane.showMessageDialog(null, "Debe escribir la solucion del paro",
+									"Solucion de Paro", JOptionPane.WARNING_MESSAGE);
+							
+							return;
+						}
 						
 						// En caso de que el paro este Completado		
 						resultado = admParos.imputarParo(new Imputacion(equipo, usuario, disciplina, 
@@ -865,6 +873,9 @@ public class Imputaciones extends JInternalFrame {
 	 */
 	private String escribirSolucion() {
 		
+		//Coloca los botones del JOptionPane en español
+		UIManager.put("OptionPane.okButtonText", "Aceptar");
+		UIManager.put("OptionPane.cancelButtonText", "Cancelar");
 		String solucion = JOptionPane.showInputDialog(null,
 				"¿Que se tuvo que hacer para solucionar este paro?", "Solucion de paro",
 				JOptionPane.INFORMATION_MESSAGE);

@@ -275,7 +275,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				if (e.getClickCount() == 2 && !e.isConsumed()) {
+				if (e.getClickCount() == 2 && !e.isConsumed() && (!(chckbxBuscarSoluciones.isSelected()))) {
 
 					int fila = tablaResultado.getSelectedRow();
 					int columna = tablaResultado.getSelectedColumn();
