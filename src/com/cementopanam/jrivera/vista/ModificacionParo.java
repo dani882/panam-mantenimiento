@@ -294,9 +294,9 @@ public class ModificacionParo extends JDialog {
 	 */
 	private void eliminarParo(int idCausa) {
 
-		//Coloca el boton de OptonPane en Espanol
+		//Coloca el boton de OptonPane en Español
 		UIManager.put("OptionPane.yesButtonText", "Si");
-		int respuesta = JOptionPane.showConfirmDialog(null, "Esta seguro que desea borrar este paro?",
+		int respuesta = JOptionPane.showConfirmDialog(null, "¿Esta seguro que desea borrar este paro?",
 				"Confirmar Borrado", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 		if (respuesta == JOptionPane.NO_OPTION) {

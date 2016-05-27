@@ -90,7 +90,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	public JTabbedPane tabbedPane;
 	private JCheckBox chckbxFiltrarPor;
 	private JList<String> listSubArea;
-	private JComboBox<String> cBReporteArea;
+	private JComboBox<String> cbReporteArea;
 	private JLabel lblArea;
 	private JLabel lblSubarea;
 	private JScrollPane scrollPaneSubArea;
@@ -204,6 +204,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 														panelInformeRangoFecha.add(separator);
 														
 														chckbxFiltrarPor = new JCheckBox("Filtrar:");
+														chckbxFiltrarPor.setEnabled(false);
 														chckbxFiltrarPor.setMnemonic('F');
 														chckbxFiltrarPor.setFont(new Font("Verdana", Font.PLAIN, 12));
 														chckbxFiltrarPor.setBounds(421, 28, 97, 23);
@@ -211,12 +212,12 @@ public class Reportes extends JInternalFrame implements ItemListener {
 														chckbxFiltrarPor.addItemListener(this);
 														panelInformeRangoFecha.add(chckbxFiltrarPor);
 														
-														cBReporteArea = new JComboBox<String>();
-														cBReporteArea.setEnabled(false);
-														cBReporteArea.setSelectedIndex(-1);
-														cBReporteArea.setFont(new Font("Verdana", Font.PLAIN, 12));
-														cBReporteArea.setBounds(425, 99, 347, 29);
-														panelInformeRangoFecha.add(cBReporteArea);
+														cbReporteArea = new JComboBox<String>();
+														cbReporteArea.setEnabled(false);
+														cbReporteArea.setSelectedIndex(-1);
+														cbReporteArea.setFont(new Font("Verdana", Font.PLAIN, 12));
+														cbReporteArea.setBounds(425, 99, 347, 29);
+														panelInformeRangoFecha.add(cbReporteArea);
 														
 														lblArea = new JLabel("Area");
 														lblArea.setEnabled(false);
@@ -537,7 +538,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	    	lblArea.setEnabled(true);
 	    	lblSubarea.setEnabled(true);
 	    	listSubArea.setEnabled(true);
-	    	cBReporteArea.setEnabled(true);
+	    	cbReporteArea.setEnabled(true);
 	    	scrollPaneSubArea.setEnabled(true);
 	    	
 	    } else if (source == chckbxBuscarSoluciones) {
@@ -554,7 +555,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	    	lblArea.setEnabled(false);
 	    	lblSubarea.setEnabled(false);
 	    	listSubArea.setEnabled(false);
-	    	cBReporteArea.setEnabled(false);
+	    	cbReporteArea.setEnabled(false);
 	    	scrollPaneSubArea.setEnabled(false);
 	    	
 	    	lblCodigoDeEquipo.setEnabled(false);

@@ -50,7 +50,7 @@ public class Login extends JFrame {
 	private JTextField txtUsuario;
 	private JPasswordField pwdClave;
 
-	private JLabel lblContrasena;
+	private JLabel lblClave;
 	private JLabel lblUsuario;
 	private JLabel lblLogo;
 	private JLabel lblIncorrecto;
@@ -158,10 +158,10 @@ public class Login extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		lblContrasena = new JLabel("Contrase\u00F1a");
-		lblContrasena.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblContrasena.setBounds(267, 118, 103, 21);
-		contentPane.add(lblContrasena);
+		lblClave = new JLabel("Contrase\u00F1a");
+		lblClave.setFont(new Font("Verdana", Font.PLAIN, 12));
+		lblClave.setBounds(267, 118, 103, 21);
+		contentPane.add(lblClave);
 
 		lblLogo = new JLabel("");
 		lblLogo.setIcon(new ImageIcon(Login.class.getResource("/imagenes/logo-panam.png")));
@@ -223,7 +223,7 @@ public class Login extends JFrame {
 			clave += c;
 		}
 		md = new ManipulacionDatos();
-		Principal p = new Principal();
+		Principal principal = new Principal();
 
 		try {
 			rs = md.autenticarUsuario(usuario, clave);
@@ -239,37 +239,45 @@ public class Login extends JFrame {
 
 					// Ejecuta la Pantalla Principal con el Thread de la Barra
 					// de Estado
-					SwingUtilities.invokeLater(p);
+					SwingUtilities.invokeLater(principal);
 					// Cierra la conexion
 					md.cerrarConexiones();
 
 					Principal.usuarioActual.setText(getNombreUsuario());
-					p.setVisible(true);
+					principal.setVisible(true);
 					dispose();
+					
 					return true;
 				} else if (tipoUsuario == 2 && estadoUsuario.equalsIgnoreCase("activo")) {
 					// Interfaz de el Operador
 					log.info("Es Operador");
 					// guardarUsuario();
 
+					SwingUtilities.invokeLater(principal);
+					// Cierra la conexion
+					md.cerrarConexiones();
+					
 					Principal.usuarioActual.setText(getNombreUsuario());
-					p.btnReportes.setVisible(false);
-					p.btnAdministrar.setVisible(false);
-
-					SwingUtilities.invokeLater(p);
-					p.setVisible(true);
+					principal.btnReportes.setVisible(false);
+					principal.btnAdministrar.setVisible(false);
+					
+					principal.setVisible(true);
 					dispose();
+					
 					return true;
 				} else if (tipoUsuario == 3 && estadoUsuario.equalsIgnoreCase("activo")) {
 					// Interfaz de el Consultor
 					log.info("Es Consultor");
-					SwingUtilities.invokeLater(p);
+					SwingUtilities.invokeLater(principal);
+					// Cierra la conexion
+					md.cerrarConexiones();
 
 					Principal.usuarioActual.setText(getNombreUsuario());
-					p.btnImputaciones.setVisible(false);
-					p.btnAdministrar.setVisible(false);
-					p.setVisible(true);
+					principal.btnImputaciones.setVisible(false);
+					principal.btnAdministrar.setVisible(false);
+					principal.setVisible(true);
 					dispose();
+					
 					return true;
 				} else {
 					lblIncorrecto.setVisible(true);

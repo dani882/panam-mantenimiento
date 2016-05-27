@@ -201,7 +201,7 @@ public class Principal extends JFrame implements Runnable {
 		menuUsuario.setLightWeightPopupEnabled(false);
 		
 		// Popup Menu item Usuario
-		itemModificarUsuario = new JMenuItem("Cambiar contraseña");
+		itemModificarUsuario = new JMenuItem("Cambiar contraseÃ±a");
 		itemModificarUsuario.setIcon(new ImageIcon(Principal.class.getResource("/iconos32x32/user32x32.png")));
 		menuUsuario.add(itemModificarUsuario);
 		

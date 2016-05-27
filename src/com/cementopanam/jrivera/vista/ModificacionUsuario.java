@@ -89,6 +89,7 @@ public class ModificacionUsuario extends JDialog {
 
 					mostrarUsuario(String.valueOf(e.getItem()));
 					mostrarUsuario();
+					
 				}
 			}
 		});
@@ -441,9 +442,16 @@ public class ModificacionUsuario extends JDialog {
 		
 		boolean resultado = false;
 
-		//Coloca el boton de OptonPane en Espanol
+		//Restringe que el usuario admin no sea eliminado por que es el usuario que crea las nuevas causa
+		// y de borrarse, se eliminan todas las causas
+		if(cbUsuario.getSelectedItem().equals("admin")) {
+			JOptionPane.showMessageDialog(null, "El usuario admin no puede ser eliminado",
+					"Borrar Usuario", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		//Coloca el boton de OptonPane en Español
 		UIManager.put("OptionPane.yesButtonText", "Si");
-		int respuesta = JOptionPane.showConfirmDialog(null, "�Esta seguro que desea borrar este Usuario?",
+		int respuesta = JOptionPane.showConfirmDialog(null, "¿Esta seguro que desea borrar este Usuario?",
 				"Confirmar Borrado", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 		if (respuesta == JOptionPane.NO_OPTION) {

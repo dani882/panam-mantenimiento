@@ -873,11 +873,11 @@ public class Imputaciones extends JInternalFrame {
 	 */
 	private String escribirSolucion() {
 		
-		//Coloca los botones del JOptionPane en español
+		//Coloca los botones del JOptionPane en espaÃ±ol
 		UIManager.put("OptionPane.okButtonText", "Aceptar");
 		UIManager.put("OptionPane.cancelButtonText", "Cancelar");
 		String solucion = JOptionPane.showInputDialog(null,
-				"¿Que se tuvo que hacer para solucionar este paro?", "Solucion de paro",
+				"Â¿Que se tuvo que hacer para solucionar este paro?", "Solucion de paro",
 				JOptionPane.INFORMATION_MESSAGE);
 
 		if (solucion == null || solucion.equals(null) || solucion == ""
