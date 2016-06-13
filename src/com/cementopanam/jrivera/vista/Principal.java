@@ -31,12 +31,16 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.vista.helper.BarraEstado;
 import com.cementopanam.jrivera.vista.helper.TimerThread;
 import com.cementopanam.jrivera.vista.internalFrames.AdministracionRegistros;
 import com.cementopanam.jrivera.vista.internalFrames.AdministracionUsuarios;
 import com.cementopanam.jrivera.vista.internalFrames.Imputaciones;
 import com.cementopanam.jrivera.vista.internalFrames.Reportes;
+import com.cementopanam.jrivera.vista.main.Login;
+
+import java.awt.Color;
 
 public class Principal extends JFrame implements Runnable {
 
@@ -48,6 +52,7 @@ public class Principal extends JFrame implements Runnable {
 	
 	private AdministracionUsuarios admUsuario;
 	private AdministracionRegistros admRegistros;
+	private AdministracionParos admParos = new AdministracionParos();
 	private Imputaciones imputaciones;
 	private Reportes reportes;
 	private Autor author;
@@ -69,15 +74,15 @@ public class Principal extends JFrame implements Runnable {
 
 	protected TimerThread timerThread;
 
-	private JPanel panel_norte;
-	private JPanel panel_oeste;
+	private JPanel panelNorte;
+	private JPanel panelOeste;
 	private JPanel contentPane;
 
 	private JLabel lblOperaciones;
 	public static JLabel lblStatusBar;
 	public BarraEstado statusBar;
 
-	private JDesktopPane desktopPane;
+	private JDesktopPane desktopPanePrincipal;
 	private Dimension dim;
 	private int w, h, x, y;
 
@@ -89,6 +94,8 @@ public class Principal extends JFrame implements Runnable {
 
 	// private CapturaUsuario captura = new CapturaUsuario();
 	private JButton btnAutor;
+	private JLabel lblPanelNorteSeparador;
+	public static JLabel lblParosPendientes;
 
 	/**
 	 * Crea el frame.
@@ -118,7 +125,7 @@ public class Principal extends JFrame implements Runnable {
 		 */
 
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Principal.class.getResource("/imagenes/logo-panam.png")));
-		setTitle("Mantenimiento - Imputaciones de Paro");
+		setTitle("Imputaciones de Paro");
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setFont(new Font("Verdana", Font.PLAIN, 12));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -143,6 +150,7 @@ public class Principal extends JFrame implements Runnable {
 		usuarioActual.setBorderPainted(false);
 		usuarioActual.setOpaque(false);
 		
+		//Muestra opciones de menu desplegables para cambio de contraseña y cerrar session
 		usuarioActual.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent evt) {
@@ -157,9 +165,9 @@ public class Principal extends JFrame implements Runnable {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 
-		panel_oeste = new JPanel();
-		contentPane.add(panel_oeste, BorderLayout.WEST);
-		panel_oeste.setLayout(new BoxLayout(panel_oeste, BoxLayout.Y_AXIS));
+		panelOeste = new JPanel();
+		contentPane.add(panelOeste, BorderLayout.WEST);
+		panelOeste.setLayout(new BoxLayout(panelOeste, BoxLayout.Y_AXIS));
 
 		btnImputaciones = new JButton("");
 		btnImputaciones.addActionListener(new ActionListener() {
@@ -171,7 +179,7 @@ public class Principal extends JFrame implements Runnable {
 		btnImputaciones.setToolTipText("Imputaciones");
 		btnImputaciones.setIcon(new ImageIcon(Principal.class.getResource("/iconos/icon_lowres.png")));
 		btnImputaciones.setFont(new Font("Verdana", Font.PLAIN, 12));
-		panel_oeste.add(btnImputaciones);
+		panelOeste.add(btnImputaciones);
 
 		btnReportes = new JButton("");
 		btnReportes.addActionListener(new ActionListener() {
@@ -184,7 +192,7 @@ public class Principal extends JFrame implements Runnable {
 		btnReportes.setIcon(new ImageIcon(Principal.class.getResource("/iconos/reportes.png")));
 		btnReportes.setToolTipText("Busqueda y Reporte de Paros");
 		btnReportes.setFont(new Font("Verdana", Font.PLAIN, 12));
-		panel_oeste.add(btnReportes);
+		panelOeste.add(btnReportes);
 
 		btnCerrarSession = new JButton("");
 		btnCerrarSession.setToolTipText("Cerrar Session");
@@ -196,7 +204,7 @@ public class Principal extends JFrame implements Runnable {
 
 			}
 		});
-
+		
 		// Menu Credenciales de Usuario
 		menuUsuario.setLightWeightPopupEnabled(false);
 		
@@ -211,7 +219,8 @@ public class Principal extends JFrame implements Runnable {
 		itemCerrarSession.setFont(new Font("Verdana", Font.PLAIN, 12));
 		itemCerrarSession.setIcon(new ImageIcon(Principal.class.getResource("/iconos32x32/logout-icon32x32.png")));
 		menuUsuario.add(itemCerrarSession);
-
+		
+		// Accede a la interfaz de modificacion de credenciales de usuario
 		itemModificarUsuario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -219,7 +228,8 @@ public class Principal extends JFrame implements Runnable {
 				modificacionUsuario.setVisible(true);
 			}
 		});
-
+		
+		// Cierra session y regresa a la ventana de Autenticacion
 		itemCerrarSession.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -236,14 +246,14 @@ public class Principal extends JFrame implements Runnable {
 		itemRegistros.setFont(new Font("Verdana", Font.PLAIN, 12));
 		itemRegistros.setIcon(new ImageIcon(Principal.class.getResource("/iconos32x32/excavadora32x32.png")));
 		menuRegistros.add(itemRegistros);
-
+		
 		menuRegistros.addSeparator();
 		// Popup Menu item Usuario
-		itemUsuario = new JMenuItem("Usuario");
+		itemUsuario = new JMenuItem("Usuarios");
 		itemRegistros.setFont(new Font("Verdana", Font.PLAIN, 12));
 		itemUsuario.setIcon(new ImageIcon(Principal.class.getResource("/iconos32x32/user32x32.png")));
 		menuRegistros.add(itemUsuario);
-
+		
 		itemUsuario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -251,7 +261,7 @@ public class Principal extends JFrame implements Runnable {
 
 			}
 		});
-
+		
 		itemRegistros.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -272,8 +282,8 @@ public class Principal extends JFrame implements Runnable {
 		btnAdministrar.setFont(new Font("Verdana", Font.PLAIN, 12));
 		btnAdministrar.setToolTipText("Administracion Registros y Usuarios");
 		btnAdministrar.setIcon(new ImageIcon(Principal.class.getResource("/iconos/Add-icon.png")));
-		panel_oeste.add(btnAdministrar);
-
+		panelOeste.add(btnAdministrar);
+		
 		btnAutor = new JButton("");
 		btnAutor.setFont(new Font("Verdana", Font.PLAIN, 12));
 		btnAutor.setToolTipText("Ayuda");
@@ -284,21 +294,25 @@ public class Principal extends JFrame implements Runnable {
 				btnAuthorActionPerformed(e);
 			}
 		});
-		panel_oeste.add(btnAutor);
+		panelOeste.add(btnAutor);
 		btnCerrarSession.setFont(new Font("Verdana", Font.PLAIN, 12));
-		panel_oeste.add(btnCerrarSession);
-
-		panel_norte = new JPanel();
-		panel_norte.setBorder(null);
-		contentPane.add(panel_norte, BorderLayout.NORTH);
-		panel_norte.setLayout(new GridLayout(0, 3, 0, 0));
-
+		panelOeste.add(btnCerrarSession);
+		
+		panelNorte = new JPanel();
+		panelNorte.setBorder(null);
+		contentPane.add(panelNorte, BorderLayout.NORTH);
+		panelNorte.setLayout(new GridLayout(0, 3, 0, 0));
+		
 		lblOperaciones = new JLabel("Operaciones");
 		lblOperaciones.setHorizontalAlignment(SwingConstants.LEFT);
 		lblOperaciones.setFont(new Font("Verdana", Font.BOLD, 14));
-		panel_norte.add(lblOperaciones);
-
-		desktopPane = new JDesktopPane() {
+		panelNorte.add(lblOperaciones);
+		
+		lblPanelNorteSeparador = new JLabel("            ");
+		lblPanelNorteSeparador.setFont(new Font("Verdana", Font.PLAIN, 12));
+		panelNorte.add(lblPanelNorteSeparador);
+		
+		desktopPanePrincipal = new JDesktopPane() {
 
 			/**
 			 * 
@@ -306,46 +320,43 @@ public class Principal extends JFrame implements Runnable {
 			private static final long serialVersionUID = 1L;
 			/*
 			 * Este metodo sirve para redimensionar automaticamente la imagen de
-			 * fondo dependiendo del tamaño de la pantalla
+			 * fondo dependiendo de la dimension de la pantalla
 			 */
-			ImageIcon icon = new ImageIcon(getClass().getResource("/imagenes/DSC_0002.JPG"));
-			Image image = icon.getImage();
+			ImageIcon icono = new ImageIcon(getClass().getResource("/imagenes/DSC_0002.JPG"));
+			Image imagen = icono.getImage();
 
-			Image newImage = image.getScaledInstance(2000, 2000, Image.SCALE_SMOOTH);
+			Image nuevaImagen = imagen.getScaledInstance(2000, 2000, Image.SCALE_SMOOTH);
 
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
 				Graphics2D g2d = (Graphics2D) g;
-				g2d.drawImage(newImage, 0, 0, getSize().width, getSize().height, this);
+				g2d.drawImage(nuevaImagen, 0, 0, getSize().width, getSize().height, this);
 			}
 		};
 
-		contentPane.add(desktopPane, BorderLayout.CENTER);
-		desktopPane.setLayout(null);
+		contentPane.add(desktopPanePrincipal, BorderLayout.CENTER);
+		desktopPanePrincipal.setLayout(null);
 
 		// Inicio Mostrar Formularios
 		imputaciones = new Imputaciones();
 		imputaciones.setBounds(12, 12, 1150, 590);
-		desktopPane.add(imputaciones);
+		desktopPanePrincipal.add(imputaciones);
 
 		reportes = new Reportes();
 		reportes.setLocation(60, 5);
-		desktopPane.add(reportes);
+		desktopPanePrincipal.add(reportes);
 
 		admUsuario = new AdministracionUsuarios();
-		desktopPane.add(admUsuario);
+		desktopPanePrincipal.add(admUsuario);
 
 		admRegistros = new AdministracionRegistros();
 		admRegistros.setLocation(50, 2);
-		desktopPane.add(admRegistros);
+		desktopPanePrincipal.add(admRegistros);
 
 		author = new Autor();
 
 		// Fin Mostrar Formularios
-
-		// pbar = new JProgressBar(min,max);
-
 	}
 
 	// Metodos de Accion
@@ -354,10 +365,15 @@ public class Principal extends JFrame implements Runnable {
 	}
 
 	private void btnReportesActionPerformed(ActionEvent e) {
+		
 		if(btnImputaciones.isVisible()) {
 			reportes.setVisible(true);
 		}
-		else {
+		//Si el usuario es admin entonces activa la pestaña de Busqueda de Paros en la Interfaz Reportes
+		else if(usuarioActual.getText().equals("admin")) {
+			reportes.setVisible(true);
+		}
+		else{
 			reportes.setVisible(true);
 			reportes.tabbedPane.setEnabledAt(0, false);
 			reportes.tabbedPane.setSelectedIndex(1);
@@ -375,12 +391,6 @@ public class Principal extends JFrame implements Runnable {
 		setVisible(false);
 	}
 
-	private void detenerHiloStatusBar() {
-
-		timerThread.setRunning(false);
-		System.exit(0);
-	}
-
 	public void mostrarMensaje(String mensaje, String alerta) {
 
 		lblStatusBar.setText(mensaje);
@@ -393,13 +403,24 @@ public class Principal extends JFrame implements Runnable {
 			JOptionPane.showMessageDialog(null, "Hay un problema con las fechas");
 		}
 	}
+	
+	/**
+	 * Muestra la cantidad de Paros Pendientes por Completar en el Panel superior de la ventana principal
+	 */
+	public void mostrarPendientes(int contador) {
+		
+		if(contador > 0) {
+			lblParosPendientes.setText("Paros pendientes: " + contador);
+		}
+		else lblParosPendientes.setText("");
+	}
 
 	public JDesktopPane getDesktopPane() {
-		return desktopPane;
+		return desktopPanePrincipal;
 	}
 
 	public void setDesktopPane(JDesktopPane desktopPane) {
-		this.desktopPane = desktopPane;
+		this.desktopPanePrincipal = desktopPane;
 	}
 
 	@Override
@@ -407,14 +428,29 @@ public class Principal extends JFrame implements Runnable {
 
 		statusBar = new BarraEstado();
 
+		
+		lblParosPendientes = new JLabel();
+		//Muestra la cantidad de Paros Pendientes por Completar en el Panel superior de la ventana principal	
+		if(admParos.contarPendientes() > 0) {
+			lblParosPendientes.setText("Paros pendientes: " + admParos.contarPendientes());
+		}
+		else {
+			lblParosPendientes.setText("");
+	
+		}
+		lblParosPendientes.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblParosPendientes.setForeground(Color.RED);
+		lblParosPendientes.setFont(new Font("Verdana", Font.BOLD, 18));
+		panelNorte.add(lblParosPendientes);
+		
 		lblStatusBar = new JLabel("Listo");
 		lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 		statusBar.setLeftComponent(lblStatusBar);
-
+		
 		pbar = new JProgressBar();
 		pbar.setStringPainted(true);
 		statusBar.addRightComponent(pbar);
-
+		
 		final JLabel dateLabel = new JLabel();
 		dateLabel.setHorizontalAlignment(JLabel.CENTER);
 		statusBar.addRightComponent(dateLabel);
@@ -424,7 +460,7 @@ public class Principal extends JFrame implements Runnable {
 		statusBar.addRightComponent(timeLabel);
 
 		contentPane.add(statusBar, BorderLayout.SOUTH);
-
+		
 		JLabel conectar = new JLabel("Conectado como: ");
 		statusBar.addRightComponent(conectar);
 

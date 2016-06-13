@@ -12,7 +12,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -51,10 +50,11 @@ import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
 import com.cementopanam.jrivera.controlador.usuario.AdministracionUsuario;
+import com.cementopanam.jrivera.vista.ModificacionImputacion;
 import com.cementopanam.jrivera.vista.NombreEquipo;
 import com.cementopanam.jrivera.vista.Principal;
-import com.cementopanam.jrivera.vista.helper.JComboBoxPersonalizado;
 import com.cementopanam.jrivera.vista.helper.BarraEstado;
+import com.cementopanam.jrivera.vista.helper.JComboBoxPersonalizado;
 import com.cementopanam.jrivera.vista.helper.TimerThread;
 
 import net.proteanit.sql.DbUtils;
@@ -68,8 +68,6 @@ public class Imputaciones extends JInternalFrame {
 	private static final long serialVersionUID = -5302400411757216295L;
 	ManipulacionDatos md;
 	private AdministracionParos admParos;
-	ResultSet rs = null;
-	PreparedStatement pstmt = null;
 	ComparacionFechas comparacionFechas;
 	Principal pri;
 
@@ -103,7 +101,7 @@ public class Imputaciones extends JInternalFrame {
 	public BarraEstado statusBar;
 
 	private DateFormat df;
-	private MaskFormatter dateMask;
+	private MaskFormatter mascaraFecha;
 
 	private JComboBox<String> comboBoxEquipo;
 	private JComboBox<String> comboBoxSubArea;
@@ -117,20 +115,22 @@ public class Imputaciones extends JInternalFrame {
 	private JTextArea textArea_motivoCausa;
 	private JTable tablaParos;
 
-	private JLayeredPane layeredPane_estatusEquipo;
+	private JLayeredPane layeredPane_estadoEquipo;
 
 	private String formatoFecha = "yyyy-MM-dd HH:mm:ss";
-	private String[] estatus = { "Completado", "Pendiente" };
+	private String[] estado = { "Completado", "Pendiente" };
+	private String paroSeleccionado = "Completado";
 	private String[] alerta = { "advertencia", "ok" };
 
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private final ButtonGroup buttonGroup_1 = new ButtonGroup();
+	
 	private JRadioButton rdbtnCompletado;
 	private JRadioButton rdbtnPendiente;
 	private JRadioButton rdbtnActivo;
 	private JRadioButton rdbtnInactivo;
 
-	private JLayeredPane layeredPane_estatusParo;
+	private JLayeredPane layeredPane_estadoParo;
 
 	private JFormattedTextField formattedTextField_fechaInicio;
 	private JFormattedTextField formattedTextField_fechaFin;
@@ -145,10 +145,8 @@ public class Imputaciones extends JInternalFrame {
 	public Imputaciones() {
 		initComponents();
 		rellenarcomboBox("area");
-		rellenarcomboBox("disciplina");
 	}
 
-	@SuppressWarnings("unchecked")
 	private void initComponents() {
 
 		setFrameIcon(null);
@@ -160,22 +158,22 @@ public class Imputaciones extends JInternalFrame {
 		getContentPane().setLayout(null);
 		setBounds(27, 26, 775, 533);
 
-		layeredPane_estatusEquipo = new JLayeredPane();
-		layeredPane_estatusEquipo.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Estado de Equipo",
+		layeredPane_estadoEquipo = new JLayeredPane();
+		layeredPane_estadoEquipo.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Estado de Equipo",
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
-		layeredPane_estatusEquipo.setBounds(80, 229, 209, 53);
-		getContentPane().add(layeredPane_estatusEquipo);
-		layeredPane_estatusEquipo.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		layeredPane_estadoEquipo.setBounds(80, 229, 209, 53);
+		getContentPane().add(layeredPane_estadoEquipo);
+		layeredPane_estadoEquipo.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		rdbtnActivo = new JRadioButton("Activo");
 		rdbtnActivo.setSelected(true);
 		rdbtnActivo.setFont(new Font("Verdana", Font.PLAIN, 12));
-		layeredPane_estatusEquipo.add(rdbtnActivo);
+		layeredPane_estadoEquipo.add(rdbtnActivo);
 		buttonGroup.add(rdbtnActivo);
 
 		rdbtnInactivo = new JRadioButton("Inactivo");
 		rdbtnInactivo.setFont(new Font("Verdana", Font.PLAIN, 12));
-		layeredPane_estatusEquipo.add(rdbtnInactivo);
+		layeredPane_estadoEquipo.add(rdbtnInactivo);
 		buttonGroup.add(rdbtnInactivo);
 
 		lblEquipo = new JLabel("Equipo");
@@ -183,8 +181,22 @@ public class Imputaciones extends JInternalFrame {
 		lblEquipo.setBounds(12, 203, 74, 15);
 		getContentPane().add(lblEquipo);
 
-		comboBoxEquipo = new JComboBoxPersonalizado();
+		comboBoxEquipo = new JComboBox<String>();
 		comboBoxEquipo.setEnabled(false);
+		comboBoxEquipo.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+
+					if (!(comboBoxDisciplina.isEnabled())) {
+						comboBoxDisciplina.setEnabled(true);
+					}
+					comboBoxDisciplina.removeAllItems();
+					rellenarcomboBox("disciplina");
+				}
+			}
+		});
+		
 		comboBoxEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
 		comboBoxEquipo.setBounds(104, 198, 158, 24);
 		getContentPane().add(comboBoxEquipo);
@@ -244,7 +256,8 @@ public class Imputaciones extends JInternalFrame {
 		lblDisciplina.setBounds(12, 302, 70, 15);
 		getContentPane().add(lblDisciplina);
 
-		comboBoxDisciplina = new JComboBox<String>();
+		comboBoxDisciplina = new JComboBoxPersonalizado();
+		comboBoxDisciplina.setEnabled(false);
 		comboBoxDisciplina.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				
@@ -308,6 +321,37 @@ public class Imputaciones extends JInternalFrame {
 				return componente;
 			}
 		};
+		tablaParos.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				
+				int codigoParo = 0;
+				
+				if (e.getClickCount() == 2 && paroSeleccionado.equals("Pendiente")) {
+	                System.out.println("Se hizo click dos veces");
+	                System.out.println("El estado es: " + paroSeleccionado);
+	                
+	                int fila = tablaParos.getSelectedRow();
+	                codigoParo = (int) tablaParos.getValueAt(fila, 0);
+	                
+	                
+	                System.out.println("Codigo de Paro " + codigoParo);
+	                
+	                
+	                Paro paro = new Paro();
+	                paro.setCodigo(codigoParo);
+	        		ModificacionImputacion modificacion = new ModificacionImputacion(paro, 
+	        				new AdministracionParos(),getDesktopPane());
+
+	        		setVisible(false);
+	        		modificacion.setVisible(true);
+	                
+	                
+	                
+	            } 
+				
+			}
+		});
 		tablaParos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		// Sirve para limitar para que sea una sola seleccion
 		tablaParos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -318,7 +362,7 @@ public class Imputaciones extends JInternalFrame {
 		tablaParos.setFont(new Font("Verdana", Font.PLAIN, 12));
 
 		scrollPane_tabla.setViewportView(tablaParos);
-		actualizarTabla(estatus[0]);
+		actualizarTabla(estado[0]);
 
 		btnIniciarParo = new JButton("Imputar Paro");
 		btnIniciarParo.setIcon(new ImageIcon(Imputaciones.class.getResource("/iconos32x32/ok32x32.png")));
@@ -393,11 +437,11 @@ public class Imputaciones extends JInternalFrame {
 		df.setLenient(false);
 
 		try {
-			dateMask = new MaskFormatter("####-##-## ##:##:##");
-			dateMask.setAllowsInvalid(false);
+			mascaraFecha = new MaskFormatter("####-##-## ##:##:##");
+			mascaraFecha.setAllowsInvalid(false);
 
 			formattedTextField_fechaInicio = new JFormattedTextField();
-			dateMask.install(formattedTextField_fechaInicio);
+			mascaraFecha.install(formattedTextField_fechaInicio);
 		} catch (ParseException e1) {
 			log.log(Level.WARNING, e1.toString(), e1);
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(), JOptionPane.ERROR_MESSAGE);
@@ -417,11 +461,11 @@ public class Imputaciones extends JInternalFrame {
 		});
 
 		try {
-			dateMask = new MaskFormatter("####-##-## ##:##:##");
-			dateMask.setAllowsInvalid(false);
+			mascaraFecha = new MaskFormatter("####-##-## ##:##:##");
+			mascaraFecha.setAllowsInvalid(false);
 
 			formattedTextField_fechaFin = new JFormattedTextField();
-			dateMask.install(formattedTextField_fechaFin);
+			mascaraFecha.install(formattedTextField_fechaFin);
 		} catch (ParseException e1) {
 			log.log(Level.WARNING, e1.toString(), e1);
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(), JOptionPane.ERROR_MESSAGE);
@@ -455,12 +499,12 @@ public class Imputaciones extends JInternalFrame {
 
 		scrollPane_MotivoCausa.setViewportView(textArea_motivoCausa);
 
-		layeredPane_estatusParo = new JLayeredPane();
-		layeredPane_estatusParo.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Estado de Paro",
+		layeredPane_estadoParo = new JLayeredPane();
+		layeredPane_estadoParo.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Estado de Paro",
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
-		layeredPane_estatusParo.setBounds(55, 72, 234, 53);
-		getContentPane().add(layeredPane_estatusParo);
-		layeredPane_estatusParo.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		layeredPane_estadoParo.setBounds(55, 72, 234, 53);
+		getContentPane().add(layeredPane_estadoParo);
+		layeredPane_estadoParo.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		rdbtnCompletado = new JRadioButton("Completado");
 		rdbtnCompletado.addMouseListener(new MouseAdapter() {
@@ -484,7 +528,7 @@ public class Imputaciones extends JInternalFrame {
 		buttonGroup_1.add(rdbtnCompletado);
 		rdbtnCompletado.setSelected(false);
 		rdbtnCompletado.setFont(new Font("Verdana", Font.PLAIN, 12));
-		layeredPane_estatusParo.add(rdbtnCompletado);
+		layeredPane_estadoParo.add(rdbtnCompletado);
 
 		rdbtnPendiente = new JRadioButton("Pendiente");
 		rdbtnPendiente.addActionListener(new ActionListener() {
@@ -496,7 +540,7 @@ public class Imputaciones extends JInternalFrame {
 		});
 		buttonGroup_1.add(rdbtnPendiente);
 		rdbtnPendiente.setFont(new Font("Verdana", Font.PLAIN, 12));
-		layeredPane_estatusParo.add(rdbtnPendiente);
+		layeredPane_estadoParo.add(rdbtnPendiente);
 
 		button_fechaInicio = new JButton("+");
 		button_fechaInicio.addActionListener(new ActionListener() {
@@ -600,13 +644,14 @@ public class Imputaciones extends JInternalFrame {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Paro Imputado correctamente");
 				limpiarCampos();
-				actualizarTabla(estatus[1]);
+				actualizarTabla(estado[1]);
 			} else {
 				Principal.lblStatusBar
 						.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 				Principal.lblStatusBar.setText("No se pudo completar la operacion");
 				return;
 			}
+			pri.mostrarPendientes(admParos.contarPendientes());
 		}
 		catch (SQLException sqle) {
 			log.log(Level.SEVERE, sqle.toString(), sqle);
@@ -646,12 +691,13 @@ public class Imputaciones extends JInternalFrame {
 	}
 
 	// Muestra los paros en un JTable
-	private void actualizarTabla(String estatus) {
+	private void actualizarTabla(String estado) {
 
+		ResultSet rs = null;
 		try {
 			md = new ManipulacionDatos();
 
-			rs = md.actualizarTabla(estatus);
+			rs = md.actualizarTabla(estado);
 			tablaParos.setModel(DbUtils.resultSetToTableModel(rs));
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
@@ -668,16 +714,16 @@ public class Imputaciones extends JInternalFrame {
 
 		ManipulacionDatos md = new ManipulacionDatos();
 
+		ResultSet rs = null;
 		md = new ManipulacionDatos();
-		ResultSet rs2 = null;
 
 		try {
 			// Rellena comboBox Area
 			if (campo.equals("area")) {
-				rs2 = md.rellenarCombo("area", null);
+				rs = md.rellenarCombo("area", null);
 
-				while (rs2.next()) {
-					comboBoxArea.addItem(rs2.getString("nombre_area"));
+				while (rs.next()) {
+					comboBoxArea.addItem(rs.getString("nombre_area"));
 				}
 
 				comboBoxArea.setSelectedIndex(-1);
@@ -687,9 +733,9 @@ public class Imputaciones extends JInternalFrame {
 				// Busca el indice de area seleccionado
 				String area = String.valueOf(comboBoxArea.getSelectedItem());
 
-				rs2 = md.rellenarCombo("subArea", area);
-				while (rs2.next()) {
-					String subArea = rs2.getString("nombre_sub_area");
+				rs = md.rellenarCombo("subArea", area);
+				while (rs.next()) {
+					String subArea = rs.getString("nombre_sub_area");
 					comboBoxSubArea.addItem(subArea);
 				}
 				comboBoxSubArea.setSelectedIndex(-1);
@@ -697,9 +743,9 @@ public class Imputaciones extends JInternalFrame {
 				// Busca el indice de subArea seleccionado
 				String subArea = String.valueOf(comboBoxSubArea.getSelectedItem());
 
-				rs2 = md.rellenarCombo("equipo", subArea);
-				while (rs2.next()) {
-					String cod_equipo = rs2.getString("cod_equipo");
+				rs = md.rellenarCombo("equipo", subArea);
+				while (rs.next()) {
+					String cod_equipo = rs.getString("cod_equipo");
 					comboBoxEquipo.addItem(cod_equipo);
 				}
 				comboBoxEquipo.setSelectedIndex(-1);
@@ -707,22 +753,22 @@ public class Imputaciones extends JInternalFrame {
 
 			// Rellena comboBox Area
 			if (campo.equals("disciplina")) {
-				rs2 = md.rellenarCombo("disciplina", null);
+				rs = md.rellenarCombo("disciplina", null);
 
-				while (rs2.next()) {
-					comboBoxDisciplina.addItem(rs2.getString("nombre_disciplina"));
+				while (rs.next()) {
+					comboBoxDisciplina.addItem(rs.getString("nombre_disciplina"));
 				}
 
 				comboBoxDisciplina.setSelectedIndex(-1);
 			}
 
-			else if (campo.equals("causa")) {
+			if (campo.equals("causa")) {
 				// Rellena comboBox Area
 				String disciplina = String.valueOf(comboBoxDisciplina.getSelectedItem());
-				rs2 = md.rellenarCombo("causa", disciplina);
+				rs = md.rellenarCombo("causa", disciplina);
 
-				while (rs2.next()) {
-					comboBoxCausa.addItem(rs2.getString("tipo_causa"));
+				while (rs.next()) {
+					comboBoxCausa.addItem(rs.getString("tipo_causa"));
 				}
 
 				comboBoxCausa.setSelectedIndex(-1);
@@ -740,11 +786,6 @@ public class Imputaciones extends JInternalFrame {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		} finally {
 			md.cerrarConexiones();
-			try {
-				rs2.close();
-			} catch (SQLException e) {
-				log.log(Level.SEVERE, e.toString(), e);
-			}
 		}
 	}
 
@@ -765,6 +806,10 @@ public class Imputaciones extends JInternalFrame {
 		formattedTextField_fechaInicio.setText("");
 		formattedTextField_fechaFin.setText("");
 		textArea_motivoCausa.setText("");
+		
+		comboBoxEquipo.setEnabled(false);
+		comboBoxSubArea.setEnabled(false);
+		comboBoxCausa.setEnabled(false);
 	}
 
 	/**
@@ -788,14 +833,18 @@ public class Imputaciones extends JInternalFrame {
 				String usuario = Principal.usuarioActual.getText();
 				String otraCausa = textArea_motivoCausa.getText();
 
-				//Valida si las fechas introducidas tienen un formato correcto
-				 pruebaFecha = df.parse(fechaFin);
-				 if (!df.format(pruebaFecha).equals(fechaFin)) {
-					 JOptionPane.showMessageDialog(null, "La Fecha introducida es invalida",
-							 "Fecha de Fin", JOptionPane.INFORMATION_MESSAGE);
-					 
-					 return;
-				}
+				
+				 if(rdbtnCompletado.isSelected()) {
+					//Valida si las fechas introducidas tienen un formato correcto
+					 pruebaFecha = df.parse(fechaFin);
+					 if (!df.format(pruebaFecha).equals(fechaFin)) {
+						 JOptionPane.showMessageDialog(null, "La Fecha introducida es invalida",
+								 "Fecha de Fin", JOptionPane.INFORMATION_MESSAGE);
+						 
+						 return;
+					}
+				 }
+	
 				 
 				if (estadoParo.equals(null)) {
 					JOptionPane.showMessageDialog(null, "Debe seleccionar el estado de Paro", "Seleccionar Paro",
@@ -825,11 +874,17 @@ public class Imputaciones extends JInternalFrame {
 							
 							return;
 						}
-						
+						//Valida si las fechas introducidas tienen un formato correcto
+						 pruebaFecha = df.parse(fechaInicio);
+						 pruebaFecha = df.parse(fechaFin);
+						 
 						// En caso de que el paro este Completado		
 						resultado = admParos.imputarParo(new Imputacion(equipo, usuario, disciplina, 
 								tipoCausa, otraCausa, fechaInicio, fechaFin, estadoParo, estadoEquipo, solucion));
 					} else {
+						//Valida si las fechas introducidas tienen un formato correcto
+						 pruebaFecha = df.parse(fechaInicio);
+						 
 						// En caso de que el paro este Pendiente
 						resultado = admParos.imputarParo(new Imputacion(equipo, usuario, disciplina, 
 								tipoCausa, otraCausa, fechaInicio, null, estadoParo, estadoEquipo, null));
@@ -841,13 +896,14 @@ public class Imputaciones extends JInternalFrame {
 						Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 						Principal.lblStatusBar.setText("Paro Imputado correctamente");
 						limpiarCampos();
-						actualizarTabla(estatus[0]);
+						actualizarTabla(estado[0]);
 						
 					} else {
 						Principal.lblStatusBar
 								.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 						Principal.lblStatusBar.setText("No se pudo completar la operacion");
 					}
+					pri.mostrarPendientes(admParos.contarPendientes());
 				}
 			} catch (NumberFormatException nfe) {
 				log.log(Level.SEVERE, nfe.toString(), nfe);
@@ -869,7 +925,8 @@ public class Imputaciones extends JInternalFrame {
 	}
 
 	/**
-	 * @return
+	 * Muestra el panel para introducir la solucion de paros completados
+	 * @return la solucion introducida por el usuario
 	 */
 	private String escribirSolucion() {
 		
@@ -889,7 +946,6 @@ public class Imputaciones extends JInternalFrame {
 
 	/**
 	 * Retorna el Estado de los equipos
-	 * 
 	 * @return Retorna el estado del equipo
 	 */
 	private String obtenerEstadoEquipo() {
@@ -901,7 +957,6 @@ public class Imputaciones extends JInternalFrame {
 
 	/**
 	 * Retorna el Estado de Paro elegido
-	 * 
 	 * @return Retorna el estado del Paro
 	 */
 	private String obtenerEstadoParo() {
@@ -925,9 +980,10 @@ public class Imputaciones extends JInternalFrame {
 		}
 	}
 
-	// Metodo para mostrar los Paros Completados en una Tabla
+	// Metodo para mostrar los Paros Completados en la Tabla
 	private void btnParosCompletadosActionPerformed(ActionEvent e) {
 
+		paroSeleccionado = "Completado";
 		formattedTextField_fechaInicio.setEnabled(true);
 		button_fechaInicio.setEnabled(true);
 		rdbtnPendiente.setEnabled(true);
@@ -949,19 +1005,20 @@ public class Imputaciones extends JInternalFrame {
 
 				@Override
 				public void run() {
-					actualizarTabla(estatus[0]);
+					actualizarTabla(estado[0]);
 				}
 			});
 		}
 	}
 
 	/**
-	 * Muestra los Paros Pendientes en una Tabla
+	 * Muestra los Paros Pendientes en la Tabla
 	 * 
 	 * @param e
 	 */
 	private void btnParosPendientesActionPerformed(ActionEvent e) {
 
+		paroSeleccionado = "Pendiente";
 		formattedTextField_fechaInicio.setEnabled(false);
 		button_fechaInicio.setEnabled(false);
 		rdbtnPendiente.setEnabled(false);
@@ -987,10 +1044,7 @@ public class Imputaciones extends JInternalFrame {
 
 				@Override
 				public void run() {
-					actualizarTabla(estatus[1]);
-
-					// TODO Agregar visualizacion de Paros Pendientes en la Barra de Estado
-					System.out.println("Paros Pendiente: " + tablaParos.getRowCount());
+					actualizarTabla(estado[1]);
 				}
 			});
 		}
@@ -999,6 +1053,7 @@ public class Imputaciones extends JInternalFrame {
 	private String mostrarUsuario(String usuarioSeleccionado) {
 
 		String tipoUsuario = "";
+		ResultSet rs = null;
 
 		try {
 			rs = admUsuario.mostrarUsuario(usuarioSeleccionado);

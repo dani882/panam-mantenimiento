@@ -238,13 +238,6 @@ public class ModificacionUsuario extends JDialog {
 	 * @return - true si la clave coincide, false si no coinciden
 	 */
 	private boolean validarPassword() {
-
-		// Verifica si la clave introducida tiene cuatro o mas caracteres
-		if(pwdClave.getPassword().length < 4) {
-			JOptionPane.showMessageDialog(null, "Debe escribir una clave de minimo cuatro caracteres", "Clave corta",
-					JOptionPane.INFORMATION_MESSAGE);
-			return false;
-		}
 		
 		if (Arrays.equals(pwdClave.getPassword(), pwdRepetirClave.getPassword())) {
 			return true;
@@ -292,6 +285,13 @@ public class ModificacionUsuario extends JDialog {
 			clave += c;
 		}
 
+		
+		// Verifica si la clave introducida tiene cuatro o mas caracteres
+		if(pwdClave.getPassword().length > 0 && pwdClave.getPassword().length <= 4) {
+			JOptionPane.showMessageDialog(null, "Debe escribir una clave de minimo cinco caracteres", "Clave corta",
+					JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
 		// Valida si las claves coinciden
 		if (validarPassword() == false) {
 			log.info("La clave de usuario no coincide");
@@ -478,7 +478,7 @@ public class ModificacionUsuario extends JDialog {
 					log.log(Level.SEVERE, e1.toString(), e1);
 			}
 				
-		} else if (respuesta == JOptionPane.CLOSED_OPTION) {
+		} else {
 			return;
 		}
 	}

@@ -4,7 +4,7 @@ import java.awt.Dimension;
 
 import javax.swing.JComboBox;
 
-public class JComboBoxPersonalizado extends JComboBox {
+public class JComboBoxPersonalizado extends JComboBox<String> {
 
 	/**
 	 * 

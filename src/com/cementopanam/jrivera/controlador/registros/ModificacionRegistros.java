@@ -2,12 +2,15 @@ package com.cementopanam.jrivera.controlador.registros;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.controlador.entidad.Area;
@@ -163,5 +166,33 @@ public class ModificacionRegistros extends ManipulacionDatos {
 			return false;
 		}
 		return true;
+	}
+	
+	
+	public DefaultTableModel mostrarDatos() {
+		
+		DefaultTableModel modelo = new DefaultTableModel();
+		
+		
+		PreparedStatement pstmt = null;
+	    try {  
+	        while (modelo.getRowCount()>0){
+	        	modelo.removeRow(0);
+	        }
+	        Connection con = cbd.conectarABaseDatos();
+	        String sql = "SELECT * FROM mantenimientodb.area";
+	        pstmt = con.prepareStatement(sql);
+	        ResultSet rs = pstmt.executeQuery();
+	        modelo.addColumn("Area");
+	        
+	        while(rs.next()){	
+	        	modelo.addRow(new Object[]{
+	            rs.getString("nombre_area")
+	            });
+	        } 
+	      }catch (Exception ex) {
+	        System.err.println(ex);
+	      }
+		return modelo;
 	}
 }

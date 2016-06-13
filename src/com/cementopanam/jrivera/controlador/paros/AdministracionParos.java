@@ -307,4 +307,33 @@ public class AdministracionParos extends ManipulacionDatos {
 		}
 		return resultado;
 	}
+	
+	/**Cuenta la cantidad de Paros Pendientes por Completar
+	 * @return el numero de paros pendientes
+	 */
+	public int contarPendientes() {
+	
+		int resultado = 0;
+
+		try(Connection con = cbd.conectarABaseDatos();
+				CallableStatement cs = con.prepareCall("{call sp_contar_paros_pendientes(?)}");) {
+			
+			log.info("Conectado de Contador Paros Pendientes");
+			cs.registerOutParameter(1, java.sql.Types.INTEGER);
+
+			cs.executeQuery();
+			//Muestra la cantidad de Paros Pendientes
+			resultado = cs.getInt(1);
+
+		} catch (SQLException sqle) {
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+			log.log(Level.SEVERE, sqle.toString(), sqle);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			log.log(Level.SEVERE, e.toString(), e);
+		}
+		log.info("Desconectado de Contador Paros Pendientes");
+		return resultado;
+	}
 }

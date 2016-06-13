@@ -2,7 +2,6 @@ package com.cementopanam.jrivera.controlador;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -20,7 +19,6 @@ public class ManipulacionDatos {
 	private ConeccionBD cbd;
 	private Connection con = null;
 	private CallableStatement cs = null;
-	private PreparedStatement pstmt = null;
 	private ResultSet rs = null;
 
 	public ManipulacionDatos() {
@@ -88,12 +86,12 @@ public class ManipulacionDatos {
 	/**
 	 * Visualiza el estado de los paros
 	 * 
-	 * @param estatus
+	 * @param estado
 	 *            estado el paro - Parametro para visualizar los estados de los
 	 *            Paros
 	 * @return Resultset - Retorna el listado de paros
 	 */
-	public ResultSet actualizarTabla(String estatus) throws SQLException {
+	public ResultSet actualizarTabla(String estado) throws SQLException {
 
 		try {
 			con = cbd.conectarABaseDatos();
@@ -104,7 +102,7 @@ public class ManipulacionDatos {
 
 		cs = con.prepareCall("{call Paros(?)}");
 
-		cs.setString(1, estatus);
+		cs.setString(1, estado);
 
 		return rs = cs.executeQuery();
 	}
@@ -215,16 +213,16 @@ public class ManipulacionDatos {
 	}
 
 	/**
-	 * Autentica el usuario
+	 * Autentica el usuario al sistema
 	 * 
-	 * @param user
-	 *            - usuario
-	 * @param password
-	 *            - clave
+	 * @param usuario
+	 *            - nombre de usuario
+	 * @param clave
+	 *            - clave del usuario
 	 * @return Resultado de la busqueda de usuario
 	 * @throws SQLException
 	 */
-	public ResultSet autenticarUsuario(String user, String password) throws SQLException {
+	public ResultSet autenticarUsuario(String usuario, String clave) throws SQLException {
 
 		try {
 
@@ -234,13 +232,10 @@ public class ManipulacionDatos {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 
-		// TODO Modificar este procedimiento para que tenga un OUT de estatus
 		cs = con.prepareCall("{call logearUsuario(?,?)}");
 
-		// String estatus = cs.getString("estatus");
-
-		cs.setString(1, user);
-		cs.setString(2, password);
+		cs.setString(1, usuario);
+		cs.setString(2, clave);
 
 		return rs = cs.executeQuery();
 	}
@@ -255,10 +250,6 @@ public class ManipulacionDatos {
 
 			if (rs != null) {
 				rs.close();
-			}
-
-			if (pstmt != null) {
-				pstmt.close();
 			}
 
 			if (cs != null) {

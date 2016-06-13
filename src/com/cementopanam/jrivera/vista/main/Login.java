@@ -1,4 +1,4 @@
-package com.cementopanam.jrivera.vista;
+package com.cementopanam.jrivera.vista.main;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -29,6 +29,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
+import com.cementopanam.jrivera.vista.Principal;
 import com.jtattoo.plaf.acryl.AcrylLookAndFeel;
 
 /**
@@ -231,10 +232,15 @@ public class Login extends JFrame {
 			if (rs.next()) {
 				int tipoUsuario = rs.getInt("id_tipo_usuario");
 				String estadoUsuario = rs.getString("estatus");
+				String nombreUsuario = rs.getString("nombre_usuario");
 
 				if (tipoUsuario == 1 && estadoUsuario.equalsIgnoreCase("activo")) {
 					// Interfaz de Administrador
 					log.info("Es Administrador");
+					// Desactiva la ventana imputacion en el usuario admin
+					if(nombreUsuario.equalsIgnoreCase("admin")) {
+						principal.btnImputaciones.setVisible(false);
+					}
 					// guardarUsuario();
 
 					// Ejecuta la Pantalla Principal con el Thread de la Barra

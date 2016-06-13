@@ -273,6 +273,13 @@ public class AdministracionUsuarios extends JInternalFrame {
 
 			int tipoUsuario = obtenerTipoUsuario();
 
+			// Verifica si la clave introducida tiene cuatro o mas caracteres
+			if(pwdClave.getPassword().length > 0 && pwdClave.getPassword().length <= 4) {
+				JOptionPane.showMessageDialog(null, "Debe escribir una clave de minimo cinco caracteres", "Clave corta",
+						JOptionPane.INFORMATION_MESSAGE);
+				return false;
+			}
+			// Valida si las claves coinciden
 			if (validarPassword() == false) {
 				JOptionPane.showMessageDialog(null, "La clave de usuario no coincide", "Clave de Usuario",
 						JOptionPane.WARNING_MESSAGE);

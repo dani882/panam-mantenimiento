@@ -18,7 +18,7 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * @author Jesus Rivera
- * @version 1.0
+ * @version 1.5.4
  */
 public class Autor extends JDialog {
 
@@ -54,28 +54,28 @@ public class Autor extends JDialog {
 		lblRegistradorDePacientes.setBounds(6, 18, 270, 22);
 		contentPanel.add(lblRegistradorDePacientes);
 
-		JLabel lblVersion = new JLabel("Version 1.5.0 ");
+		JLabel lblVersion = new JLabel("Version 1.6.1 ");
 		lblVersion.setFont(new Font("Verdana", Font.PLAIN, 14));
-		lblVersion.setBounds(6, 52, 146, 16);
+		lblVersion.setBounds(6, 68, 146, 16);
 		contentPanel.add(lblVersion);
 
-		JLabel lblCopyright = new JLabel(" - Copyright \u00A9 " + anio + " - Jesus Rivera");
+		JLabel lblCopyright = new JLabel(" - Copyright © 2015-" + anio);
 		lblCopyright.setFont(new Font("Verdana", Font.PLAIN, 14));
-		lblCopyright.setBounds(97, 49, 270, 22);
+		lblCopyright.setBounds(104, 65, 270, 22);
 		contentPanel.add(lblCopyright);
 
-		JButton btnNewButton = new JButton("Aceptar");
-		btnNewButton.addActionListener(new ActionListener() {
+		JButton btnAceptar = new JButton("Aceptar");
+		btnAceptar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				setVisible(false);
 			}
 		});
-		btnNewButton.setBounds(342, 233, 90, 28);
-		contentPanel.add(btnNewButton);
+		btnAceptar.setBounds(342, 233, 90, 28);
+		contentPanel.add(btnAceptar);
 
-		JLabel lblEmail = new JLabel("Email - jrivera@estrella.com.do");
-		lblEmail.setFont(new Font("Verdana", Font.PLAIN, 14));
-		lblEmail.setBounds(6, 84, 245, 22);
+		JLabel lblEmail = new JLabel("Desarrollador: Ing. Jesus Rivera");
+		lblEmail.setFont(new Font("Verdana", Font.BOLD, 14));
+		lblEmail.setBounds(6, 110, 270, 22);
 		contentPanel.add(lblEmail);
 
 		JPanel panelInformacion = new JPanel();
@@ -91,15 +91,5 @@ public class Autor extends JDialog {
 		scrollPane.setViewportView(txtrAplicacionUtilizadaPara);
 		txtrAplicacionUtilizadaPara.setText(
 				"Aplicacion utilizada para el registro e informe de paros.\r\n\r\nEn colaboraci\u00F3n con:\r\nIng. Alfredo Amstrong\r\n\r\nAgradecimientos a:\r\nIng. Juan Carlos Fernandez\r\nIng. Jose Pagan");
-
-		JLabel lblTel = new JLabel("Tel: 809-796-0772");
-		lblTel.setFont(new Font("Verdana", Font.BOLD, 14));
-		lblTel.setBounds(6, 117, 155, 22);
-		contentPanel.add(lblTel);
-
-		JLabel lblExtension = new JLabel("Extension: 3126");
-		lblExtension.setFont(new Font("Verdana", Font.BOLD, 14));
-		lblExtension.setBounds(171, 117, 171, 22);
-		contentPanel.add(lblExtension);
 	}
 }

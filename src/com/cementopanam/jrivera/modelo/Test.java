@@ -8,18 +8,20 @@ import java.net.SocketAddress;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Calendar;
+import java.sql.SQLException;
+
+import org.apache.commons.lang.StringUtils;
 
 public class Test {
 
 	Connection con = null;
 
-	PreparedStatement pstmt = null;
+	static PreparedStatement ps = null;
 	ResultSet rs = null;
 
 	public static void main(String[] args) {
 		
-	    String version = System.getProperty("java.version");
+/*	    String version = System.getProperty("java.version");
 	    char minor = version.charAt(2);
 	    char point = version.charAt(4);
 	    
@@ -30,25 +32,56 @@ public class Test {
 	      throw new RuntimeException("JDK 1.4.1 or higher " +
 	        "is required to run the examples in this book.");
 	    System.out.println("JDK version "+ version + " found");
+		*/
+		
+		int[] num = new int[]{1,2,3};
+		StringBuffer sb = new StringBuffer();
+		
+		String repeticion = StringUtils.repeat("hola", num.length - 1);
+		sb.append("SELECT * FROM items WHERE id IN(").append(StringUtils.repeat("?", num.length)).append(")");
+		for (int i = 0; i < num.length; i++) {
+			System.out.println("SB es " + sb +" Numero "+ num[i]);
+		//	(i, num[i]);
+		}
 		
 		
 		
+		System.out.println("Cantidad: " + repeticion);
+		System.out.println("Cantidad: " + sb);
 		
 		
-		
-		
-		
-		
-		
-		/*long currentTime = System.currentTimeMillis();
+		ResultSet rs;
+		try {
+			rs = ps.executeQuery();
+			
+			while (rs.next())
+			{
+				int id = rs.getInt("id");
+				String str1 = rs.getString("str1");
+				System.out.println(id + ", " + str1);
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-		System.out.println("Tiempo" + currentTime);
-		int year2 = Calendar.getInstance().get(Calendar.YEAR);
-		Test t = new Test();
-		t.testDB();
-
-		System.out.println(year2);
-*/	}
+		
+		
+		
+		//sb.append("SELECT * FROM items WHERE id IN(").append(StringUtils.repeat("?", num.length)).append(")");
+		
+/*		sb.append("SELECT * FROM items WHERE id IN(").append(StringUtils.repeat("?", num.length)).append(")");
+		for (int i = 0; i < num.length; i++) {
+			ps.setInt(i, num[i]);
+		}
+		ps.executeQuery();	
+		*/
+		
+		
+		
+		
+		}
 
 	private void testDB() {
 

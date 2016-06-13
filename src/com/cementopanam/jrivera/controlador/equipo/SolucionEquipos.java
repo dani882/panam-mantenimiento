@@ -2,7 +2,6 @@ package com.cementopanam.jrivera.controlador.equipo;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
@@ -15,7 +14,6 @@ public class SolucionEquipos {
 	ConeccionBD cbd;
 	Connection con = null;
 	CallableStatement cs = null;
-	PreparedStatement pstmt = null;
 	ResultSet rs = null;
 
 	public SolucionEquipos() {

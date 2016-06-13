@@ -7,7 +7,7 @@ import javax.swing.table.AbstractTableModel;
 import com.cementopanam.jrivera.controlador.equipo.NombreEquipo;
 import com.cementopanam.jrivera.controlador.equipo.SolucionEquipos;
 
-public class TablaModeloEquiposSolucion extends AbstractTableModel {
+public class TablaModeloEquipoSolucion extends AbstractTableModel {
 
 	/**
 	 * 
@@ -25,7 +25,7 @@ public class TablaModeloEquiposSolucion extends AbstractTableModel {
 	ArrayList<NombreEquipo> lista = null;
 	SolucionEquipos equipos = new SolucionEquipos();
 
-	public TablaModeloEquiposSolucion() {
+	public TablaModeloEquipoSolucion() {
 		lista = equipos.mostrarSoluciones("");
 	}
 

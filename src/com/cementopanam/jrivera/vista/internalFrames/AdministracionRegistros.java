@@ -27,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -60,6 +61,10 @@ public class AdministracionRegistros extends JInternalFrame {
 	private JTextField txtCausa;
 	private JTextField txtDisciplina;
 	private JList<String> listDisciplina;
+	private JTable tblModificarArea;
+	private JTable tblModificarEquipo;
+	private JTable tblModificarCausa;
+	private JTable tblModificarSubArea;
 	
 	public AdministracionRegistros() {
 		
@@ -191,6 +196,132 @@ public class AdministracionRegistros extends JInternalFrame {
 		lblTitulo.setForeground(Color.WHITE);
 		lblTitulo.setFont(new Font("Verdana", Font.BOLD, 16));
 		panelTituloAgregar.add(lblTitulo);
+		setTitle("Administracion de Registros");
+		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		setBounds(100, 10, 835, 540);
+		
+		rellenarCombo();
+		cbSubArea.setSelectedIndex(-1);
+		cbArea.setSelectedIndex(-1);
+		
+		JPanel panelCausa = new JPanel();
+		panelCausa.setLayout(null);
+		panelCausa.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Causa", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panelCausa.setBounds(538, 58, 265, 232);
+		panelAgregar.add(panelCausa);
+		
+		JLabel label = new JLabel("Causa");
+		label.setFont(new Font("Verdana", Font.PLAIN, 12));
+		label.setBounds(29, 21, 46, 24);
+		panelCausa.add(label);
+		
+		txtCausa = new JTextField();
+		txtCausa.setToolTipText("Agrega una nueva causa");
+		txtCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
+		txtCausa.setColumns(10);
+		txtCausa.setBounds(29, 46, 214, 30);
+		panelCausa.add(txtCausa);
+		
+		JLabel lblDisciplinaAQue = new JLabel("Disciplina(s) a que pertenece");
+		lblDisciplinaAQue.setFont(new Font("Verdana", Font.PLAIN, 12));
+		lblDisciplinaAQue.setBounds(29, 93, 200, 14);
+		panelCausa.add(lblDisciplinaAQue);
+		
+		JScrollPane scrollPaneDisciplina = new JScrollPane();
+		scrollPaneDisciplina.setBounds(29, 118, 214, 103);
+		panelCausa.add(scrollPaneDisciplina);
+		
+		listDisciplina = new JList<String>();
+		scrollPaneDisciplina.setViewportView(listDisciplina);
+		listDisciplina.setBorder(new LineBorder(new Color(0, 0, 0)));
+		listDisciplina.setToolTipText("Disciplinas a que pertenece la nueva causa");
+		//Pobla la lista con los resultados de la Base de Datos
+		try {
+			manipulacionDatos.poblarJList(listDisciplina);
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		listDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
+		
+		JPanel panelDisciplina = new JPanel();
+		panelDisciplina.setBorder(new TitledBorder(null, "Disciplina", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelDisciplina.setBounds(538, 301, 265, 111);
+		panelAgregar.add(panelDisciplina);
+		panelDisciplina.setLayout(null);
+		
+		JLabel lblDisciplina = new JLabel("Disciplina");
+		lblDisciplina.setBounds(29, 24, 58, 16);
+		lblDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
+		panelDisciplina.add(lblDisciplina);
+		
+		txtDisciplina = new JTextField();
+		txtDisciplina.setToolTipText("Agrega nueva Disciplina");
+		txtDisciplina.setBounds(29, 51, 214, 30);
+		txtDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
+		txtDisciplina.setColumns(10);
+		panelDisciplina.add(txtDisciplina);
+		
+		JPanel panelModificar = new JPanel();
+		tpMenu.addTab("Modificar", null, panelModificar, null);
+		panelModificar.setLayout(new BorderLayout(0, 0));
+		
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		panelModificar.add(tabbedPane, BorderLayout.CENTER);
+		
+		JPanel panelModificarArea = new JPanel();
+		tabbedPane.addTab("Area y SubArea", null, panelModificarArea, null);
+		panelModificarArea.setLayout(null);
+		
+		JScrollPane scrollPaneModificarArea = new JScrollPane();
+		scrollPaneModificarArea.setBounds(10, 11, 323, 359);
+		panelModificarArea.add(scrollPaneModificarArea);
+		
+		tblModificarArea = new JTable();
+		tblModificarArea.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tblModificarArea.setFillsViewportHeight(true);
+		tblModificarArea.setFont(new Font("Verdana", Font.PLAIN, 12));
+		scrollPaneModificarArea.setViewportView(tblModificarArea);
+		tblModificarArea.setModel(modificacionRegistros.mostrarDatos());
+		
+		JScrollPane scrollPaneModificarSubArea = new JScrollPane();
+		scrollPaneModificarSubArea.setBounds(377, 372, 375, -353);
+		panelModificarArea.add(scrollPaneModificarSubArea);
+		
+		tblModificarSubArea = new JTable();
+		tblModificarSubArea.setFillsViewportHeight(true);
+		tblModificarSubArea.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		scrollPaneModificarSubArea.setViewportView(tblModificarSubArea);
+		tblModificarSubArea.setFont(new Font("Verdana", Font.PLAIN, 12));
+		
+		JPanel panelModificarEquipo = new JPanel();
+		tabbedPane.addTab("Equipo", null, panelModificarEquipo, null);
+		panelModificarEquipo.setLayout(null);
+		
+		JScrollPane scrollPaneModificarEquipo = new JScrollPane();
+		scrollPaneModificarEquipo.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Equipo", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		scrollPaneModificarEquipo.setBounds(10, 11, 789, 359);
+		panelModificarEquipo.add(scrollPaneModificarEquipo);
+		
+		tblModificarEquipo = new JTable();
+		scrollPaneModificarEquipo.setViewportView(tblModificarEquipo);
+		
+		JPanel panelModificarCausa = new JPanel();
+		tabbedPane.addTab("Causa y Disciplina", null, panelModificarCausa, null);
+		panelModificarCausa.setLayout(null);
+		
+		JScrollPane scrollPaneModificarCausa = new JScrollPane();
+		scrollPaneModificarCausa.setViewportBorder(new TitledBorder(null, "Causa", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		scrollPaneModificarCausa.setBounds(10, 11, 323, 359);
+		panelModificarCausa.add(scrollPaneModificarCausa);
+		
+		tblModificarCausa = new JTable();
+		scrollPaneModificarCausa.setViewportView(tblModificarCausa);
+		
+		JScrollPane scrollPane_3 = new JScrollPane();
+		scrollPane_3.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Disciplina", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		scrollPane_3.setBounds(409, 11, 323, 359);
+		panelModificarCausa.add(scrollPane_3);
 		
 		JPanel panelBorrar = new JPanel();
 		tpMenu.addTab("Borrar", null, panelBorrar, null);
@@ -262,74 +393,9 @@ public class AdministracionRegistros extends JInternalFrame {
 		panelCentroBorrar.add(lblBorrarSubArea);
 		panelCentroBorrar.add(scrollPane);
 		panelCentroBorrar.add(btnRegistros);
-		setTitle("Administracion de Registros");
-		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		setBounds(100, 10, 835, 540);
 		
-		rellenarCombo();
-		cbSubArea.setSelectedIndex(-1);
-		cbArea.setSelectedIndex(-1);
 		
-		JPanel panelCausa = new JPanel();
-		panelCausa.setLayout(null);
-		panelCausa.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Causa", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panelCausa.setBounds(538, 58, 265, 232);
-		panelAgregar.add(panelCausa);
 		
-		JLabel label = new JLabel("Causa");
-		label.setFont(new Font("Verdana", Font.PLAIN, 12));
-		label.setBounds(29, 21, 46, 24);
-		panelCausa.add(label);
-		
-		txtCausa = new JTextField();
-		txtCausa.setToolTipText("Agrega una nueva causa");
-		txtCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
-		txtCausa.setColumns(10);
-		txtCausa.setBounds(29, 46, 214, 30);
-		panelCausa.add(txtCausa);
-		
-		JLabel lblDisciplinaAQue = new JLabel("Disciplina(s) a que pertenece");
-		lblDisciplinaAQue.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblDisciplinaAQue.setBounds(29, 93, 200, 14);
-		panelCausa.add(lblDisciplinaAQue);
-		
-		JScrollPane scrollPaneDisciplina = new JScrollPane();
-		scrollPaneDisciplina.setBounds(29, 118, 214, 103);
-		panelCausa.add(scrollPaneDisciplina);
-		
-		listDisciplina = new JList<String>();
-		scrollPaneDisciplina.setViewportView(listDisciplina);
-		listDisciplina.setBorder(new LineBorder(new Color(0, 0, 0)));
-		listDisciplina.setToolTipText("Disciplinas a que pertenece la nueva causa");
-		//Pobla la lista con los resultados de la Base de Datos
-		try {
-			manipulacionDatos.poblarJList(listDisciplina);
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		listDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
-		
-		JPanel panelDisciplina = new JPanel();
-		panelDisciplina.setBorder(new TitledBorder(null, "Disciplina", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panelDisciplina.setBounds(538, 301, 265, 111);
-		panelAgregar.add(panelDisciplina);
-		panelDisciplina.setLayout(null);
-		
-		JLabel lblDisciplina = new JLabel("Disciplina");
-		lblDisciplina.setBounds(29, 24, 58, 16);
-		lblDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
-		panelDisciplina.add(lblDisciplina);
-		
-		txtDisciplina = new JTextField();
-		txtDisciplina.setToolTipText("Agrega nueva Disciplina");
-		txtDisciplina.setBounds(29, 51, 214, 30);
-		txtDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
-		txtDisciplina.setColumns(10);
-		panelDisciplina.add(txtDisciplina);
-		
-		JPanel panelModificar = new JPanel();
-		tpMenu.addTab("Modificar", null, panelModificar, null);
 	}
 	
 	/**
@@ -447,6 +513,7 @@ public class AdministracionRegistros extends JInternalFrame {
 			
 			// Obtiene el indice de todos los elementos seleccionados
 		    int[] indicesSeleccionados = listDisciplina.getSelectedIndices();
+		    
 
 		    // Lista de las Areas seleccionadas
 		    listaCausa = new ArrayList<Causa>();

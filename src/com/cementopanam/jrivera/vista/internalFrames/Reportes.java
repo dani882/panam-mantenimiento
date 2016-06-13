@@ -48,7 +48,7 @@ import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
 import com.cementopanam.jrivera.vista.ModificacionParo;
-import com.cementopanam.jrivera.vista.helper.tablaModelo.TablaModeloEquiposSolucion;
+import com.cementopanam.jrivera.vista.helper.tablaModelo.TablaModeloEquipoSolucion;
 import com.cementopanam.jrivera.vista.helper.tablaModelo.TablaModeloParo;
 import com.toedter.calendar.JDateChooser;
 
@@ -84,7 +84,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	private JTable tablaResultado;
 	
 	private TablaModeloParo modeloParo = new TablaModeloParo();
-	private TablaModeloEquiposSolucion equipoSolucion = new TablaModeloEquiposSolucion();
+	private TablaModeloEquipoSolucion equipoSolucion = new TablaModeloEquipoSolucion();
 	
 	private JButton btnBuscar;
 	public JTabbedPane tabbedPane;
@@ -272,45 +272,25 @@ public class Reportes extends JInternalFrame implements ItemListener {
 				return component;
 			}
 		};
+		tablaResultado.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				
+				if (e.getKeyCode() == KeyEvent.VK_ENTER && (!(chckbxBuscarSoluciones.isSelected()))) {
+					
+					modificarParo();
+				}
+			}
+
+		});
 		tablaResultado.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
 				if (e.getClickCount() == 2 && !e.isConsumed() && (!(chckbxBuscarSoluciones.isSelected()))) {
-
-					int fila = tablaResultado.getSelectedRow();
-					int columna = tablaResultado.getSelectedColumn();
-
-					int codigoParo = 0;
-					String tiempoInicio = "";
-					String solucion = "";
-					String descripcionAdicional = "";
-					String tiempoFin = "";
-					String causa = "";
-					String disciplina = "";
-
-					for (int i = 0; i < columna; i++) {
-
-						codigoParo = (int) tablaResultado.getValueAt(fila, 0);
-						disciplina = String.valueOf(tablaResultado.getValueAt(fila, 5));
-						causa = String.valueOf(tablaResultado.getValueAt(fila, 6));
-						descripcionAdicional = String.valueOf(tablaResultado.getValueAt(fila, 7));
-						
-						if(descripcionAdicional.equals(null) || descripcionAdicional.equals("")) {
-							descripcionAdicional = "";;
-						}
-						tiempoInicio = String.valueOf(tablaResultado.getValueAt(fila, 8));
-						tiempoFin = String.valueOf(tablaResultado.getValueAt(fila, 9));
-						solucion = String.valueOf(tablaResultado.getValueAt(fila, 10));
-					}
-
-					ModificacionParo modificacion = new ModificacionParo(new Paro(codigoParo, tiempoInicio, tiempoFin,
-							solucion, causa, descripcionAdicional, disciplina), new AdministracionParos(),
-							getDesktopPane());
-
-					setVisible(false);
-					e.consume();
-					modificacion.setVisible(true);
+					
+					modificarParo();
+					
 				}
 			}
 		});
@@ -528,7 +508,49 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		}
 	}
 		
+	/**
+	 * Abre la interfaz para modificar los valores de un paro
+	 */
+	private void modificarParo() {
+		
+		int fila = tablaResultado.getSelectedRow();
+		int columna = tablaResultado.getSelectedColumn();
+
+		int codigoParo = 0;
+		String tiempoInicio = "";
+		String solucion = "";
+		String descripcionAdicional = "";
+		String tiempoFin = "";
+		String causa = "";
+		String disciplina = "";
+
+		for (int i = 0; i < columna; i++) {
+
+			codigoParo = (int) tablaResultado.getValueAt(fila, 0);
+			disciplina = String.valueOf(tablaResultado.getValueAt(fila, 5));
+			causa = String.valueOf(tablaResultado.getValueAt(fila, 6));
+			descripcionAdicional = String.valueOf(tablaResultado.getValueAt(fila, 7));
+			
+			if(descripcionAdicional.equals(null) || descripcionAdicional.equals("")) {
+				descripcionAdicional = "";
+			}
+			tiempoInicio = String.valueOf(tablaResultado.getValueAt(fila, 8));
+			tiempoFin = String.valueOf(tablaResultado.getValueAt(fila, 9));
+			solucion = String.valueOf(tablaResultado.getValueAt(fila, 10));
+		}
+
+		ModificacionParo modificacion = new ModificacionParo(new Paro(codigoParo, tiempoInicio, tiempoFin,
+				solucion, causa, descripcionAdicional, disciplina), new AdministracionParos(),
+				getDesktopPane());
+
+		setVisible(false);
+		modificacion.setVisible(true);
+		
+	}
 	
+	/* (non-Javadoc)
+	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+	 */
 	public void itemStateChanged(ItemEvent e) {
 	    
 	    Object source = e.getItemSelectable();

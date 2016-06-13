@@ -35,14 +35,14 @@ import javax.swing.border.TitledBorder;
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
 import com.cementopanam.jrivera.vista.helper.JComboBoxPersonalizado;
-import com.cementopanam.jrivera.vista.internalFrames.Reportes;
+import com.cementopanam.jrivera.vista.internalFrames.Imputaciones;
 
-public class ModificacionParo extends JDialog {
+public class ModificacionImputacion extends JDialog {
 
 	/**
 	 * 
 	 */
-	private static final Logger LOG = Logger.getLogger( ModificacionParo.class.getName() );
+	private static final Logger LOG = Logger.getLogger( ModificacionImputacion.class.getName() );
 	private static final long serialVersionUID = -7239938319668117403L;
 	private final JPanel contentPanel = new JPanel();
 	private JButton btnGuardar;
@@ -64,7 +64,7 @@ public class ModificacionParo extends JDialog {
 	private JLabel label;
 	private JButton btnBorrar;
 
-	public ModificacionParo(Paro modificacion, AdministracionParos paroDB, JDesktopPane desktopPane) {
+	public ModificacionImputacion(Paro modificacion, AdministracionParos paroDB, JDesktopPane desktopPane) {
 
 		this();
 		admParo = paroDB;
@@ -107,12 +107,12 @@ public class ModificacionParo extends JDialog {
 		cbDisciplina.setSelectedItem(modificacion.getDisciplina());
 	}
 
-	public ModificacionParo() {
+	public ModificacionImputacion() {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
 
-				mostrarReporte();
+				mostrarImputacion();
 
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 				Principal.lblStatusBar.setText("Operacion cancelada por el usuario");
@@ -239,11 +239,11 @@ public class ModificacionParo extends JDialog {
 			getContentPane().add(buttonPaneBotones, BorderLayout.SOUTH);
 			{
 				btnGuardar = new JButton("Guardar");
-				btnGuardar.setIcon(new ImageIcon(ModificacionParo.class.getResource("/iconos32x32/ok32x32.png")));
+				btnGuardar.setIcon(new ImageIcon(ModificacionImputacion.class.getResource("/iconos32x32/ok32x32.png")));
 				btnGuardar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 
-						actualizarParo();
+						actualizarImputacion();
 
 					}
 
@@ -256,11 +256,11 @@ public class ModificacionParo extends JDialog {
 
 			{
 				btnCancelar = new JButton("Cancelar");
-				btnCancelar.setIcon(new ImageIcon(ModificacionParo.class.getResource("/iconos32x32/fail32x32.png")));
+				btnCancelar.setIcon(new ImageIcon(ModificacionImputacion.class.getResource("/iconos32x32/fail32x32.png")));
 				btnCancelar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 
-						mostrarReporte();
+						mostrarImputacion();
 
 						Principal.lblStatusBar
 								.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
@@ -274,7 +274,7 @@ public class ModificacionParo extends JDialog {
 						eliminarParo(codigoCausa);
 					}
 				});
-				btnBorrar.setIcon(new ImageIcon(ModificacionParo.class.getResource("/iconos32x32/delete32x32.png")));
+				btnBorrar.setIcon(new ImageIcon(ModificacionImputacion.class.getResource("/iconos32x32/delete32x32.png")));
 				btnBorrar.setFont(new Font("Verdana", Font.PLAIN, 12));
 				buttonPaneBotones.add(btnBorrar);
 				btnCancelar.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -309,7 +309,7 @@ public class ModificacionParo extends JDialog {
 					Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 					Principal.lblStatusBar.setText("Paro Eliminado correctamente");
 
-					mostrarReporte();
+					mostrarImputacion();
 				} else {
 					Principal.lblStatusBar
 							.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
@@ -326,19 +326,19 @@ public class ModificacionParo extends JDialog {
 	/**
 	 * Retorna a la interfaz de reporte
 	 */
-	private void mostrarReporte() {
+	private void mostrarImputacion() {
 
-		Reportes repo = new Reportes();
-		desktopPane.add(repo);
-		repo.toFront();
-		repo.setVisible(true);
+		Imputaciones imp = new Imputaciones();
+		desktopPane.add(imp);
+		imp.toFront();
+		imp.setVisible(true);
 		dispose();
 	}
 
 	/**
 	 * Modifica la informacion de los Paros
 	 */
-	private void actualizarParo() {
+	private void actualizarImputacion() {
 
 		String tiempoInicio = txtTiempoInicio.getText();
 		String disciplina = String.valueOf(cbDisciplina.getSelectedItem());
@@ -355,8 +355,9 @@ public class ModificacionParo extends JDialog {
 
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Paro Actualizado correctamente");
+				
+				mostrarImputacion();
 
-				mostrarReporte();
 			} else {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 				Principal.lblStatusBar.setText("No se pudo completar la operacion");
