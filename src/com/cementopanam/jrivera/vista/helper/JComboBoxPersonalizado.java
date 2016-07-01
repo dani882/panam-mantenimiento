@@ -16,7 +16,7 @@ public class JComboBoxPersonalizado extends JComboBox<String> {
 
 	private boolean layingOut = false;
 
-	// Sobreescribimos este Metodo :)
+	// Sobreescribimos este Metodo
 	public void doLayout() {
 		try {
 			layingOut = true;

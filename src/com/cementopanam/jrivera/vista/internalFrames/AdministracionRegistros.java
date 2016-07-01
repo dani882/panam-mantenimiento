@@ -6,6 +6,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,7 +15,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -56,8 +57,6 @@ public class AdministracionRegistros extends JInternalFrame {
 	private JTextField txtSubArea;
 	private JComboBox<String> cbArea;
 	private JComboBox<String> cbSubArea;
-	private JList<Object> listBorrarCausa;
-	private JTable table;
 	private JTextField txtCausa;
 	private JTextField txtDisciplina;
 	private JList<String> listDisciplina;
@@ -65,6 +64,9 @@ public class AdministracionRegistros extends JInternalFrame {
 	private JTable tblModificarEquipo;
 	private JTable tblModificarCausa;
 	private JTable tblModificarSubArea;
+	private JTable tblModificarDisciplina;
+	private JTable tblBorrarCausa;
+	private JTable tblBorrarDisciplina;
 	
 	public AdministracionRegistros() {
 		
@@ -266,11 +268,11 @@ public class AdministracionRegistros extends JInternalFrame {
 		tpMenu.addTab("Modificar", null, panelModificar, null);
 		panelModificar.setLayout(new BorderLayout(0, 0));
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		panelModificar.add(tabbedPane, BorderLayout.CENTER);
+		JTabbedPane tabbedPaneModificar = new JTabbedPane(JTabbedPane.TOP);
+		panelModificar.add(tabbedPaneModificar, BorderLayout.CENTER);
 		
 		JPanel panelModificarArea = new JPanel();
-		tabbedPane.addTab("Area y SubArea", null, panelModificarArea, null);
+		tabbedPaneModificar.addTab("Area y SubArea", null, panelModificarArea, null);
 		panelModificarArea.setLayout(null);
 		
 		JScrollPane scrollPaneModificarArea = new JScrollPane();
@@ -282,46 +284,84 @@ public class AdministracionRegistros extends JInternalFrame {
 		tblModificarArea.setFillsViewportHeight(true);
 		tblModificarArea.setFont(new Font("Verdana", Font.PLAIN, 12));
 		scrollPaneModificarArea.setViewportView(tblModificarArea);
-		tblModificarArea.setModel(modificacionRegistros.mostrarDatos());
-		
+		tblModificarArea.setModel(modificacionRegistros.mostrarDatos("area"));
+		// Sirve para no permitir que el usuario reordene las columnas
+		tblModificarArea.getTableHeader().setReorderingAllowed(false);
+	
 		JScrollPane scrollPaneModificarSubArea = new JScrollPane();
-		scrollPaneModificarSubArea.setBounds(377, 372, 375, -353);
+		scrollPaneModificarSubArea.setBounds(358, 11, 441, 359);
 		panelModificarArea.add(scrollPaneModificarSubArea);
 		
 		tblModificarSubArea = new JTable();
-		tblModificarSubArea.setFillsViewportHeight(true);
 		tblModificarSubArea.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tblModificarSubArea.setFillsViewportHeight(true);
 		scrollPaneModificarSubArea.setViewportView(tblModificarSubArea);
 		tblModificarSubArea.setFont(new Font("Verdana", Font.PLAIN, 12));
-		
+		tblModificarSubArea.setModel(modificacionRegistros.mostrarDatos("subArea"));
+		// Sirve para no permitir que el usuario reordene las columnas
+		tblModificarSubArea.getTableHeader().setReorderingAllowed(false);
+	
 		JPanel panelModificarEquipo = new JPanel();
-		tabbedPane.addTab("Equipo", null, panelModificarEquipo, null);
+		tabbedPaneModificar.addTab("Equipo", null, panelModificarEquipo, null);
 		panelModificarEquipo.setLayout(null);
 		
 		JScrollPane scrollPaneModificarEquipo = new JScrollPane();
-		scrollPaneModificarEquipo.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Equipo", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		scrollPaneModificarEquipo.setBounds(10, 11, 789, 359);
 		panelModificarEquipo.add(scrollPaneModificarEquipo);
 		
 		tblModificarEquipo = new JTable();
+		tblModificarEquipo.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tblModificarEquipo.setFillsViewportHeight(true);
+		tblModificarEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
 		scrollPaneModificarEquipo.setViewportView(tblModificarEquipo);
+		tblModificarEquipo.setModel(modificacionRegistros.mostrarDatos("equipo"));
+		// Sirve para no permitir que el usuario reordene las columnas
+		tblModificarEquipo.getTableHeader().setReorderingAllowed(false);
+
 		
 		JPanel panelModificarCausa = new JPanel();
-		tabbedPane.addTab("Causa y Disciplina", null, panelModificarCausa, null);
+		tabbedPaneModificar.addTab("Causa y Disciplina", null, panelModificarCausa, null);
 		panelModificarCausa.setLayout(null);
 		
 		JScrollPane scrollPaneModificarCausa = new JScrollPane();
-		scrollPaneModificarCausa.setViewportBorder(new TitledBorder(null, "Causa", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		scrollPaneModificarCausa.setBounds(10, 11, 323, 359);
+		scrollPaneModificarCausa.setBounds(10, 11, 536, 359);
 		panelModificarCausa.add(scrollPaneModificarCausa);
 		
-		tblModificarCausa = new JTable();
+		tblModificarCausa = new JTable() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -3466158353530192531L;
+
+			public boolean isCellEditable(int row,int column) {
+				switch(column) {
+				case 1:  // selecciona la columna que se desea que no sea editable
+					return false;
+				default: 
+					return true;
+				}
+			}
+		}; 
+		tblModificarCausa.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tblModificarCausa.setFillsViewportHeight(true);
+		tblModificarCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
 		scrollPaneModificarCausa.setViewportView(tblModificarCausa);
+		tblModificarCausa.setModel(modificacionRegistros.mostrarDatos("causa"));
+		// Sirve para no permitir que el usuario reordene las columnas
+		tblModificarCausa.getTableHeader().setReorderingAllowed(false);
 		
-		JScrollPane scrollPane_3 = new JScrollPane();
-		scrollPane_3.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Disciplina", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		scrollPane_3.setBounds(409, 11, 323, 359);
-		panelModificarCausa.add(scrollPane_3);
+		JScrollPane scrollPaneModificarDisciplina = new JScrollPane();
+		scrollPaneModificarDisciplina.setBounds(556, 11, 243, 359);
+		panelModificarCausa.add(scrollPaneModificarDisciplina);
+		
+		tblModificarDisciplina = new JTable();
+		tblModificarDisciplina.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tblModificarDisciplina.setFillsViewportHeight(true);
+		scrollPaneModificarDisciplina.setViewportView(tblModificarDisciplina);
+		tblModificarDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
+		tblModificarDisciplina.setModel(modificacionRegistros.mostrarDatos("disciplina"));
+		// Sirve para no permitir que el usuario reordene las columnas
+		tblModificarDisciplina.getTableHeader().setReorderingAllowed(false);
 		
 		JPanel panelBorrar = new JPanel();
 		tpMenu.addTab("Borrar", null, panelBorrar, null);
@@ -338,113 +378,90 @@ public class AdministracionRegistros extends JInternalFrame {
 		
 		JPanel panelCentroBorrar = new JPanel();
 		panelBorrar.add(panelCentroBorrar, BorderLayout.CENTER);
-		
-		JLabel lblBorrarCausa = new JLabel("Causa");
-		lblBorrarCausa.setBounds(21, 19, 40, 16);
-		lblBorrarCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
-		
-		JScrollPane scrollPaneBorrarArea = new JScrollPane();
-		scrollPaneBorrarArea.setBounds(22, 47, 192, 153);
-		
-		listBorrarCausa = new JList<Object>();
-		listBorrarCausa.setModel(new AbstractListModel() {
-			String[] values = new String[] {};
-			public int getSize() {
-				return values.length;
-			}
-			public Object getElementAt(int index) {
-				return values[index];
-			}
-		});
-		scrollPaneBorrarArea.setViewportView(listBorrarCausa);
-		listBorrarCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
-		
-		JButton btnRegistros = new JButton("Borrar Registros");
-		btnRegistros.setBounds(366, 520, 172, 41);
-		btnRegistros.setIcon(new ImageIcon(AdministracionRegistros.class.getResource("/iconos32x32/delete32x32.png")));
-		btnRegistros.setFont(new Font("Verdana", Font.PLAIN, 12));
-		btnRegistros.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				borrarSeleccionados();
-			}
-		});
-		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(265, 47, 190, 151);
-		
-		JList<Object> listBorrarDisciplina = new JList<Object>();
-		scrollPane.setViewportView(listBorrarDisciplina);
-		listBorrarDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
-		
-		JLabel lblBorrarSubArea = new JLabel("SubArea");
-		lblBorrarSubArea.setBounds(265, 19, 53, 16);
-		lblBorrarSubArea.setFont(new Font("Verdana", Font.PLAIN, 12));
 		panelCentroBorrar.setLayout(null);
 		
-		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(22, 283, 192, 101);
-		panelCentroBorrar.add(scrollPane_1);
+		JScrollPane scrollPaneBorrarCausa = new JScrollPane();
+		scrollPaneBorrarCausa.setBounds(10, 11, 536, 359);
+		panelCentroBorrar.add(scrollPaneBorrarCausa);
 		
-		table = new JTable();
-		table.setBounds(0, 0, 190, 0);
-		panelCentroBorrar.add(table);
-		panelCentroBorrar.add(scrollPaneBorrarArea);
-		panelCentroBorrar.add(lblBorrarCausa);
-		panelCentroBorrar.add(lblBorrarSubArea);
-		panelCentroBorrar.add(scrollPane);
-		panelCentroBorrar.add(btnRegistros);
+		tblBorrarCausa = new JTable() {
+			
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1917807722999935768L;
+
+			public boolean isCellEditable(int fila,int columna) {
+				switch(columna) {
+				case 0: // selecciona la columna que se desea que no sea editable
+					return false;
+				case 1:  // selecciona la columna que se desea que no sea editable
+					return false;
+				default: 
+					return false;
+				}
+			}
+		};
+		tblBorrarCausa.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				
+				if(e.getKeyChar() == KeyEvent.VK_DELETE ) {
+					log.info("Se presiono delete");
+					borrarRegistros();
+				}
+			}
+		});
+		scrollPaneBorrarCausa.setViewportView(tblBorrarCausa);
+		tblBorrarCausa.setModel(modificacionRegistros.mostrarDatos("causa"));
+		tblBorrarCausa.setFont(new Font("Verdana", Font.PLAIN, 12));
+		// Sirve para no permitir que el usuario reordene las columnas
+		tblBorrarCausa.getTableHeader().setReorderingAllowed(false);
 		
+		JScrollPane scrollPaneBorrarDisciplina = new JScrollPane();
+		scrollPaneBorrarDisciplina.setBounds(556, 11, 243, 359);
+		panelCentroBorrar.add(scrollPaneBorrarDisciplina);
 		
+		tblBorrarDisciplina = new JTable() {
+			
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -5036637592998233488L;
+
+			public boolean isCellEditable(int row,int column) {
+				switch(column) {
+				case 0:  // selecciona la columna que se desea que no sea editable
+					return false;
+				default: 
+					return false;
+				}
+			}
+		};
+		tblBorrarDisciplina.setFillsViewportHeight(true);
+		scrollPaneBorrarDisciplina.setViewportView(tblBorrarDisciplina);
+		tblBorrarDisciplina.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tblBorrarDisciplina.setModel(modificacionRegistros.mostrarDatos("disciplina"));
+		tblBorrarDisciplina.setFont(new Font("Verdana", Font.PLAIN, 12));
+		// Sirve para no permitir que el usuario reordene las columnas
+		tblBorrarDisciplina.getTableHeader().setReorderingAllowed(false);
+		
+		JButton btnBorrarRegistros = new JButton("Borrar Registros");
+		btnBorrarRegistros.setIcon(new ImageIcon(AdministracionRegistros.class.getResource("/iconos32x32/delete32x32.png")));
+		btnBorrarRegistros.setFont(new Font("Verdana", Font.PLAIN, 12));
+		btnBorrarRegistros.setBounds(628, 381, 171, 41);
+		panelCentroBorrar.add(btnBorrarRegistros);
 		
 	}
 	
 	/**
-	 * 
+	 * Borrar las causas seleccionadas
 	 */
-	protected void borrarSeleccionados() {
-		
-		// Obtiene el indice de todos los elementos seleccionados
-	    int[] selectedIx = listBorrarCausa.getSelectedIndices();
-
-	    // Lista de las Areas seleccionadas
-	    List<Area> listaArea = new ArrayList<Area>();
-	    // Obtiene todos los elementos seleccionados usando los indices
-	    for (int i = 0; i < selectedIx.length; i++) {
-	    	String sel = String.valueOf(listBorrarCausa.getModel().getElementAt(selectedIx[i]));
-	    	listaArea.add(new Area(sel));
-	    }
-	    
-	    try {
-			
-	    	// Si el resultado es satisfactorio, notifica que se agregaron nuevos registros a la Base de Datos
-			if (modificacionRegistros.borrarRegistros(listaArea) == true) {
-							
-				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
-				Principal.lblStatusBar.setText("Registro(s) borrado(s) correctamente");
-				rellenarCombo();
-				limpiarCampos();
-			}
-			else {
-					
-				Principal.lblStatusBar
-								.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
-				Principal.lblStatusBar.setText("No se pudo completar la operacion");
-				
-			}
-			
-		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
-			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(), 
-					JOptionPane.ERROR_MESSAGE);
-		}
-		catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), 
-					JOptionPane.ERROR_MESSAGE);
-		}
+	private void borrarRegistros() {
+		// TODO Escribir el codigo para borrar los registros seleccionados
 		
 	}
-	
+
 	private void guardarRegistros() {
 		
 		String nombreArea = txtArea.getText();
@@ -562,7 +579,7 @@ public class AdministracionRegistros extends JInternalFrame {
 	}
 	
 	/**
-	 * Limpia los componentes luego de agregar nuevos registros
+	 * Limpia los componentes luego de agregar nuevos registros y actualiza tablas de modificar y borrar causas
 	 */
 	private void limpiarCampos() {
 		
@@ -574,6 +591,17 @@ public class AdministracionRegistros extends JInternalFrame {
 		cbSubArea.setSelectedIndex(-1);
 		txtDisciplina.setText("");
 		txtCausa.setText("");
+		
+		//Actualiza las tablas de Modificacion de Registros
+		tblModificarArea.setModel(modificacionRegistros.mostrarDatos("area"));
+		tblModificarSubArea.setModel(modificacionRegistros.mostrarDatos("subArea"));
+		tblModificarEquipo.setModel(modificacionRegistros.mostrarDatos("equipo"));
+		tblModificarCausa.setModel(modificacionRegistros.mostrarDatos("causa"));
+		tblModificarDisciplina.setModel(modificacionRegistros.mostrarDatos("disciplina"));
+
+		//Actualiza las tablas de Borrado de Registros
+		tblBorrarCausa.setModel(modificacionRegistros.mostrarDatos("causa"));
+		tblBorrarDisciplina.setModel(modificacionRegistros.mostrarDatos("disciplina"));
 	}
 
 	/**

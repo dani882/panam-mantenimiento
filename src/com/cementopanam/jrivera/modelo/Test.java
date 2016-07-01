@@ -21,6 +21,7 @@ public class Test {
 
 	public static void main(String[] args) {
 		
+		testDB();
 /*	    String version = System.getProperty("java.version");
 	    char minor = version.charAt(2);
 	    char point = version.charAt(4);
@@ -65,7 +66,6 @@ public class Test {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		
 		
 		
@@ -83,7 +83,7 @@ public class Test {
 		
 		}
 
-	private void testDB() {
+	private static void testDB() {
 
 		int port = 3306;
 

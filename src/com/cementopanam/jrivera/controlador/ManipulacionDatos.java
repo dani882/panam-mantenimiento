@@ -19,7 +19,6 @@ public class ManipulacionDatos {
 	private ConeccionBD cbd;
 	private Connection con = null;
 	private CallableStatement cs = null;
-	private ResultSet rs = null;
 
 	public ManipulacionDatos() {
 
@@ -48,6 +47,8 @@ public class ManipulacionDatos {
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
+			System.exit(0);
 		}
 		return con;
 	}
@@ -76,13 +77,14 @@ public class ManipulacionDatos {
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e); 
-			JOptionPane.showMessageDialog(null, e.getMessage()); }
+			JOptionPane.showMessageDialog(null, e.getMessage()); 
+			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
+			System.exit(0);
+		}
 	
-		return rs = cs.executeQuery();
+		return cs.executeQuery();
 	}
 	 
-
-
 	/**
 	 * Visualiza el estado de los paros
 	 * 
@@ -104,7 +106,7 @@ public class ManipulacionDatos {
 
 		cs.setString(1, estado);
 
-		return rs = cs.executeQuery();
+		return cs.executeQuery();
 	}
 
 	/**
@@ -140,6 +142,8 @@ public class ManipulacionDatos {
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
+			System.exit(0);
 		}
 		return resultado;
 	}
@@ -191,12 +195,11 @@ public class ManipulacionDatos {
 		try(Connection  con = cbd.conectarABaseDatos();
 			    CallableStatement cs = con.prepareCall("{call sp_listar_disciplina()}");) {
 
-		    ResultSet resultSet = cs.executeQuery();
+		    ResultSet rs = cs.executeQuery();
 
-		    while (resultSet.next()) {
+		    while (rs.next()) {
 		    	
-		        String nombreDisciplina = resultSet.getString("nombre_disciplina"); 
-		        modelo.addElement(nombreDisciplina);
+		        modelo.addElement(rs.getString("nombre_disciplina"));
 		    }
 		    lista.setModel(modelo);
 
@@ -209,6 +212,8 @@ public class ManipulacionDatos {
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
+			System.exit(0);
 		}
 	}
 
@@ -230,6 +235,8 @@ public class ManipulacionDatos {
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
+			System.exit(0);
 		}
 
 		cs = con.prepareCall("{call logearUsuario(?,?)}");
@@ -237,7 +244,7 @@ public class ManipulacionDatos {
 		cs.setString(1, usuario);
 		cs.setString(2, clave);
 
-		return rs = cs.executeQuery();
+		return cs.executeQuery();
 	}
 
 	/**
@@ -248,9 +255,9 @@ public class ManipulacionDatos {
 
 		try {
 
-			if (rs != null) {
-				rs.close();
-			}
+	//		if (rs != null) {
+	//			rs.close();
+	//		}
 
 			if (cs != null) {
 				cs.close();
@@ -266,6 +273,8 @@ public class ManipulacionDatos {
 			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), 
 					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
+			System.exit(0);
 		}
 	}
 }

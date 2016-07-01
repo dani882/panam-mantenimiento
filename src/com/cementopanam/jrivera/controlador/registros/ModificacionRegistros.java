@@ -2,7 +2,6 @@ package com.cementopanam.jrivera.controlador.registros;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -45,17 +44,25 @@ public class ModificacionRegistros extends ManipulacionDatos {
 	}
 	
 
-	public boolean borrarRegistros(List<Area> areas) throws SQLException {
+	public boolean borrarRegistros(List<Causa> causas, List<Disciplina> disciplinas) throws SQLException {
 		
 		try (Connection con = cbd.conectarABaseDatos();
 				CallableStatement cs = con.prepareCall("{call sp_eliminar_registros(?,?)}");) {
 						
-			//Borra registro de Area
-			for (Area area : areas) {
-				cs.setString(1, area.getNombreArea());
-				cs.setString(2, "area");
+			//Borra registro de Causa
+			for (Causa causa : causas) {
+				cs.setString(1, causa.getTipoCausa());
+				cs.setString(2, causa.getIdDisciplina());
 				cs.addBatch();
-				log.info("Nombre de Area: " + area.getNombreArea());
+				log.info("Nombre de Causa: " + causa.getTipoCausa());
+			}
+			
+			//Borra registro de Disciplina
+			for (Disciplina disciplina : disciplinas) {
+				cs.setString(1, disciplina.getNombreDisciplina());
+				cs.setString(2, "disciplina");
+				cs.addBatch();
+				log.info("Nombre de Disciplina: " + disciplina.getNombreDisciplina());
 			}
 			
 			cs.executeBatch();
@@ -169,27 +176,99 @@ public class ModificacionRegistros extends ManipulacionDatos {
 	}
 	
 	
-	public DefaultTableModel mostrarDatos() {
+	public DefaultTableModel mostrarDatos(String registro) {
 		
 		DefaultTableModel modelo = new DefaultTableModel();
+		ResultSet rs = null;
 		
-		
-		PreparedStatement pstmt = null;
 	    try {  
 	        while (modelo.getRowCount()>0){
 	        	modelo.removeRow(0);
 	        }
-	        Connection con = cbd.conectarABaseDatos();
-	        String sql = "SELECT * FROM mantenimientodb.area";
-	        pstmt = con.prepareStatement(sql);
-	        ResultSet rs = pstmt.executeQuery();
-	        modelo.addColumn("Area");
 	        
-	        while(rs.next()){	
-	        	modelo.addRow(new Object[]{
-	            rs.getString("nombre_area")
-	            });
-	        } 
+	    try (Connection con = cbd.conectarABaseDatos();
+	    		CallableStatement cs = con.prepareCall("{call sp_mostrar_registros(?)}");) {
+	    	
+	    	//Rellena el JTable de Modificacion Area
+	    	switch (registro) {
+				case "area":
+					
+					cs.setString(1, registro);
+		        	rs = cs.executeQuery();
+		        		
+		    	    modelo.addColumn("Area");
+		    	        
+		    	    while(rs.next()){
+		    	    	modelo.addRow(new Object[]{
+		    	        rs.getString("nombre_area")});
+		    	    }
+					
+					break;
+				
+			//Rellena el JTable de Modificacion SubArea
+				case "subArea":
+					
+					cs.setString(1, registro);
+		        	rs = cs.executeQuery();
+		        		
+		    	    modelo.addColumn("SubArea");
+		    	        
+		    	    while(rs.next()){
+		    	    	modelo.addRow(new Object[]{
+		    	        rs.getString("nombre_sub_area")});
+		    	    }
+					
+					break;
+					
+			//Rellena el JTable de Modificacion Equipo
+				case "equipo":
+					
+					cs.setString(1, registro);
+		        	rs = cs.executeQuery();
+		        		
+		    	    modelo.addColumn("Codigo Equipo");
+		    	    modelo.addColumn("Nombre Equipo");
+		    	        
+		    	    while(rs.next()){
+		    	    	modelo.addRow(new Object[]{
+		    	        rs.getString("cod_equipo"), rs.getString("nombre_equipo")});
+		    	    }
+					
+					break;
+					
+			//Rellena el JTable de Modificacion Causa
+				case "causa":
+					
+					cs.setString(1, registro);
+		        	rs = cs.executeQuery();
+		        		
+		    	    modelo.addColumn("Causa");
+		    	    modelo.addColumn("Disciplina");
+		    	        
+		    	    while(rs.next()){
+		    	    	modelo.addRow(new Object[]{
+		    	        rs.getString("tipo_causa"), rs.getString("nombre_disciplina")});
+		    	    }
+					
+					break;
+			//Rellena el JTable de Modificacion Disciplina
+				case "disciplina":
+					
+					cs.setString(1, registro);
+		        	rs = cs.executeQuery();
+		        		
+		    	    modelo.addColumn("Disciplina");
+		    	        
+		    	    while(rs.next()){
+		    	    	modelo.addRow(new Object[]{
+		    	        rs.getString("nombre_disciplina")});
+		    	    }
+					
+					break;
+
+				}
+	        }
+	        
 	      }catch (Exception ex) {
 	        System.err.println(ex);
 	      }

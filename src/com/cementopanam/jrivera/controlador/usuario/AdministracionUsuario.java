@@ -21,8 +21,6 @@ public class AdministracionUsuario extends ManipulacionDatos {
 	private static final Logger log = Logger.getLogger(AdministracionUsuario.class.getName());
 	private ConeccionBD cbd;
 	private Connection con;
-	private CallableStatement cs = null;
-	private ResultSet rs = null;
 
 	public AdministracionUsuario() {
 
@@ -40,8 +38,11 @@ public class AdministracionUsuario extends ManipulacionDatos {
 
 	/**
 	 * Agrega nuevo usuario a la base de datos
-	 * @param usuario - informacion del usuario que se agregara a la base de datos
-	 * @return - true si la operacion fue exitosa, false si no se completo la operacion
+	 * 
+	 * @param usuario
+	 *            - informacion del usuario que se agregara a la base de datos
+	 * @return - true si la operacion fue exitosa, false si no se completo la
+	 *         operacion
 	 * @throws SQLException
 	 */
 	public boolean registrarUsuario(Usuario usuario) throws SQLException {
@@ -65,6 +66,13 @@ public class AdministracionUsuario extends ManipulacionDatos {
 
 			con.rollback();
 			return false;
+		} catch (NumberFormatException nfe) {
+			log.log(Level.SEVERE, nfe.toString(), nfe);
+			JOptionPane.showMessageDialog(null, "Formato de Codigo Empleado incorrecto", "Codigo Empleado",
+					JOptionPane.WARNING_MESSAGE);
+
+			con.rollback();
+			return false;
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
@@ -78,8 +86,12 @@ public class AdministracionUsuario extends ManipulacionDatos {
 
 	/**
 	 * Modifica las credenciales del usuario en la base de datos
-	 * @param usuario - informacion del usuario que se realizara la modificacion de credenciales
-	 * @return - true si la operacion fue exitosa, false si no se completo la operacion
+	 * 
+	 * @param usuario
+	 *            - informacion del usuario que se realizara la modificacion de
+	 *            credenciales
+	 * @return - true si la operacion fue exitosa, false si no se completo la
+	 *         operacion
 	 * @throws SQLException
 	 */
 	public boolean modificarUsuario(Usuario usuario) throws SQLException {
@@ -111,11 +123,14 @@ public class AdministracionUsuario extends ManipulacionDatos {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Elimina el usuario de la base de datos
-	 * @param usuario - nombre de usuario que se desea eliminar
-	 * @return - true si la operacion fue exitosa, false si no se completo la operacion
+	 * 
+	 * @param usuario
+	 *            - nombre de usuario que se desea eliminar
+	 * @return - true si la operacion fue exitosa, false si no se completo la
+	 *         operacion
 	 * @throws SQLException
 	 */
 	public boolean eliminarUsuario(Usuario usuario) throws SQLException {
@@ -146,12 +161,17 @@ public class AdministracionUsuario extends ManipulacionDatos {
 
 	/**
 	 * Muestra los usuarios registrados en el sistema
-	 * @param usuario - usuario que desea visualizar
+	 * 
+	 * @param usuario
+	 *            - usuario que desea visualizar
 	 * @return - listado de usuarios
 	 * @throws SQLException
 	 */
 	public ResultSet mostrarUsuario(String usuario) throws SQLException {
 
+		ResultSet rs = null;
+		CallableStatement cs = null;
+		
 		try {
 
 			con = cbd.conectarABaseDatos();

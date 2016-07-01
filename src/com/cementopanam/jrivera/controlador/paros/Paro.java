@@ -14,6 +14,7 @@ public class Paro {
 	private String descripcionAdicional;
 	private String disciplina;
 
+
 	/**
 	 * @return the codigo
 	 */
@@ -180,6 +181,7 @@ public class Paro {
 	}
 
 	/**
+	 * Constructor para mostrar los Paros en la Busqueda de Paros Completados
 	 * @param codigo
 	 * @param usuario
 	 * @param area
@@ -193,7 +195,8 @@ public class Paro {
 	 * @param disciplina
 	 */
 	public Paro(int codigo, String usuario, String area, String subArea, String equipo, String tiempoInicio,
-			String tiempoFin, String solucion, String causa, String descripcionAdicional, String disciplina) {
+			String tiempoFin, String solucion, String causa, String descripcionAdicional, 
+			String disciplina) {
 
 		this.codigo = codigo;
 		this.usuario = usuario;
@@ -209,6 +212,7 @@ public class Paro {
 	}
 
 	/**
+	 * Constructor de Modificacion de Paros Completados
 	 * @param tiempoInicio
 	 * @param tiempoFin
 	 * @param solucion
@@ -243,5 +247,18 @@ public class Paro {
 		this.solucion = solucion;
 	}
 
+	
+/*	String tiempoInicio = txtTiempoInicio.getText();
+	String disciplina = String.valueOf(cbDisciplina.getSelectedItem());
+	String causa = String.valueOf(cbCausa.getSelectedItem());
+	String equipo = String.valueOf(cbEquipo.getSelectedItem());
+	String descripcionAdicional = txtDescripcionAdicional.getText();
+	*/
+	
+	
+	
+	
+	
+	
 	public Paro() {}
 }

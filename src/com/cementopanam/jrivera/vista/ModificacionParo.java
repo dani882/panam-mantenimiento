@@ -78,9 +78,9 @@ public class ModificacionParo extends JDialog {
 				cbCausa.addItem(rs.getString("tipo_causa"));
 			}
 			// Rellena combo Disciplina
-			ResultSet rs2 = admParo.rellenarCombo("disciplina", null);
-			while (rs2.next()) {
-				cbDisciplina.addItem(rs2.getString("nombre_disciplina"));
+			 rs = admParo.rellenarCombo("disciplina", null);
+			while (rs.next()) {
+				cbDisciplina.addItem(rs.getString("nombre_disciplina"));
 			}
 
 		} 
@@ -88,7 +88,6 @@ public class ModificacionParo extends JDialog {
 			 LOG.log(Level.SEVERE, e.toString(), e);
 		}
 
-		
 		codigoParo = modificacion.getCodigo();
 
 		// Obtiene el codigo de Causa
@@ -283,6 +282,7 @@ public class ModificacionParo extends JDialog {
 			}
 
 			label = new JLabel(" ");
+			label.setFont(new Font("Verdana", Font.PLAIN, 12));
 			buttonPaneBotones.add(label);
 		}
 	}
@@ -350,8 +350,8 @@ public class ModificacionParo extends JDialog {
 		// Si el paro fue exitoso
 		try {
 			if (admParo.modificarParo(
-					new Paro(codigoParo, tiempoInicio, tiempoFin, solucion, causa, descripcionAdicional, disciplina),
-					codigoCausa) == true) {
+					new Paro(codigoParo, tiempoInicio, tiempoFin, solucion, causa, 
+							descripcionAdicional, disciplina), codigoCausa) == true) {
 
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Paro Actualizado correctamente");

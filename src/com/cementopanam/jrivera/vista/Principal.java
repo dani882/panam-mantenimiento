@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
@@ -317,7 +318,7 @@ public class Principal extends JFrame implements Runnable {
 			/**
 			 * 
 			 */
-			private static final long serialVersionUID = 1L;
+			private static final long serialVersionUID = 5379593925144225542L;
 			/*
 			 * Este metodo sirve para redimensionar automaticamente la imagen de
 			 * fondo dependiendo de la dimension de la pantalla
@@ -340,11 +341,11 @@ public class Principal extends JFrame implements Runnable {
 
 		// Inicio Mostrar Formularios
 		imputaciones = new Imputaciones();
-		imputaciones.setBounds(12, 12, 1150, 590);
+		imputaciones.setLocation(65, 5);
 		desktopPanePrincipal.add(imputaciones);
 
 		reportes = new Reportes();
-		reportes.setLocation(60, 5);
+		reportes.setLocation(60, 2);
 		desktopPanePrincipal.add(reportes);
 
 		admUsuario = new AdministracionUsuarios();
@@ -427,7 +428,6 @@ public class Principal extends JFrame implements Runnable {
 	public void run() {
 
 		statusBar = new BarraEstado();
-
 		
 		lblParosPendientes = new JLabel();
 		//Muestra la cantidad de Paros Pendientes por Completar en el Panel superior de la ventana principal	
@@ -451,22 +451,22 @@ public class Principal extends JFrame implements Runnable {
 		pbar.setStringPainted(true);
 		statusBar.addRightComponent(pbar);
 		
-		final JLabel dateLabel = new JLabel();
-		dateLabel.setHorizontalAlignment(JLabel.CENTER);
-		statusBar.addRightComponent(dateLabel);
+		final JLabel lblFecha = new JLabel();
+		lblFecha.setHorizontalAlignment(JLabel.CENTER);
+		statusBar.addRightComponent(lblFecha);
 
-		final JLabel timeLabel = new JLabel();
-		timeLabel.setHorizontalAlignment(JLabel.CENTER);
-		statusBar.addRightComponent(timeLabel);
+		final JLabel lblTiempo = new JLabel();
+		lblTiempo.setHorizontalAlignment(JLabel.CENTER);
+		statusBar.addRightComponent(lblTiempo);
 
 		contentPane.add(statusBar, BorderLayout.SOUTH);
 		
-		JLabel conectar = new JLabel("Conectado como: ");
-		statusBar.addRightComponent(conectar);
+		JLabel lblconectado = new JLabel("Conectado como: ");
+		statusBar.addRightComponent(lblconectado);
 
 		statusBar.addRightComponent(usuarioActual);
 
-		timerThread = new TimerThread(dateLabel, timeLabel);
+		timerThread = new TimerThread(lblFecha, lblTiempo);
 		timerThread.start();
 	}
 	
@@ -486,8 +486,15 @@ public class Principal extends JFrame implements Runnable {
 					}
 				});
 				Thread.sleep(duracion);
-			} catch (InterruptedException e) {
-				JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			} catch (InterruptedException ie) {
+				log.log(Level.SEVERE, ie.toString(), ie);
+				JOptionPane.showMessageDialog(null, ie.getMessage(), 
+						ie.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			}
+			catch (Exception e) {
+				log.log(Level.SEVERE, e.toString(), e);
+				JOptionPane.showMessageDialog(null, e.getMessage(), 
+						e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		pbar.setValue(0);

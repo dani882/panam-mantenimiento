@@ -1,9 +1,9 @@
 package com.cementopanam.jrivera.modelo;
 
 /**
- * Entidad para manipular la Base de Datos
+ * Entidad para conectarse a la Base de Datos
  * @author Jesus Rivera
- * @version 1.3.0
+ * @version 1.6.1
  */
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +24,7 @@ public class ConeccionBD {
 	private static ConeccionBD cbd = new ConeccionBD();
 
 	// Hace que el constructor no pueda ser instanciado
-	private ConeccionBD() {
-	}
+	private ConeccionBD() {}
 
 	// Obtiene el unico Objeto Disponible
 	public static ConeccionBD getInstance() {
@@ -60,6 +59,8 @@ public class ConeccionBD {
 		catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 			log.log(Level.SEVERE, e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
+			System.exit(0);
 		}
 
 		return con;

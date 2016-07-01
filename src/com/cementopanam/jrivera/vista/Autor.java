@@ -18,7 +18,7 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * @author Jesus Rivera
- * @version 1.5.4
+ * @version 1.6.1
  */
 public class Autor extends JDialog {
 
@@ -90,6 +90,6 @@ public class Autor extends JDialog {
 		JTextArea txtrAplicacionUtilizadaPara = new JTextArea();
 		scrollPane.setViewportView(txtrAplicacionUtilizadaPara);
 		txtrAplicacionUtilizadaPara.setText(
-				"Aplicacion utilizada para el registro e informe de paros.\r\n\r\nEn colaboraci\u00F3n con:\r\nIng. Alfredo Amstrong\r\n\r\nAgradecimientos a:\r\nIng. Juan Carlos Fernandez\r\nIng. Jose Pagan");
+				"Aplicacion utilizada para el registro e informe de paros.\r\n\r\nEn colaboración con:\r\nIng. Alfredo Amstrong\r\nIng. Juan Carlos Fernandez\r\nIng. Jose Pagan");
 	}
 }

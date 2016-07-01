@@ -9,12 +9,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -36,8 +39,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -48,6 +53,7 @@ import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
 import com.cementopanam.jrivera.vista.ModificacionParo;
+import com.cementopanam.jrivera.vista.Principal;
 import com.cementopanam.jrivera.vista.helper.tablaModelo.TablaModeloEquipoSolucion;
 import com.cementopanam.jrivera.vista.helper.tablaModelo.TablaModeloParo;
 import com.toedter.calendar.JDateChooser;
@@ -59,9 +65,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
-import javax.swing.JTextField;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class Reportes extends JInternalFrame implements ItemListener {
 
@@ -82,11 +85,12 @@ public class Reportes extends JInternalFrame implements ItemListener {
 
 	private SimpleDateFormat df;
 	private JTable tablaResultado;
-	
+
 	private TablaModeloParo modeloParo = new TablaModeloParo();
 	private TablaModeloEquipoSolucion equipoSolucion = new TablaModeloEquipoSolucion();
-	
+
 	private JButton btnBuscar;
+	private JButton btnInformeGenerarReporte;
 	public JTabbedPane tabbedPane;
 	private JCheckBox chckbxFiltrarPor;
 	private JList<String> listSubArea;
@@ -125,121 +129,119 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		JPanel panelInformes = new JPanel();
 		tabbedPane.addTab("Informes", null, panelInformes, null);
 
-		JButton btnInformeGenerarReporte = new JButton("Generar Reporte");
+		btnInformeGenerarReporte = new JButton("Generar Reporte");
 		btnInformeGenerarReporte.setIcon(new ImageIcon(Reportes.class.getResource("/iconos32x32/report32x32.png")));
 		btnInformeGenerarReporte.setFont(new Font("Verdana", Font.PLAIN, 12));
 		btnInformeGenerarReporte.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+
 				generarReporte();
 
 			}
 		});
 
 		JPanel panelInformeRangoFecha = new JPanel();
-		panelInformeRangoFecha.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229), 2, true), "Opciones de Reporte", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
+		panelInformeRangoFecha.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229), 2, true),
+				"Opciones de Reporte", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
 		panelInformeRangoFecha.setLayout(null);
 		GroupLayout gl_panelInformes = new GroupLayout(panelInformes);
-		gl_panelInformes.setHorizontalGroup(
-			gl_panelInformes.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panelInformes.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panelInformes.createParallelGroup(Alignment.LEADING)
-						.addComponent(panelInformeRangoFecha, GroupLayout.DEFAULT_SIZE, 809, Short.MAX_VALUE)
-						.addComponent(btnInformeGenerarReporte))
-					.addContainerGap())
-		);
-		gl_panelInformes.setVerticalGroup(
-			gl_panelInformes.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panelInformes.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(panelInformeRangoFecha, GroupLayout.PREFERRED_SIZE, 332, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 208, Short.MAX_VALUE)
-					.addComponent(btnInformeGenerarReporte)
-					.addContainerGap())
-		);
-		
-				JLabel lblTipoDeReporte = new JLabel("Tipo de Reporte");
-				lblTipoDeReporte.setBounds(20, 34, 104, 16);
-				panelInformeRangoFecha.add(lblTipoDeReporte);
-				lblTipoDeReporte.setFont(new Font("Verdana", Font.BOLD, 12));
-				
-						cbTipoReporte = new JComboBox<String>();
-						cbTipoReporte.setBounds(187, 28, 154, 29);
-						panelInformeRangoFecha.add(cbTipoReporte);
-						cbTipoReporte.setModel(
-								new DefaultComboBoxModel<String>(new String[] {"Rango de Fecha", "Rango de Fecha(excel)", "Frecuentes", "Duracion"}));
-						cbTipoReporte.setSelectedIndex(-1);
-						cbTipoReporte.setFont(new Font("Verdana", Font.PLAIN, 12));
-						
-						JPanel panelReportesRangoFecha = new JPanel();
-						panelReportesRangoFecha.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true), "Rango de Fecha", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-						panelReportesRangoFecha.setBounds(20, 84, 347, 111);
-						panelInformeRangoFecha.add(panelReportesRangoFecha);
-						panelReportesRangoFecha.setLayout(null);
-						
-								JLabel lblFechaDeInicio = new JLabel("Fecha de Inicio");
-								lblFechaDeInicio.setBounds(10, 30, 105, 15);
-								panelReportesRangoFecha.add(lblFechaDeInicio);
-								lblFechaDeInicio.setFont(new Font("Verdana", Font.BOLD, 12));
-								
-										JLabel lblFechaFin = new JLabel("Fecha Fin");
-										lblFechaFin.setBounds(10, 61, 105, 15);
-										panelReportesRangoFecha.add(lblFechaFin);
-										lblFechaFin.setFont(new Font("Verdana", Font.BOLD, 12));
-										
-												informeDCFechaDesde = new JDateChooser();
-												informeDCFechaDesde.setBounds(165, 21, 155, 28);
-												panelReportesRangoFecha.add(informeDCFechaDesde);
-												informeDCFechaDesde.getCalendarButton().setFont(new Font("Verdana", Font.PLAIN, 12));
-												
-														informeDCFechaHasta = new JDateChooser();
-														informeDCFechaHasta.setBounds(165, 61, 155, 28);
-														panelReportesRangoFecha.add(informeDCFechaHasta);
-														informeDCFechaHasta.getCalendarButton().setFont(new Font("Verdana", Font.PLAIN, 12));
-														
-														JSeparator separator = new JSeparator();
-														separator.setOrientation(SwingConstants.VERTICAL);
-														separator.setBounds(403, 11, 12, 299);
-														panelInformeRangoFecha.add(separator);
-														
-														chckbxFiltrarPor = new JCheckBox("Filtrar:");
-														chckbxFiltrarPor.setEnabled(false);
-														chckbxFiltrarPor.setMnemonic('F');
-														chckbxFiltrarPor.setFont(new Font("Verdana", Font.PLAIN, 12));
-														chckbxFiltrarPor.setBounds(421, 28, 97, 23);
-														chckbxFiltrarPor.setSelected(false);
-														chckbxFiltrarPor.addItemListener(this);
-														panelInformeRangoFecha.add(chckbxFiltrarPor);
-														
-														cbReporteArea = new JComboBox<String>();
-														cbReporteArea.setEnabled(false);
-														cbReporteArea.setSelectedIndex(-1);
-														cbReporteArea.setFont(new Font("Verdana", Font.PLAIN, 12));
-														cbReporteArea.setBounds(425, 99, 347, 29);
-														panelInformeRangoFecha.add(cbReporteArea);
-														
-														lblArea = new JLabel("Area");
-														lblArea.setEnabled(false);
-														lblArea.setFont(new Font("Verdana", Font.PLAIN, 12));
-														lblArea.setBounds(425, 74, 46, 14);
-														panelInformeRangoFecha.add(lblArea);
-														
-														scrollPaneSubArea = new JScrollPane();
-														scrollPaneSubArea.setEnabled(false);
-														scrollPaneSubArea.setBounds(425, 180, 347, 130);
-														panelInformeRangoFecha.add(scrollPaneSubArea);
-														
-														listSubArea = new JList<String>();
-														listSubArea.setEnabled(false);
-														listSubArea.setFont(new Font("Verdana", Font.PLAIN, 12));
-														scrollPaneSubArea.setColumnHeaderView(listSubArea);
-														
-														lblSubarea = new JLabel("SubArea");
-														lblSubarea.setEnabled(false);
-														lblSubarea.setFont(new Font("Verdana", Font.PLAIN, 12));
-														lblSubarea.setBounds(425, 155, 75, 14);
-														panelInformeRangoFecha.add(lblSubarea);
+		gl_panelInformes
+				.setHorizontalGroup(gl_panelInformes.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panelInformes.createSequentialGroup().addContainerGap()
+								.addGroup(gl_panelInformes.createParallelGroup(Alignment.LEADING)
+										.addComponent(panelInformeRangoFecha, GroupLayout.DEFAULT_SIZE, 809,
+												Short.MAX_VALUE)
+										.addComponent(btnInformeGenerarReporte))
+								.addContainerGap()));
+		gl_panelInformes.setVerticalGroup(gl_panelInformes.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panelInformes.createSequentialGroup().addContainerGap()
+						.addComponent(panelInformeRangoFecha, GroupLayout.PREFERRED_SIZE, 332,
+								GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.RELATED, 208, Short.MAX_VALUE)
+						.addComponent(btnInformeGenerarReporte).addContainerGap()));
+
+		JLabel lblTipoDeReporte = new JLabel("Tipo de Reporte");
+		lblTipoDeReporte.setBounds(20, 34, 104, 16);
+		panelInformeRangoFecha.add(lblTipoDeReporte);
+		lblTipoDeReporte.setFont(new Font("Verdana", Font.BOLD, 12));
+
+		cbTipoReporte = new JComboBox<String>();
+		cbTipoReporte.setBounds(187, 28, 154, 29);
+		panelInformeRangoFecha.add(cbTipoReporte);
+		cbTipoReporte.setModel(new DefaultComboBoxModel<String>(
+				new String[] { "Rango de Fecha", "Rango de Fecha(excel)", "Frecuentes", "Duracion" }));
+		cbTipoReporte.setSelectedIndex(-1);
+		cbTipoReporte.setFont(new Font("Verdana", Font.PLAIN, 12));
+
+		JPanel panelReportesRangoFecha = new JPanel();
+		panelReportesRangoFecha.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true),
+				"Rango de Fecha", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panelReportesRangoFecha.setBounds(20, 84, 347, 111);
+		panelInformeRangoFecha.add(panelReportesRangoFecha);
+		panelReportesRangoFecha.setLayout(null);
+
+		JLabel lblFechaDeInicio = new JLabel("Fecha de Inicio");
+		lblFechaDeInicio.setBounds(10, 30, 105, 15);
+		panelReportesRangoFecha.add(lblFechaDeInicio);
+		lblFechaDeInicio.setFont(new Font("Verdana", Font.BOLD, 12));
+
+		JLabel lblFechaFin = new JLabel("Fecha Fin");
+		lblFechaFin.setBounds(10, 61, 105, 15);
+		panelReportesRangoFecha.add(lblFechaFin);
+		lblFechaFin.setFont(new Font("Verdana", Font.BOLD, 12));
+
+		informeDCFechaDesde = new JDateChooser();
+		informeDCFechaDesde.setBounds(165, 21, 155, 28);
+		panelReportesRangoFecha.add(informeDCFechaDesde);
+		informeDCFechaDesde.getCalendarButton().setFont(new Font("Verdana", Font.PLAIN, 12));
+
+		informeDCFechaHasta = new JDateChooser();
+		informeDCFechaHasta.setBounds(165, 61, 155, 28);
+		panelReportesRangoFecha.add(informeDCFechaHasta);
+		informeDCFechaHasta.getCalendarButton().setFont(new Font("Verdana", Font.PLAIN, 12));
+
+		JSeparator separator = new JSeparator();
+		separator.setOrientation(SwingConstants.VERTICAL);
+		separator.setBounds(403, 11, 12, 299);
+		panelInformeRangoFecha.add(separator);
+
+		chckbxFiltrarPor = new JCheckBox("Filtrar:");
+		chckbxFiltrarPor.setEnabled(false);
+		chckbxFiltrarPor.setMnemonic('F');
+		chckbxFiltrarPor.setFont(new Font("Verdana", Font.PLAIN, 12));
+		chckbxFiltrarPor.setBounds(421, 28, 97, 23);
+		chckbxFiltrarPor.setSelected(false);
+		chckbxFiltrarPor.addItemListener(this);
+		panelInformeRangoFecha.add(chckbxFiltrarPor);
+
+		cbReporteArea = new JComboBox<String>();
+		cbReporteArea.setEnabled(false);
+		cbReporteArea.setSelectedIndex(-1);
+		cbReporteArea.setFont(new Font("Verdana", Font.PLAIN, 12));
+		cbReporteArea.setBounds(425, 99, 347, 29);
+		panelInformeRangoFecha.add(cbReporteArea);
+
+		lblArea = new JLabel("Area");
+		lblArea.setEnabled(false);
+		lblArea.setFont(new Font("Verdana", Font.PLAIN, 12));
+		lblArea.setBounds(425, 74, 46, 14);
+		panelInformeRangoFecha.add(lblArea);
+
+		scrollPaneSubArea = new JScrollPane();
+		scrollPaneSubArea.setEnabled(false);
+		scrollPaneSubArea.setBounds(425, 180, 347, 130);
+		panelInformeRangoFecha.add(scrollPaneSubArea);
+
+		listSubArea = new JList<String>();
+		listSubArea.setEnabled(false);
+		listSubArea.setFont(new Font("Verdana", Font.PLAIN, 12));
+		scrollPaneSubArea.setColumnHeaderView(listSubArea);
+
+		lblSubarea = new JLabel("SubArea");
+		lblSubarea.setEnabled(false);
+		lblSubarea.setFont(new Font("Verdana", Font.PLAIN, 12));
+		lblSubarea.setBounds(425, 155, 75, 14);
+		panelInformeRangoFecha.add(lblSubarea);
 		panelInformes.setLayout(gl_panelInformes);
 		panelBusqueda.setLayout(null);
 
@@ -275,9 +277,9 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		tablaResultado.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				
+
 				if (e.getKeyCode() == KeyEvent.VK_ENTER && (!(chckbxBuscarSoluciones.isSelected()))) {
-					
+
 					modificarParo();
 				}
 			}
@@ -288,9 +290,9 @@ public class Reportes extends JInternalFrame implements ItemListener {
 			public void mouseClicked(MouseEvent e) {
 
 				if (e.getClickCount() == 2 && !e.isConsumed() && (!(chckbxBuscarSoluciones.isSelected()))) {
-					
+
 					modificarParo();
-					
+
 				}
 			}
 		});
@@ -305,13 +307,13 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		btnBuscar = new JButton("Buscar");
 		btnBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				
-				if(chckbxBuscarSoluciones.isSelected()) {
+
+				if (chckbxBuscarSoluciones.isSelected()) {
 					mostrarSolucion();
 				}
-				
-				else buscarParo();
+
+				else
+					buscarParo();
 
 			}
 		});
@@ -345,29 +347,29 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		busquedaDCFechaDesde.getCalendarButton().setFont(new Font("Verdana", Font.PLAIN, 12));
 		busquedaDCFechaDesde.setBounds(85, 23, 159, 25);
 		panelRangoFecha.add(busquedaDCFechaDesde);
-		
+
 		JSeparator separator_1 = new JSeparator();
 		separator_1.setOrientation(SwingConstants.VERTICAL);
 		separator_1.setBounds(402, 11, 9, 133);
 		panelBusqueda.add(separator_1);
-		
+
 		chckbxBuscarSoluciones = new JCheckBox("Buscar Soluciones");
 		chckbxBuscarSoluciones.setFont(new Font("Verdana", Font.PLAIN, 12));
 		chckbxBuscarSoluciones.setBounds(417, 18, 153, 23);
 		chckbxBuscarSoluciones.addItemListener(this);
 		panelBusqueda.add(chckbxBuscarSoluciones);
-		
+
 		lblCodigoDeEquipo = new JLabel("Codigo de Equipo");
 		lblCodigoDeEquipo.setEnabled(false);
 		lblCodigoDeEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
 		lblCodigoDeEquipo.setBounds(421, 65, 121, 23);
 		panelBusqueda.add(lblCodigoDeEquipo);
-		
+
 		txtSoluciones = new JTextField();
 		txtSoluciones.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				
+
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 
 					mostrarSolucion();
@@ -380,139 +382,171 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		txtSoluciones.setBounds(549, 63, 270, 29);
 		panelBusqueda.add(txtSoluciones);
 		txtSoluciones.setColumns(10);
-		setBounds(60, 26, 850, 663);
+		setBounds(60, 2, 850, 663);
 
 		// Actualiza el JTable en el panel de Busqueda
 		modeloParo.fireTableDataChanged();
 	}
 
 	private void mostrarSolucion() {
-		
-		try{
-			
+
+		try {
+
 			equipoSolucion.buscarSolucion(txtSoluciones.getText());
 			tablaResultado.setModel(equipoSolucion);
 		}
-		
-		catch(NullPointerException npe) {
+
+		catch (NullPointerException npe) {
 			tablaResultado.setModel(equipoSolucion);
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			log.log(Level.SEVERE, e.toString(), e);
 		}
 	}
-	
-	
+
 	private void buscarParo() {
-		
-		try{
+
+		try {
 			df = new SimpleDateFormat(formatoFecha);
-			
+
 			String fInicio = df.format(busquedaDCFechaDesde.getDate().getTime());
 			String fFin = df.format(busquedaDCFechaHasta.getDate().getTime());
-			
+
 			Paro paro = new Paro();
 			paro.setTiempoInicio(fInicio);
 			paro.setTiempoFin(fFin);
 
-			
-			if(paro.getTiempoInicio().equals(null) || paro.getTiempoFin().equals(null)) {
+			if (paro.getTiempoInicio().equals(null) || paro.getTiempoFin().equals(null)) {
 				modeloParo.buscarParo(new Paro(), "");
 				tablaResultado.setModel(modeloParo);
-			}
-			else {
+			} else {
 				modeloParo.buscarParo(paro, "fecha");
 				tablaResultado.setModel(modeloParo);
 			}
 		}
-		
-		catch(NullPointerException npe) {
+
+		catch (NullPointerException npe) {
 			modeloParo.buscarParo(new Paro(), "");
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			log.log(Level.SEVERE, e.toString(), e);
 		}
 	}
 
 	private void generarReporte() {
-		
-		df = new SimpleDateFormat(formatoFecha);
 
-		String fechaInicio = df.format(informeDCFechaDesde.getDate().getTime());
-		String fechaFin = df.format(informeDCFechaHasta.getDate().getTime());
+		if (cbTipoReporte.getSelectedIndex() < 0) {
+			JOptionPane.showMessageDialog(null, "Debe elegir un tipo de Reporte", "Tipo de Reporte",
+					JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
 
-		ManipulacionDatos md = new ManipulacionDatos();
-		Connection con = md.obtenerConexion();
-		Map<String, Object> parametro = new HashMap<String, Object>();
-		String archivo = "";
-		String titulo = "";
+		SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
 
-		try (InputStream in = getClass().getResourceAsStream("/properties/paros.properties");) {
-			// Carga las propiedades del archivo
-			Properties pros = new Properties();
-			pros.load(in);
+			@Override
+			protected Void doInBackground() throws Exception {
 
-			switch (cbTipoReporte.getSelectedIndex()) {
-			case 0:
-				// Paros por Rango de fecha
-				archivo = pros.getProperty("fecha");
-				titulo = "Fecha";
-				break;
-			
-			case 1:
-				// Paros por Rango de fecha optimizado para excel
-				archivo = pros.getProperty("excel");
-				titulo = "Fecha";
-				// Sirve para que el reporte sea de una pagina
-				parametro.put(JRParameter.IS_IGNORE_PAGINATION, true);
-				break;
-			case 2:
-				// Paros por Frecuencia
-				archivo = pros.getProperty("frecuencia");
-				titulo = "Frecuencia";
-				break;
-			case 3:
-				// Paros por duracion
-				archivo = pros.getProperty("duracion");
-				titulo = "Duracion";
-				break;
-			default:
-				JOptionPane.showMessageDialog(null, "Debe elegir un tipo de Paro");
-				break;
+				publish();
+				df = new SimpleDateFormat(formatoFecha);
+
+				Map<String, Object> parametro = new HashMap<String, Object>();
+				String archivo = "";
+				String titulo = "";
+
+				try (InputStream in = getClass().getResourceAsStream("/properties/paros.properties");) {
+					// Carga las propiedades del archivo
+					Properties pros = new Properties();
+					pros.load(in);
+
+					switch (cbTipoReporte.getSelectedIndex()) {
+					case 0:
+						// Paros por Rango de fecha
+						archivo = pros.getProperty("fecha");
+						titulo = "Fecha";
+						break;
+
+					case 1:
+						// Paros por Rango de fecha optimizado para excel
+						archivo = pros.getProperty("excel");
+						titulo = "Fecha";
+						// Sirve para que el reporte sea de una pagina
+						parametro.put(JRParameter.IS_IGNORE_PAGINATION, true);
+						break;
+					case 2:
+						// Paros por Frecuencia
+						archivo = pros.getProperty("frecuencia");
+						titulo = "Frecuencia";
+						break;
+					case 3:
+						// Paros por duracion
+						archivo = pros.getProperty("duracion");
+						titulo = "Duracion";
+						break;
+					}
+
+					try {
+
+						String fechaInicio = df.format(informeDCFechaDesde.getDate().getTime());
+						String fechaFin = df.format(informeDCFechaHasta.getDate().getTime());
+
+						// Conecta a la Base de Datos para la generacion del
+						// reporte
+						ManipulacionDatos md = new ManipulacionDatos();
+						Connection con = md.obtenerConexion();
+
+						parametro.put("fechaInicio", fechaInicio);
+						parametro.put("fechaFin", fechaFin);
+
+						JasperReport jr = (JasperReport) JRLoader.loadObjectFromFile(archivo);
+						JasperPrint jp = JasperFillManager.fillReport(jr, parametro, con);
+
+						JasperViewer jv = new JasperViewer(jp, false);
+						jv.setVisible(true);
+						jv.setTitle("Reporte de Paros por " + titulo);
+					} catch (JRException ex) {
+						log.log(Level.SEVERE, ex.toString(), ex);
+						JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(),
+								JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (NullPointerException npe) {
+					JOptionPane.showMessageDialog(null, "Debe elegir un rango de Fecha", "Rango de Fecha",
+							JOptionPane.INFORMATION_MESSAGE);
+				} catch (Exception e) {
+					log.log(Level.SEVERE, e.toString(), e);
+					JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
+							JOptionPane.ERROR_MESSAGE);
+				}
+				return null;
+
 			}
 
-			try {
-				
-				parametro.put("fechaInicio", fechaInicio);
-				parametro.put("fechaFin", fechaFin);
-
-				JasperReport jr = (JasperReport) JRLoader.loadObjectFromFile(archivo);
-				JasperPrint jp = JasperFillManager.fillReport(jr, parametro, con);
-
-				JasperViewer jv = new JasperViewer(jp, false);
-				jv.setVisible(true);
-				jv.setTitle("Reporte de Paros por " + titulo);
-			} 
-			catch (JRException ex) {
-				log.log(Level.SEVERE, ex.toString(), ex);
-				JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(),
-						JOptionPane.ERROR_MESSAGE);
+			@Override
+			protected void process(List<String> chunks) {
+				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/loading.gif")));
+				Principal.lblStatusBar.setText("Generando Reporte. Espere...");
+				btnInformeGenerarReporte.setVisible(false);
+				btnInformeGenerarReporte.setEnabled(false);
 			}
-		}
-		catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
-					JOptionPane.ERROR_MESSAGE);
-		}
+
+			// Can safely update the GUI from this method.
+			@Override
+			protected void done() {
+
+				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
+				Principal.lblStatusBar.setText("Listo");
+				btnInformeGenerarReporte.setVisible(true);
+				btnInformeGenerarReporte.setEnabled(true);
+			}
+		};
+
+		worker.execute();
 	}
-		
+
 	/**
 	 * Abre la interfaz para modificar los valores de un paro
 	 */
 	private void modificarParo() {
-		
+
 		int fila = tablaResultado.getSelectedRow();
 		int columna = tablaResultado.getSelectedColumn();
 
@@ -530,8 +564,8 @@ public class Reportes extends JInternalFrame implements ItemListener {
 			disciplina = String.valueOf(tablaResultado.getValueAt(fila, 5));
 			causa = String.valueOf(tablaResultado.getValueAt(fila, 6));
 			descripcionAdicional = String.valueOf(tablaResultado.getValueAt(fila, 7));
-			
-			if(descripcionAdicional.equals(null) || descripcionAdicional.equals("")) {
+
+			if (descripcionAdicional.equals(null) || descripcionAdicional.equals("")) {
 				descripcionAdicional = "";
 			}
 			tiempoInicio = String.valueOf(tablaResultado.getValueAt(fila, 8));
@@ -539,52 +573,55 @@ public class Reportes extends JInternalFrame implements ItemListener {
 			solucion = String.valueOf(tablaResultado.getValueAt(fila, 10));
 		}
 
-		ModificacionParo modificacion = new ModificacionParo(new Paro(codigoParo, tiempoInicio, tiempoFin,
-				solucion, causa, descripcionAdicional, disciplina), new AdministracionParos(),
-				getDesktopPane());
+		ModificacionParo modificacion = new ModificacionParo(
+				new Paro(codigoParo, tiempoInicio, tiempoFin, solucion, causa, descripcionAdicional, disciplina),
+				new AdministracionParos(), getDesktopPane());
 
 		setVisible(false);
 		modificacion.setVisible(true);
-		
+
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
 	 */
 	public void itemStateChanged(ItemEvent e) {
-	    
-	    Object source = e.getItemSelectable();
 
-	    if (source == chckbxFiltrarPor) {
-	    	
-	    	lblArea.setEnabled(true);
-	    	lblSubarea.setEnabled(true);
-	    	listSubArea.setEnabled(true);
-	    	cbReporteArea.setEnabled(true);
-	    	scrollPaneSubArea.setEnabled(true);
-	    	
-	    } else if (source == chckbxBuscarSoluciones) {
-	    	
-	    	lblCodigoDeEquipo.setEnabled(true);
-	    	txtSoluciones.setEnabled(true);
-	    	
-	    	busquedaDCFechaDesde.setEnabled(false);
-	    	busquedaDCFechaHasta.setEnabled(false);
-	    }
+		Object source = e.getItemSelectable();
 
-	    if (e.getStateChange() == ItemEvent.DESELECTED) {
-	    	
-	    	lblArea.setEnabled(false);
-	    	lblSubarea.setEnabled(false);
-	    	listSubArea.setEnabled(false);
-	    	cbReporteArea.setEnabled(false);
-	    	scrollPaneSubArea.setEnabled(false);
-	    	
-	    	lblCodigoDeEquipo.setEnabled(false);
-	    	txtSoluciones.setEnabled(false);
-	    	
-	    	busquedaDCFechaDesde.setEnabled(true);
-	    	busquedaDCFechaHasta.setEnabled(true);
-	    }
+		if (source == chckbxFiltrarPor) {
+
+			lblArea.setEnabled(true);
+			lblSubarea.setEnabled(true);
+			listSubArea.setEnabled(true);
+			cbReporteArea.setEnabled(true);
+			scrollPaneSubArea.setEnabled(true);
+
+		} else if (source == chckbxBuscarSoluciones) {
+
+			lblCodigoDeEquipo.setEnabled(true);
+			txtSoluciones.setEnabled(true);
+
+			busquedaDCFechaDesde.setEnabled(false);
+			busquedaDCFechaHasta.setEnabled(false);
+		}
+
+		if (e.getStateChange() == ItemEvent.DESELECTED) {
+
+			lblArea.setEnabled(false);
+			lblSubarea.setEnabled(false);
+			listSubArea.setEnabled(false);
+			cbReporteArea.setEnabled(false);
+			scrollPaneSubArea.setEnabled(false);
+
+			lblCodigoDeEquipo.setEnabled(false);
+			txtSoluciones.setEnabled(false);
+
+			busquedaDCFechaDesde.setEnabled(true);
+			busquedaDCFechaHasta.setEnabled(true);
+		}
 	}
 }

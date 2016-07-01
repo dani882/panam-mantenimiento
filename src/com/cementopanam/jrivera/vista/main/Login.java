@@ -11,7 +11,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,6 +27,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
@@ -122,6 +125,8 @@ public class Login extends JFrame {
 				} catch (Exception e) {
 					log.log(Level.SEVERE, e.toString(), e);
 					JOptionPane.showMessageDialog(null, e.getMessage());
+					JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
+					System.exit(0);
 				}
 			}
 		});
@@ -137,7 +142,7 @@ public class Login extends JFrame {
 
 	private void initComponents() {
 
-		setTitle("Iniciar Session");
+		setTitle("Iniciar Sesion");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(552, 305);
 		setResizable(false);
@@ -212,108 +217,165 @@ public class Login extends JFrame {
 		btnAcceder.setBounds(363, 224, 167, 42);
 		contentPane.add(btnAcceder);
 	}
-	
-	public boolean validarUsuario() {
 
-		String usuario = txtUsuario.getText();
-		char[] password = pwdClave.getPassword();
+	private void validarUsuario() {
 
-		String clave = "";
+		SwingWorker<String, String> worker = new SwingWorker<String, String>() {
 
-		for (char c : password) {
-			clave += c;
-		}
-		md = new ManipulacionDatos();
-		Principal principal = new Principal();
+			/**
+			 * Metodo que realiza la tarea pesada
+			 */
+			@Override
+			protected String doInBackground() throws Exception {
 
-		try {
-			rs = md.autenticarUsuario(usuario, clave);
-			// si los datos son correctos, entra al formulario
-			if (rs.next()) {
-				int tipoUsuario = rs.getInt("id_tipo_usuario");
-				String estadoUsuario = rs.getString("estatus");
-				String nombreUsuario = rs.getString("nombre_usuario");
+				lblIncorrecto.setVisible(true);
+				publish();
 
-				if (tipoUsuario == 1 && estadoUsuario.equalsIgnoreCase("activo")) {
-					// Interfaz de Administrador
-					log.info("Es Administrador");
-					// Desactiva la ventana imputacion en el usuario admin
-					if(nombreUsuario.equalsIgnoreCase("admin")) {
-						principal.btnImputaciones.setVisible(false);
+				txtUsuario.setEnabled(false);
+				btnAcceder.setEnabled(false);
+				btnAcceder.setVisible(false);
+				String usuario = txtUsuario.getText();
+				char[] password = pwdClave.getPassword();
+
+				String clave = "";
+
+				for (char c : password) {
+					clave += c;
+				}
+
+				pwdClave.setEnabled(false);
+				md = new ManipulacionDatos();
+				Principal principal = new Principal();
+
+				try {
+					rs = md.autenticarUsuario(usuario, clave);
+					// si los datos son correctos, entra al formulario
+					if (rs.next()) {
+						int tipoUsuario = rs.getInt("id_tipo_usuario");
+						String estadoUsuario = rs.getString("estatus");
+						String nombreUsuario = rs.getString("nombre_usuario");
+
+						if (tipoUsuario == 1 && estadoUsuario.equalsIgnoreCase("activo")) {
+							// Interfaz de Administrador
+							log.info("Es Administrador");
+							// Desactiva la ventana imputacion en el usuario
+							// admin
+							if (nombreUsuario.equalsIgnoreCase("admin")) {
+								principal.btnImputaciones.setVisible(false);
+							}
+							// guardarUsuario();
+
+							// Ejecuta la Pantalla Principal con el Thread de la
+							// Barra de Estado
+							SwingUtilities.invokeLater(principal);
+
+							Principal.usuarioActual.setText(getNombreUsuario());
+							principal.setVisible(true);
+							dispose();
+
+							// return true;
+						} else if (tipoUsuario == 2 && estadoUsuario.equalsIgnoreCase("activo")) {
+							// Interfaz de el Operador
+							log.info("Es Operador");
+							// guardarUsuario();
+							SwingUtilities.invokeLater(principal);
+
+							Principal.usuarioActual.setText(getNombreUsuario());
+							principal.btnReportes.setVisible(false);
+							principal.btnAdministrar.setVisible(false);
+
+							principal.setVisible(true);
+							dispose();
+
+							// return true;
+						} else if (tipoUsuario == 3 && estadoUsuario.equalsIgnoreCase("activo")) {
+							// Interfaz de el Consultor
+							log.info("Es Consultor");
+							SwingUtilities.invokeLater(principal);
+
+							Principal.usuarioActual.setText(getNombreUsuario());
+							principal.btnImputaciones.setVisible(false);
+							principal.btnAdministrar.setVisible(false);
+							principal.setVisible(true);
+							dispose();
+
+							// return true;
+						} else {
+							lblIncorrecto.setVisible(true);
+							// lblIncorrecto.setText("El Usuario no esta
+							// activo");
+							return "El Usuario no esta activo";
+						}
 					}
-					// guardarUsuario();
 
-					// Ejecuta la Pantalla Principal con el Thread de la Barra
-					// de Estado
-					SwingUtilities.invokeLater(principal);
+					else {
+						lblIncorrecto.setVisible(true);
+						// lblIncorrecto.setText("Credenciales invalidos!");
+						return "Credenciales invalidos!";
+					}
+				} catch (SQLException sqle) {
+					log.log(Level.SEVERE, sqle.toString(), sqle);
+					JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+							JOptionPane.ERROR_MESSAGE);
+					// return false;
+
+				} catch (Exception e) {
+					log.log(Level.SEVERE, e.toString(), e);
+					JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
+							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
+					System.exit(0);
+					// return false;
+				}
+				return "";
+			}
+
+			@Override
+			// Can safely update the GUI from this method.
+			protected void process(List<String> chunks) {
+				// Here we receive the values that we publish().
+				// They may come grouped in chunks.
+				// int mostRecentValue = chunks.get(chunks.size()-1);
+
+				lblIncorrecto.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/loading.gif")));
+				lblIncorrecto.setText("Comprobando credenciales. Espere...");
+		//		lblIncorrecto.setText(chunks.toString());
+				// countLabel1.setText(Integer.toString(mostRecentValue));
+			}
+
+			// Can safely update the GUI from this method.
+			@Override
+			protected void done() {
+				String estado;
+				try {
+					// Retrieve the return value of doInBackground.
+					estado = get();
+					lblIncorrecto.setText(estado);
+					lblIncorrecto.setIcon(null);
+					txtUsuario.setEnabled(true);
+					pwdClave.setEnabled(true);
+					btnAcceder.setEnabled(true);
+					btnAcceder.setVisible(true);
+
+				} catch (InterruptedException e) {
+					// This is thrown if the thread's interrupted.
+				} catch (ExecutionException e) {
+					// This is thrown if we throw an exception
+					// from doInBackground.
+				} finally {
 					// Cierra la conexion
 					md.cerrarConexiones();
-
-					Principal.usuarioActual.setText(getNombreUsuario());
-					principal.setVisible(true);
-					dispose();
-					
-					return true;
-				} else if (tipoUsuario == 2 && estadoUsuario.equalsIgnoreCase("activo")) {
-					// Interfaz de el Operador
-					log.info("Es Operador");
-					// guardarUsuario();
-
-					SwingUtilities.invokeLater(principal);
-					// Cierra la conexion
-					md.cerrarConexiones();
-					
-					Principal.usuarioActual.setText(getNombreUsuario());
-					principal.btnReportes.setVisible(false);
-					principal.btnAdministrar.setVisible(false);
-					
-					principal.setVisible(true);
-					dispose();
-					
-					return true;
-				} else if (tipoUsuario == 3 && estadoUsuario.equalsIgnoreCase("activo")) {
-					// Interfaz de el Consultor
-					log.info("Es Consultor");
-					SwingUtilities.invokeLater(principal);
-					// Cierra la conexion
-					md.cerrarConexiones();
-
-					Principal.usuarioActual.setText(getNombreUsuario());
-					principal.btnImputaciones.setVisible(false);
-					principal.btnAdministrar.setVisible(false);
-					principal.setVisible(true);
-					dispose();
-					
-					return true;
-				} else {
-					lblIncorrecto.setVisible(true);
-					lblIncorrecto.setText("El Usuario no esta activo");
-					return false;
 				}
 			}
 
-			else {
-				lblIncorrecto.setVisible(true);
-				lblIncorrecto.setText("Credenciales invalidos!");
-				return false;
-			}
-		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
-			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
-					JOptionPane.ERROR_MESSAGE);
-			return false;
-		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
+		};
+
+		worker.execute();
 	}
 
 	private String getNombreUsuario() {
 		return txtUsuario.getText().toLowerCase();
 	}
-
-
 
 	private void passwordFieldKeyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {

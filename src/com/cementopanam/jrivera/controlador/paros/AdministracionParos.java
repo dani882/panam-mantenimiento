@@ -17,10 +17,10 @@ import com.cementopanam.jrivera.modelo.ConeccionBD;
 
 public class AdministracionParos extends ManipulacionDatos {
 
-	private static final Logger log = Logger.getLogger( AdministracionParos.class.getName() );
+	private static final Logger log = Logger.getLogger(AdministracionParos.class.getName());
 	private ConeccionBD cbd;
 	private Connection con = null;
-	private ResultSet rs = null;
+	private CallableStatement cs = null;
 
 	private String formatoFecha = "yyyy-MM-dd HH:mm:ss";
 
@@ -40,22 +40,24 @@ public class AdministracionParos extends ManipulacionDatos {
 			}
 		}
 	}
-	
+
 	/**
 	 * Muestra los paros en la busqueda de paros
+	 * 
 	 * @return el listado de Paros
 	 */
 	public ArrayList<Paro> mostrarParo(Paro p, String filtro) {
 
 		ArrayList<Paro> lista = new ArrayList<Paro>();
-		
-		try(Connection con = cbd.conectarABaseDatos();
+		ResultSet rs = null;
+
+		try (Connection con = cbd.conectarABaseDatos();
 				CallableStatement cs = con.prepareCall("{call sp_buscar_paro(?,?,?)}");) {
 
 			cs.setString(1, p.getTiempoInicio());
 			cs.setString(2, p.getTiempoFin());
 			cs.setString(3, filtro);
-			
+
 			rs = cs.executeQuery();
 
 			while (rs.next()) {
@@ -86,21 +88,23 @@ public class AdministracionParos extends ManipulacionDatos {
 		return lista;
 	}
 
-	
 	/**
 	 * Guarda los paros a la base de datos
-	 * @param imp - informaciones del paro para guardar al sistema
-	 * @return - true si la operacion fue exitosa, false - si no se compleeto la operacion
+	 * 
+	 * @param imp
+	 *            - informaciones del paro para guardar al sistema
+	 * @return - true si la operacion fue exitosa, false - si no se compleeto la
+	 *         operacion
 	 * @throws SQLException
 	 */
-	public boolean imputarParo(Imputacion imp) throws SQLException{
-		
-		//Verifica si el tiempo de inicio es superior al tiempo de fin
+	public boolean imputarParo(Imputacion imp) throws SQLException {
+
+		// Verifica si el tiempo de inicio es superior al tiempo de fin
 		if (compararFecha(imp.getTiempoInicio(), imp.getTiempoFin(), formatoFecha) == false) {
 			return false;
 		}
 
-		try(Connection con = cbd.conectarABaseDatos();
+		try (Connection con = cbd.conectarABaseDatos();
 				CallableStatement cs = con.prepareCall("{call sp_insertar_paro(?,?,?,?,?,?,?,?,?,?)}");) {
 
 			cs.setString(1, imp.getCausa()); // Causa
@@ -110,24 +114,16 @@ public class AdministracionParos extends ManipulacionDatos {
 			cs.setString(5, imp.getDisciplina()); // Disciplina
 			cs.setString(6, imp.getTiempoInicio()); // Tiempo de Inicio
 			cs.setString(7, imp.getTiempoFin()); // Tiempo de Fin
-			cs.setString(8, imp.getEstadoEquipo()); // Estado del Equipo (Activo o Inactivo)
-			cs.setString(9, imp.getEstadoParo()); // Estado del Paro (Completado o Pendiente)
-			cs.setString(10, imp.getSolucion()); // Solucion del paro, null si paro esta Pendiente
+			cs.setString(8, imp.getEstadoEquipo()); // Estado del Equipo (Activo
+													// o Inactivo)
+			cs.setString(9, imp.getEstadoParo()); // Estado del Paro (Completado
+													// o Pendiente)
+			cs.setString(10, imp.getSolucion()); // Solucion del paro, null si
+													// paro esta Pendiente
 
 			cs.execute();
 			con.commit();
-			
-			log.info("Causa: " + imp.getCausa());
-			log.info("Causa Extendida: " + imp.getCausaExtendida());
-			log.info("Codigo Equipo: " + imp.getEquipo());
-			log.info("Nombre de Usuario: " + imp.getUsuario());
-			log.info("Disciplina: " + imp.getDisciplina());
-			log.info("Tiempo de Inicio: " + imp.getTiempoInicio());
-			log.info("Tiempo de Fin: " + imp.getTiempoFin());
-			log.info("Estado de Equipo: " + imp.getEstadoEquipo());
-			log.info("Estado de Paro: " + imp.getEstadoParo());
-			log.info("Solucion: " + imp.getSolucion());
-			
+
 		} catch (SQLException sqle) {
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
@@ -141,26 +137,29 @@ public class AdministracionParos extends ManipulacionDatos {
 			return false;
 		}
 		return true;
-		
+
 	}
-	
-	
+
 	/**
 	 * Modifica el paro seleccionado
-	 * @param p - atributos de la entidad
-	 * @param idCausa - indice de la causa
+	 * 
+	 * @param p
+	 *            - atributos de la entidad
+	 * @param idCausa
+	 *            - indice de la causa
 	 * @return - true si fue exitoso, false si no se completa la operacion
 	 * @throws SQLException
 	 */
 	public boolean modificarParo(Paro p, int idCausa) throws SQLException {
 
+		// Comprueba si la fecha de fin es menor a la Fecha de Inicio
 		if (compararFecha(p.getTiempoInicio(), p.getTiempoFin(), formatoFecha) == false) {
 			return false;
 		}
 
-		try(Connection con = cbd.conectarABaseDatos();
+		try (Connection con = cbd.conectarABaseDatos();
 				CallableStatement cs = con.prepareCall("{call sp_modificar_paro(?,?,?,?,?,?,?,?)}");) {
-			
+
 			cs.setInt(1, p.getCodigo());
 			cs.setString(2, p.getSolucion());
 			cs.setString(3, p.getTiempoInicio());
@@ -172,16 +171,14 @@ public class AdministracionParos extends ManipulacionDatos {
 
 			cs.execute();
 			con.commit();
-		} 
-		catch (SQLException sqle) {
+		} catch (SQLException sqle) {
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			con.rollback();
 			log.log(Level.SEVERE, sqle.toString(), sqle);
 			return false;
-			
-		} 
-		catch (Exception e) {
+
+		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			con.rollback();
 			log.log(Level.SEVERE, e.toString(), e);
@@ -189,7 +186,7 @@ public class AdministracionParos extends ManipulacionDatos {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Actualiza el paro de Pendiente a Completado
 	 * 
@@ -201,7 +198,7 @@ public class AdministracionParos extends ManipulacionDatos {
 	 * @throws SQLException
 	 */
 	public boolean actualizarParo(Paro paro) throws SQLException {
-		
+
 		// Verifica si la fecha de Fin es Mayor a Fecha Inicio de Paro
 		ComparacionFechas cf = new ComparacionFechas();
 		boolean comparacionFechas = cf.compararFechas(paro.getTiempoInicio(), paro.getTiempoFin(), formatoFecha);
@@ -220,30 +217,73 @@ public class AdministracionParos extends ManipulacionDatos {
 		}
 
 		else {
-			
-			try(Connection con = cbd.conectarABaseDatos();
+
+			try (Connection con = cbd.conectarABaseDatos();
 					CallableStatement cs = con.prepareCall("{call sp_actualizar_paro(?,?,?)}");) {
-				
+
 				cs.setInt(1, paro.getCodigo());
 				cs.setString(2, paro.getTiempoFin());
 				cs.setString(3, paro.getSolucion());
-		
+
 				cs.execute();
 				con.commit();
 			}
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Modifica el paro pendiente seleccionado
+	 * 
+	 * @param p
+	 *            - atributos de la entidad
+	 * @param idCausa
+	 *            - indice de la causa
+	 * @return - true si fue exitoso, false si no se completa la operacion
+	 * @throws SQLException
+	 */
+	public boolean modificarParoPendiente(Paro p, int idCausa) throws SQLException {
+
+		try (Connection con = cbd.conectarABaseDatos();
+				CallableStatement cs = con.prepareCall("{call sp_modificar_paro_pendiente(?,?,?,?,?,?,?)}");) {
+
+			cs.setInt(1, p.getCodigo());
+			cs.setString(2, p.getTiempoInicio());
+			cs.setString(3, p.getDisciplina());
+			cs.setString(4, p.getCausa());
+			cs.setString(5, p.getDescripcionAdicional());
+			cs.setString(6, p.getEquipo());
+			cs.setInt(7, idCausa);
+
+			cs.execute();
+			con.commit();
+		} catch (SQLException sqle) {
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+			con.rollback();
+			log.log(Level.SEVERE, sqle.toString(), sqle);
+			return false;
+
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			con.rollback();
+			log.log(Level.SEVERE, e.toString(), e);
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Elimina el paro seleccionado
-	 * @param idParo - indice del paro a ser eliminar
+	 * 
+	 * @param idParo
+	 *            - indice del paro a ser eliminar
 	 * @return - true si fue exitoso, false si no se completa la operacion
 	 * @throws SQLException
 	 */
 	public boolean eliminarParo(int idCausa) throws SQLException {
 
-		try(Connection con = cbd.conectarABaseDatos();
+		try (Connection con = cbd.conectarABaseDatos();
 				CallableStatement cs = con.prepareCall("{call sp_eliminar_paro(?)}");) {
 
 			cs.setInt(1, idCausa);
@@ -256,9 +296,8 @@ public class AdministracionParos extends ManipulacionDatos {
 			con.rollback();
 			log.log(Level.SEVERE, sqle.toString(), sqle);
 			return false;
-			
-		}
-		catch (Exception e) {
+
+		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			con.rollback();
 			log.log(Level.SEVERE, e.toString(), e);
@@ -266,7 +305,6 @@ public class AdministracionParos extends ManipulacionDatos {
 		}
 		return true;
 	}
-	
 
 	/**
 	 * @param causa
@@ -280,21 +318,20 @@ public class AdministracionParos extends ManipulacionDatos {
 		int resultado = 0;
 
 		// Valida si la descripcion adicional esta vacia o nula
-		int longitud = causa.length();
-		if (longitud == 0) {
+		if (causa.length() == 0) {
 
 			return resultado = buscarIndice(causa, "causa");
 		}
 
-		try(Connection con = cbd.conectarABaseDatos();
+		try (Connection con = cbd.conectarABaseDatos();
 				CallableStatement cs = con.prepareCall("{call sp_buscar_causa(?,?,?)}");) {
-			
+
 			cs.setString(1, causa);
 			cs.setString(2, descripcion);
 			cs.registerOutParameter(3, java.sql.Types.INTEGER);
 
 			cs.executeQuery();
-			//Muestra el ID de causa obtenida de la Base de Datos
+			// Muestra el ID de causa obtenida de la Base de Datos
 			resultado = cs.getInt(3);
 
 		} catch (SQLException sqle) {
@@ -307,22 +344,24 @@ public class AdministracionParos extends ManipulacionDatos {
 		}
 		return resultado;
 	}
-	
-	/**Cuenta la cantidad de Paros Pendientes por Completar
+
+	/**
+	 * Cuenta la cantidad de Paros Pendientes por Completar
+	 * 
 	 * @return el numero de paros pendientes
 	 */
 	public int contarPendientes() {
-	
+
 		int resultado = 0;
 
-		try(Connection con = cbd.conectarABaseDatos();
+		try (Connection con = cbd.conectarABaseDatos();
 				CallableStatement cs = con.prepareCall("{call sp_contar_paros_pendientes(?)}");) {
-			
+
 			log.info("Conectado de Contador Paros Pendientes");
 			cs.registerOutParameter(1, java.sql.Types.INTEGER);
 
 			cs.executeQuery();
-			//Muestra la cantidad de Paros Pendientes
+			// Muestra la cantidad de Paros Pendientes
 			resultado = cs.getInt(1);
 
 		} catch (SQLException sqle) {
@@ -335,5 +374,25 @@ public class AdministracionParos extends ManipulacionDatos {
 		}
 		log.info("Desconectado de Contador Paros Pendientes");
 		return resultado;
+	}
+
+	public ResultSet mostrarDetallePendiente(int codigoParo) throws SQLException {
+
+		try {
+
+			con = cbd.conectarABaseDatos();
+			cs = con.prepareCall("{call sp_mostrar_detalle_pendiente(?)}");
+
+			cs.setInt(1, codigoParo);
+
+		} catch (SQLException sqle) {
+			log.log(Level.SEVERE, sqle.toString(), sqle);
+			JOptionPane.showMessageDialog(null, sqle.getMessage());
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.toString(), e);
+			JOptionPane.showMessageDialog(null, e.getMessage());
+		}
+
+		return cs.executeQuery();
 	}
 }
