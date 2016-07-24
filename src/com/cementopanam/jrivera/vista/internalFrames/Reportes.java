@@ -14,7 +14,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.InputStream;
+import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
@@ -93,7 +97,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	private JButton btnInformeGenerarReporte;
 	public JTabbedPane tabbedPane;
 	private JCheckBox chckbxFiltrarPor;
-	private JList<String> listSubArea;
+	private JList<String> listReporteSubArea;
 	private JComboBox<String> cbReporteArea;
 	private JLabel lblArea;
 	private JLabel lblSubarea;
@@ -101,12 +105,31 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	private JTextField txtSoluciones;
 	private JCheckBox chckbxBuscarSoluciones;
 	private JLabel lblCodigoDeEquipo;
+	
+	private AdministracionParos admParo;
+	private ResultSet rs = null;
 
 	/**
 	 * Crea el frame.
 	 */
 	public Reportes() {
 		initComponents();
+		admParo = new AdministracionParos();
+		
+		
+		try {
+			// Rellena combo Causa
+			rs = admParo.rellenarCombo("area", null);
+			
+			while (rs.next()) {
+				cbReporteArea.addItem(rs.getString("nombre_area"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		cbReporteArea.setSelectedIndex(-1);
 	}
 
 	private void initComponents() {
@@ -206,7 +229,6 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		panelInformeRangoFecha.add(separator);
 
 		chckbxFiltrarPor = new JCheckBox("Filtrar:");
-		chckbxFiltrarPor.setEnabled(false);
 		chckbxFiltrarPor.setMnemonic('F');
 		chckbxFiltrarPor.setFont(new Font("Verdana", Font.PLAIN, 12));
 		chckbxFiltrarPor.setBounds(421, 28, 97, 23);
@@ -215,6 +237,12 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		panelInformeRangoFecha.add(chckbxFiltrarPor);
 
 		cbReporteArea = new JComboBox<String>();
+		cbReporteArea.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				poblarJListSubArea();
+			}
+		});
 		cbReporteArea.setEnabled(false);
 		cbReporteArea.setSelectedIndex(-1);
 		cbReporteArea.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -232,10 +260,10 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		scrollPaneSubArea.setBounds(425, 180, 347, 130);
 		panelInformeRangoFecha.add(scrollPaneSubArea);
 
-		listSubArea = new JList<String>();
-		listSubArea.setEnabled(false);
-		listSubArea.setFont(new Font("Verdana", Font.PLAIN, 12));
-		scrollPaneSubArea.setColumnHeaderView(listSubArea);
+		listReporteSubArea = new JList<String>();
+		listReporteSubArea.setEnabled(false);
+		listReporteSubArea.setFont(new Font("Verdana", Font.PLAIN, 12));
+		scrollPaneSubArea.setColumnHeaderView(listReporteSubArea);
 
 		lblSubarea = new JLabel("SubArea");
 		lblSubarea.setEnabled(false);
@@ -590,17 +618,17 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	 */
 	public void itemStateChanged(ItemEvent e) {
 
-		Object source = e.getItemSelectable();
+		Object origen = e.getItemSelectable();
 
-		if (source == chckbxFiltrarPor) {
+		if (origen == chckbxFiltrarPor) {
 
 			lblArea.setEnabled(true);
 			lblSubarea.setEnabled(true);
-			listSubArea.setEnabled(true);
+			listReporteSubArea.setEnabled(true);
 			cbReporteArea.setEnabled(true);
 			scrollPaneSubArea.setEnabled(true);
 
-		} else if (source == chckbxBuscarSoluciones) {
+		} else if (origen == chckbxBuscarSoluciones) {
 
 			lblCodigoDeEquipo.setEnabled(true);
 			txtSoluciones.setEnabled(true);
@@ -613,7 +641,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 
 			lblArea.setEnabled(false);
 			lblSubarea.setEnabled(false);
-			listSubArea.setEnabled(false);
+			listReporteSubArea.setEnabled(false);
 			cbReporteArea.setEnabled(false);
 			scrollPaneSubArea.setEnabled(false);
 
@@ -623,5 +651,29 @@ public class Reportes extends JInternalFrame implements ItemListener {
 			busquedaDCFechaDesde.setEnabled(true);
 			busquedaDCFechaHasta.setEnabled(true);
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void poblarJListSubArea() {
+		
+		DefaultListModel<String> modelo = new DefaultListModel<String>();
+		String area = String.valueOf(cbReporteArea.getSelectedItem());
+		
+		try {
+		//	rs.close();
+			rs = admParo.rellenarCombo("subArea", area);
+			
+		    while (rs.next()) {
+		    	
+		        modelo.addElement(rs.getString("nombre_sub_area"));
+		    }
+		} catch (SQLException sqle) {
+			// TODO Auto-generated catch block
+			sqle.printStackTrace();
+		}
+
+		    listReporteSubArea.setModel(modelo);
 	}
 }

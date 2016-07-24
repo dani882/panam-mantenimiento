@@ -131,6 +131,7 @@ public class ModificacionPendiente extends JDialog {
 	}
 
 	public ModificacionPendiente() {
+		setResizable(false);
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -349,9 +350,9 @@ public class ModificacionPendiente extends JDialog {
 	private void mostrarImputacion() {
 
 		Imputaciones imp = new Imputaciones();
+		imp.mostrarPendientes();
 		desktopPane.add(imp);
 		imp.setVisible(true);
-		imp.mostrarPendientes();
 		dispose();
 	}
 

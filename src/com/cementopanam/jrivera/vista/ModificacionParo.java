@@ -36,13 +36,15 @@ import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
 import com.cementopanam.jrivera.vista.helper.JComboBoxPersonalizado;
 import com.cementopanam.jrivera.vista.internalFrames.Reportes;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class ModificacionParo extends JDialog {
 
 	/**
 	 * 
 	 */
-	private static final Logger LOG = Logger.getLogger( ModificacionParo.class.getName() );
+	private static final Logger LOG = Logger.getLogger(ModificacionParo.class.getName());
 	private static final long serialVersionUID = -7239938319668117403L;
 	private final JPanel contentPanel = new JPanel();
 	private JButton btnGuardar;
@@ -78,21 +80,20 @@ public class ModificacionParo extends JDialog {
 				cbCausa.addItem(rs.getString("tipo_causa"));
 			}
 			// Rellena combo Disciplina
-			 rs = admParo.rellenarCombo("disciplina", null);
+			rs = admParo.rellenarCombo("disciplina", null);
 			while (rs.next()) {
 				cbDisciplina.addItem(rs.getString("nombre_disciplina"));
 			}
 
-		} 
-		catch (SQLException e) {
-			 LOG.log(Level.SEVERE, e.toString(), e);
+		} catch (SQLException e) {
+			LOG.log(Level.SEVERE, e.toString(), e);
 		}
 
 		codigoParo = modificacion.getCodigo();
 
 		// Obtiene el codigo de Causa
 		if (modificacion.getDescripcionAdicional().length() == 0) {
-			
+
 			codigoCausa = admParo.buscarIndiceCausa(modificacion.getCausa(), "");
 		} else {
 			codigoCausa = admParo.buscarIndiceCausa(modificacion.getCausa(), modificacion.getDescripcionAdicional());
@@ -107,6 +108,8 @@ public class ModificacionParo extends JDialog {
 	}
 
 	public ModificacionParo() {
+		setResizable(false);
+
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -167,62 +170,67 @@ public class ModificacionParo extends JDialog {
 		scrollPaneDescripcionAdicional.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"),
 				"Descripcion Adicional", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
-		gl_contentPanel.setHorizontalGroup(
-			gl_contentPanel.createParallelGroup(Alignment.LEADING)
+		gl_contentPanel.setHorizontalGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(scrollPaneSolucion, GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE))
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addGap(8)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblTiempoInicio)
-								.addComponent(lblDisciplina))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-								.addComponent(cbDisciplina, GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
-								.addComponent(txtTiempoInicio, GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE))))
-					.addGap(18)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
-								.addComponent(lblCausa, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(lblTiempoFin, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(cbCausa, Alignment.TRAILING, 0, 182, Short.MAX_VALUE)
-								.addComponent(txtTiempoFin, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)))
-						.addComponent(scrollPaneDescripcionAdicional, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
-					.addContainerGap())
-		);
+						.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+								.addGroup(gl_contentPanel.createSequentialGroup().addContainerGap().addComponent(
+										scrollPaneSolucion, GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE))
+								.addGroup(gl_contentPanel.createSequentialGroup().addGap(8)
+										.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+												.addComponent(lblTiempoInicio).addComponent(lblDisciplina))
+										.addPreferredGap(ComponentPlacement.UNRELATED)
+										.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+												.addComponent(cbDisciplina, GroupLayout.DEFAULT_SIZE, 174,
+														Short.MAX_VALUE)
+												.addComponent(txtTiempoInicio, GroupLayout.DEFAULT_SIZE, 174,
+														Short.MAX_VALUE))))
+						.addGap(18).addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING).addGroup(
+								gl_contentPanel
+										.createSequentialGroup().addGroup(
+												gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
+														.addComponent(lblCausa, GroupLayout.DEFAULT_SIZE,
+																GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(lblTiempoFin, GroupLayout.DEFAULT_SIZE,
+																GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+										.addPreferredGap(ComponentPlacement.UNRELATED)
+										.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+												.addComponent(cbCausa, Alignment.TRAILING, 0, 182,
+														Short.MAX_VALUE)
+												.addComponent(txtTiempoFin, GroupLayout.DEFAULT_SIZE, 182,
+														Short.MAX_VALUE)))
+								.addComponent(scrollPaneDescripcionAdicional, GroupLayout.DEFAULT_SIZE, 308,
+										Short.MAX_VALUE))
+						.addContainerGap()));
 		gl_contentPanel.setVerticalGroup(
-			gl_contentPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addGap(38)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblTiempoInicio)
-								.addComponent(txtTiempoInicio, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(cbDisciplina, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblDisciplina)))
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(txtTiempoFin, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblTiempoFin))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(cbCausa, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblCausa))))
-					.addGap(54)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(scrollPaneSolucion, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
-						.addComponent(scrollPaneDescripcionAdicional, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(25, Short.MAX_VALUE))
-		);
+				gl_contentPanel.createParallelGroup(Alignment.LEADING).addGroup(gl_contentPanel.createSequentialGroup()
+						.addGap(38).addGroup(gl_contentPanel
+								.createParallelGroup(Alignment.LEADING).addGroup(gl_contentPanel.createSequentialGroup()
+										.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+												.addComponent(lblTiempoInicio).addComponent(txtTiempoInicio,
+														GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))
+										.addPreferredGap(ComponentPlacement.UNRELATED)
+										.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+												.addComponent(cbDisciplina,
+														GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
+												.addComponent(lblDisciplina)))
+								.addGroup(
+										gl_contentPanel.createSequentialGroup()
+												.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+														.addComponent(txtTiempoFin, GroupLayout.PREFERRED_SIZE, 27,
+																GroupLayout.PREFERRED_SIZE)
+														.addComponent(lblTiempoFin))
+												.addPreferredGap(ComponentPlacement.UNRELATED)
+												.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+														.addComponent(cbCausa, GroupLayout.PREFERRED_SIZE, 31,
+																GroupLayout.PREFERRED_SIZE)
+														.addComponent(lblCausa))))
+						.addGap(54)
+						.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(scrollPaneSolucion, GroupLayout.PREFERRED_SIZE, 137,
+										GroupLayout.PREFERRED_SIZE)
+								.addComponent(scrollPaneDescripcionAdicional, GroupLayout.PREFERRED_SIZE, 137,
+										GroupLayout.PREFERRED_SIZE))
+						.addContainerGap(25, Short.MAX_VALUE)));
 
 		txtDescripcionAdicional = new JTextArea();
 		txtDescripcionAdicional.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -270,6 +278,7 @@ public class ModificacionParo extends JDialog {
 				btnBorrar = new JButton("Borrar");
 				btnBorrar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+
 						eliminarParo(codigoCausa);
 					}
 				});
@@ -289,11 +298,13 @@ public class ModificacionParo extends JDialog {
 
 	/**
 	 * Elimina el paro seleccionado
-	 * @param idCausa - codigo del paro que se eliminara
+	 * 
+	 * @param idCausa
+	 *            - codigo del paro que se eliminara
 	 */
 	private void eliminarParo(int idCausa) {
 
-		//Coloca el boton de OptonPane en Español
+		// Coloca el boton de OptonPane en Español
 		UIManager.put("OptionPane.yesButtonText", "Si");
 		int respuesta = JOptionPane.showConfirmDialog(null, "¿Esta seguro que desea borrar este paro?",
 				"Confirmar Borrado", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -350,8 +361,8 @@ public class ModificacionParo extends JDialog {
 		// Si el paro fue exitoso
 		try {
 			if (admParo.modificarParo(
-					new Paro(codigoParo, tiempoInicio, tiempoFin, solucion, causa, 
-							descripcionAdicional, disciplina), codigoCausa) == true) {
+					new Paro(codigoParo, tiempoInicio, tiempoFin, solucion, causa, descripcionAdicional, disciplina),
+					codigoCausa) == true) {
 
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Paro Actualizado correctamente");
