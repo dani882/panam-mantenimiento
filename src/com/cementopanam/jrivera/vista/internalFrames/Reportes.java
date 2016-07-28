@@ -14,11 +14,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.InputStream;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +54,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
+import com.cementopanam.jrivera.controlador.entidad.Causa;
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
 import com.cementopanam.jrivera.vista.ModificacionParo;
@@ -96,7 +97,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	private JButton btnBuscar;
 	private JButton btnInformeGenerarReporte;
 	public JTabbedPane tabbedPane;
-	private JCheckBox chckbxFiltrarPor;
+	private JCheckBox chckbxReporteFiltrarPor;
 	private JList<String> listReporteSubArea;
 	private JComboBox<String> cbReporteArea;
 	private JLabel lblArea;
@@ -105,31 +106,37 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	private JTextField txtSoluciones;
 	private JCheckBox chckbxBuscarSoluciones;
 	private JLabel lblCodigoDeEquipo;
-	
+
 	private AdministracionParos admParo;
-	private ResultSet rs = null;
+	private static final int MAX_SUBAREA = 10;
+	// private ResultSet rs = null;
 
 	/**
 	 * Crea el frame.
 	 */
 	public Reportes() {
 		initComponents();
+
 		admParo = new AdministracionParos();
-		
-		
-		try {
+		try (ResultSet rs = admParo.rellenarCombo("area", null);) {
 			// Rellena combo Causa
-			rs = admParo.rellenarCombo("area", null);
-			
 			while (rs.next()) {
+
 				cbReporteArea.addItem(rs.getString("nombre_area"));
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		cbReporteArea.setSelectedIndex(-1);
+		// Muestra las subAreas del Area seleccionada
+		cbReporteArea.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				poblarJListSubArea();
+			}
+		});
+
 	}
 
 	private void initComponents() {
@@ -225,39 +232,39 @@ public class Reportes extends JInternalFrame implements ItemListener {
 
 		JSeparator separator = new JSeparator();
 		separator.setOrientation(SwingConstants.VERTICAL);
-		separator.setBounds(403, 11, 12, 299);
+		separator.setBounds(450, 11, 12, 299);
 		panelInformeRangoFecha.add(separator);
 
-		chckbxFiltrarPor = new JCheckBox("Filtrar:");
-		chckbxFiltrarPor.setMnemonic('F');
-		chckbxFiltrarPor.setFont(new Font("Verdana", Font.PLAIN, 12));
-		chckbxFiltrarPor.setBounds(421, 28, 97, 23);
-		chckbxFiltrarPor.setSelected(false);
-		chckbxFiltrarPor.addItemListener(this);
-		panelInformeRangoFecha.add(chckbxFiltrarPor);
+		chckbxReporteFiltrarPor = new JCheckBox("Filtrar:");
+		chckbxReporteFiltrarPor.setMnemonic('F');
+		chckbxReporteFiltrarPor.setFont(new Font("Verdana", Font.PLAIN, 12));
+		chckbxReporteFiltrarPor.setBounds(508, 28, 154, 23);
+		chckbxReporteFiltrarPor.setSelected(false);
+		chckbxReporteFiltrarPor.addItemListener(this);
+		panelInformeRangoFecha.add(chckbxReporteFiltrarPor);
 
 		cbReporteArea = new JComboBox<String>();
-		cbReporteArea.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-				poblarJListSubArea();
-			}
-		});
+		/*
+		 * cbReporteArea.addActionListener(new ActionListener() { public void
+		 * actionPerformed(ActionEvent e) {
+		 * 
+		 * poblarJListSubArea(); } });
+		 */
 		cbReporteArea.setEnabled(false);
 		cbReporteArea.setSelectedIndex(-1);
 		cbReporteArea.setFont(new Font("Verdana", Font.PLAIN, 12));
-		cbReporteArea.setBounds(425, 99, 347, 29);
+		cbReporteArea.setBounds(508, 99, 408, 29);
 		panelInformeRangoFecha.add(cbReporteArea);
 
 		lblArea = new JLabel("Area");
 		lblArea.setEnabled(false);
 		lblArea.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblArea.setBounds(425, 74, 46, 14);
+		lblArea.setBounds(508, 74, 408, 14);
 		panelInformeRangoFecha.add(lblArea);
 
 		scrollPaneSubArea = new JScrollPane();
 		scrollPaneSubArea.setEnabled(false);
-		scrollPaneSubArea.setBounds(425, 180, 347, 130);
+		scrollPaneSubArea.setBounds(508, 180, 408, 130);
 		panelInformeRangoFecha.add(scrollPaneSubArea);
 
 		listReporteSubArea = new JList<String>();
@@ -268,7 +275,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		lblSubarea = new JLabel("SubArea");
 		lblSubarea.setEnabled(false);
 		lblSubarea.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblSubarea.setBounds(425, 155, 75, 14);
+		lblSubarea.setBounds(508, 155, 136, 14);
 		panelInformeRangoFecha.add(lblSubarea);
 		panelInformes.setLayout(gl_panelInformes);
 		panelBusqueda.setLayout(null);
@@ -276,7 +283,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		JPanel panel_Resultado = new JPanel();
 		panel_Resultado.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Resultado de Busqueda",
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel_Resultado.setBounds(0, 155, 820, 437);
+		panel_Resultado.setBounds(10, 155, 948, 306);
 		panelBusqueda.add(panel_Resultado);
 		panel_Resultado.setLayout(new BorderLayout(0, 0));
 
@@ -378,19 +385,19 @@ public class Reportes extends JInternalFrame implements ItemListener {
 
 		JSeparator separator_1 = new JSeparator();
 		separator_1.setOrientation(SwingConstants.VERTICAL);
-		separator_1.setBounds(402, 11, 9, 133);
+		separator_1.setBounds(476, 11, 9, 133);
 		panelBusqueda.add(separator_1);
 
 		chckbxBuscarSoluciones = new JCheckBox("Buscar Soluciones");
 		chckbxBuscarSoluciones.setFont(new Font("Verdana", Font.PLAIN, 12));
-		chckbxBuscarSoluciones.setBounds(417, 18, 153, 23);
+		chckbxBuscarSoluciones.setBounds(546, 20, 153, 23);
 		chckbxBuscarSoluciones.addItemListener(this);
 		panelBusqueda.add(chckbxBuscarSoluciones);
 
 		lblCodigoDeEquipo = new JLabel("Codigo de Equipo");
 		lblCodigoDeEquipo.setEnabled(false);
 		lblCodigoDeEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
-		lblCodigoDeEquipo.setBounds(421, 65, 121, 23);
+		lblCodigoDeEquipo.setBounds(550, 67, 121, 23);
 		panelBusqueda.add(lblCodigoDeEquipo);
 
 		txtSoluciones = new JTextField();
@@ -407,10 +414,10 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		txtSoluciones.setToolTipText("Escriba el codigo de equipo para ver sus Soluciones");
 		txtSoluciones.setEnabled(false);
 		txtSoluciones.setFont(new Font("Verdana", Font.PLAIN, 12));
-		txtSoluciones.setBounds(549, 63, 270, 29);
+		txtSoluciones.setBounds(678, 65, 270, 29);
 		panelBusqueda.add(txtSoluciones);
 		txtSoluciones.setColumns(10);
-		setBounds(60, 2, 850, 663);
+		setBounds(60, 2, 979, 532);
 
 		// Actualiza el JTable en el panel de Busqueda
 		modeloParo.fireTableDataChanged();
@@ -517,13 +524,40 @@ public class Reportes extends JInternalFrame implements ItemListener {
 						String fechaInicio = df.format(informeDCFechaDesde.getDate().getTime());
 						String fechaFin = df.format(informeDCFechaHasta.getDate().getTime());
 
-						// Conecta a la Base de Datos para la generacion del
-						// reporte
+						// Conecta a la Base de Datos para la generacion del reporte
 						ManipulacionDatos md = new ManipulacionDatos();
 						Connection con = md.obtenerConexion();
 
 						parametro.put("fechaInicio", fechaInicio);
 						parametro.put("fechaFin", fechaFin);
+
+						// Valida si el filtro esta activo
+						if (chckbxReporteFiltrarPor.isSelected()) {
+							parametro.put("f_area", String.valueOf(cbReporteArea.getSelectedItem()));
+
+							// Obtiene el indice de todos los elementos seleccionados
+							int[] indicesSeleccionados = listReporteSubArea.getSelectedIndices();
+
+							if (indicesSeleccionados.length > MAX_SUBAREA) {
+								JOptionPane.showMessageDialog(null, "Solo puede elegir maximo 10 subAreas",
+										"Limite SubArea", JOptionPane.INFORMATION_MESSAGE);
+								return null;
+							}
+
+							int i = 1;
+							for (; i <= indicesSeleccionados.length; i++) {
+								String seleccionSubArea = String.valueOf(
+										listReporteSubArea.getModel().getElementAt(indicesSeleccionados[i - 1]));
+
+								parametro.put("f_subArea" + i, seleccionSubArea);
+							}
+
+							// asigna null para los restantes
+							for (; i <= MAX_SUBAREA; i++) {
+								parametro.put("f_subArea" + i, null);
+
+							}
+						}
 
 						JasperReport jr = (JasperReport) JRLoader.loadObjectFromFile(archivo);
 						JasperPrint jp = JasperFillManager.fillReport(jr, parametro, con);
@@ -618,9 +652,9 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	 */
 	public void itemStateChanged(ItemEvent e) {
 
-		Object origen = e.getItemSelectable();
+		Object source = e.getItemSelectable();
 
-		if (origen == chckbxFiltrarPor) {
+		if (source == chckbxReporteFiltrarPor) {
 
 			lblArea.setEnabled(true);
 			lblSubarea.setEnabled(true);
@@ -628,7 +662,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 			cbReporteArea.setEnabled(true);
 			scrollPaneSubArea.setEnabled(true);
 
-		} else if (origen == chckbxBuscarSoluciones) {
+		} else if (source == chckbxBuscarSoluciones) {
 
 			lblCodigoDeEquipo.setEnabled(true);
 			txtSoluciones.setEnabled(true);
@@ -657,23 +691,23 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	 * 
 	 */
 	private void poblarJListSubArea() {
-		
+
 		DefaultListModel<String> modelo = new DefaultListModel<String>();
 		String area = String.valueOf(cbReporteArea.getSelectedItem());
-		
+
 		try {
-		//	rs.close();
-			rs = admParo.rellenarCombo("subArea", area);
-			
-		    while (rs.next()) {
-		    	
-		        modelo.addElement(rs.getString("nombre_sub_area"));
-		    }
+			// rs.close();
+			ResultSet rs = admParo.rellenarCombo("subArea", area);
+
+			while (rs.next()) {
+
+				modelo.addElement(rs.getString("nombre_sub_area"));
+			}
 		} catch (SQLException sqle) {
 			// TODO Auto-generated catch block
 			sqle.printStackTrace();
 		}
 
-		    listReporteSubArea.setModel(modelo);
+		listReporteSubArea.setModel(modelo);
 	}
 }
