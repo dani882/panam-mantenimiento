@@ -4,21 +4,23 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 
+import org.apache.log4j.Logger;
+
+import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.modelo.ConeccionBD;
 
 public class ManipulacionDatos {
 
-	private static final Logger log = Logger.getLogger(ManipulacionDatos.class.getName());
+	private static final Logger logger = Logger.getLogger(ManipulacionDatos.class);
 	private ConeccionBD cbd;
 	private Connection con = null;
 	private CallableStatement cs = null;
+	private CapturaUsuario captura = new CapturaUsuario();
 
 	public ManipulacionDatos() {
 
@@ -28,14 +30,16 @@ public class ManipulacionDatos {
 			try {
 				cbd.conectarABaseDatos();
 			} catch (Exception e) {
-				log.log(Level.SEVERE, e.toString(), e);
+				logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
 				JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+				return;
 			}
 		}
 	}
 
 	/**
 	 * Conecta a la Base de Datos
+	 * 
 	 * @return la conexion a la base de datos
 	 */
 	public Connection obtenerConexion() {
@@ -45,7 +49,7 @@ public class ManipulacionDatos {
 			cbd = ConeccionBD.getInstance();
 			con = cbd.conectarABaseDatos();
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
 			System.exit(0);
@@ -56,35 +60,35 @@ public class ManipulacionDatos {
 	/**
 	 * Agrega elementos a los comboBox
 	 * 
-	 * @param sentencia - condicion para saber que elemento para que comboBox rellenar
-	 * @param indice - indice solicitado por un elemento
+	 * @param sentencia
+	 *            - condicion para saber que elemento para que comboBox rellenar
+	 * @param indice
+	 *            - indice solicitado por un elemento
 	 * @return ResultSet de elementos para el comboBox
 	 */
 	public ResultSet rellenarCombo(String sentencia, String indice) throws SQLException {
-		
+
 		try {
-			
+
 			con = cbd.conectarABaseDatos();
 			cs = con.prepareCall("{call sp_rellenar_comboBox(?,?)}");
-			
+
 			cs.setString(1, sentencia);
 			cs.setString(2, indice);
-			
-		}
-		catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
-			JOptionPane.showMessageDialog(null, sqle.getMessage()); 
-		}
-		catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e); 
-			JOptionPane.showMessageDialog(null, e.getMessage()); 
+
+		} catch (SQLException sqle) {
+			logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: " + sqle.toString());
+			JOptionPane.showMessageDialog(null, sqle.getMessage());
+		} catch (Exception e) {
+			logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
 			System.exit(0);
 		}
-	
+
 		return cs.executeQuery();
 	}
-	 
+
 	/**
 	 * Visualiza el estado de los paros
 	 * 
@@ -98,7 +102,7 @@ public class ManipulacionDatos {
 		try {
 			con = cbd.conectarABaseDatos();
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -135,12 +139,12 @@ public class ManipulacionDatos {
 			resultado = cs.getInt(3);
 
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: " + sqle.toString());
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
-			
+
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
 			System.exit(0);
@@ -170,47 +174,49 @@ public class ManipulacionDatos {
 			if (comparacionFechas == true) {
 
 				try {
-					JOptionPane.showMessageDialog(null,
-							"La fecha Fin no puede ser Mayor a la Fecha de Inicio de Paro", "Comparacion Fechas",
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "La fecha Fin no puede ser Mayor a la Fecha de Inicio de Paro",
+							"Comparacion Fechas", JOptionPane.ERROR_MESSAGE);
 
 					return false;
 				} catch (Exception e) {
-					log.log(Level.WARNING, e.toString(), e);
+					logger.warn(e.toString(), e);
 				}
 			}
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Genera el listado de las disciplinas para mostrarlas en un JList
-	 * @param lista - JList que se va a poblar
+	 * 
+	 * @param lista
+	 *            - JList que se va a poblar
 	 * @throws SQLException
 	 */
 	public void poblarJList(JList<String> lista) throws SQLException {
-		
+
 		DefaultListModel<String> modelo = new DefaultListModel<String>();
-		
-		try(Connection  con = cbd.conectarABaseDatos();
-			    CallableStatement cs = con.prepareCall("{call sp_listar_disciplina()}");) {
 
-		    ResultSet rs = cs.executeQuery();
+		try (Connection con = cbd.conectarABaseDatos();
+				CallableStatement cs = con.prepareCall("{call sp_listar_disciplina()}");) {
 
-		    while (rs.next()) {
-		    	
-		        modelo.addElement(rs.getString("nombre_disciplina"));
-		    }
-		    lista.setModel(modelo);
+			ResultSet rs = cs.executeQuery();
 
-		}
-		catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			while (rs.next()) {
+
+				modelo.addElement(rs.getString("nombre_disciplina"));
+			}
+			lista.setModel(modelo);
+
+		} catch (SQLException sqle) {
+			logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ sqle.toString());
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ e.toString());
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
 			System.exit(0);
@@ -233,7 +239,8 @@ public class ManipulacionDatos {
 
 			con = cbd.conectarABaseDatos();
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ e.toString());
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
 			System.exit(0);
@@ -255,24 +262,21 @@ public class ManipulacionDatos {
 
 		try {
 
-	//		if (rs != null) {
-	//			rs.close();
-	//		}
-
 			if (cs != null) {
 				cs.close();
 			}
 
 			cbd.cerrarConexion();
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ sqle.toString());
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), 
-					JOptionPane.ERROR_MESSAGE);
+			logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ e.toString());
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
 			System.exit(0);
 		}

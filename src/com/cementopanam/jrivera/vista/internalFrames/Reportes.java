@@ -18,13 +18,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -53,10 +50,12 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import org.apache.log4j.Logger;
+
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
-import com.cementopanam.jrivera.controlador.entidad.Causa;
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
+import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.vista.ModificacionParo;
 import com.cementopanam.jrivera.vista.Principal;
 import com.cementopanam.jrivera.vista.helper.tablaModelo.TablaModeloEquipoSolucion;
@@ -76,7 +75,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	/**
 	 * 
 	 */
-	private static final Logger log = Logger.getLogger(Reportes.class.getName());
+	private static final Logger logger = Logger.getLogger(Reportes.class);
 	private static final long serialVersionUID = 3425343178839382975L;
 
 	private String formatoFecha = "yyyy-MM-dd";
@@ -102,14 +101,17 @@ public class Reportes extends JInternalFrame implements ItemListener {
 	private JComboBox<String> cbReporteArea;
 	private JLabel lblArea;
 	private JLabel lblSubarea;
-	private JScrollPane scrollPaneSubArea;
 	private JTextField txtSoluciones;
 	private JCheckBox chckbxBuscarSoluciones;
 	private JLabel lblCodigoDeEquipo;
 
 	private AdministracionParos admParo;
+	// Establece la cantidad maxima de subAreas que pueden ser seleccionadas
 	private static final int MAX_SUBAREA = 10;
-	// private ResultSet rs = null;
+	private JScrollPane scrollPaneSubArea;
+	
+	private CapturaUsuario captura = new CapturaUsuario();
+	private String usuarioLog = Principal.usuarioActual.getText();
 
 	/**
 	 * Crea el frame.
@@ -125,7 +127,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 				cbReporteArea.addItem(rs.getString("nombre_area"));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error(e.toString(), e);
 		}
 
 		cbReporteArea.setSelectedIndex(-1);
@@ -232,7 +234,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 
 		JSeparator separator = new JSeparator();
 		separator.setOrientation(SwingConstants.VERTICAL);
-		separator.setBounds(450, 11, 12, 299);
+		separator.setBounds(450, 28, 12, 282);
 		panelInformeRangoFecha.add(separator);
 
 		chckbxReporteFiltrarPor = new JCheckBox("Filtrar:");
@@ -244,12 +246,6 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		panelInformeRangoFecha.add(chckbxReporteFiltrarPor);
 
 		cbReporteArea = new JComboBox<String>();
-		/*
-		 * cbReporteArea.addActionListener(new ActionListener() { public void
-		 * actionPerformed(ActionEvent e) {
-		 * 
-		 * poblarJListSubArea(); } });
-		 */
 		cbReporteArea.setEnabled(false);
 		cbReporteArea.setSelectedIndex(-1);
 		cbReporteArea.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -264,13 +260,13 @@ public class Reportes extends JInternalFrame implements ItemListener {
 
 		scrollPaneSubArea = new JScrollPane();
 		scrollPaneSubArea.setEnabled(false);
-		scrollPaneSubArea.setBounds(508, 180, 408, 130);
+		scrollPaneSubArea.setBounds(508, 182, 406, 128);
 		panelInformeRangoFecha.add(scrollPaneSubArea);
 
 		listReporteSubArea = new JList<String>();
+		scrollPaneSubArea.setViewportView(listReporteSubArea);
 		listReporteSubArea.setEnabled(false);
 		listReporteSubArea.setFont(new Font("Verdana", Font.PLAIN, 12));
-		scrollPaneSubArea.setColumnHeaderView(listReporteSubArea);
 
 		lblSubarea = new JLabel("SubArea");
 		lblSubarea.setEnabled(false);
@@ -383,10 +379,10 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		busquedaDCFechaDesde.setBounds(85, 23, 159, 25);
 		panelRangoFecha.add(busquedaDCFechaDesde);
 
-		JSeparator separator_1 = new JSeparator();
-		separator_1.setOrientation(SwingConstants.VERTICAL);
-		separator_1.setBounds(476, 11, 9, 133);
-		panelBusqueda.add(separator_1);
+		JSeparator separador = new JSeparator();
+		separador.setOrientation(SwingConstants.VERTICAL);
+		separador.setBounds(476, 11, 9, 133);
+		panelBusqueda.add(separador);
 
 		chckbxBuscarSoluciones = new JCheckBox("Buscar Soluciones");
 		chckbxBuscarSoluciones.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -434,8 +430,8 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		catch (NullPointerException npe) {
 			tablaResultado.setModel(equipoSolucion);
 		} catch (Exception e) {
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-			log.log(Level.SEVERE, e.toString(), e);
 		}
 	}
 
@@ -463,8 +459,8 @@ public class Reportes extends JInternalFrame implements ItemListener {
 		catch (NullPointerException npe) {
 			modeloParo.buscarParo(new Paro(), "");
 		} catch (Exception e) {
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-			log.log(Level.SEVERE, e.toString(), e);
 		}
 	}
 
@@ -524,7 +520,8 @@ public class Reportes extends JInternalFrame implements ItemListener {
 						String fechaInicio = df.format(informeDCFechaDesde.getDate().getTime());
 						String fechaFin = df.format(informeDCFechaHasta.getDate().getTime());
 
-						// Conecta a la Base de Datos para la generacion del reporte
+						// Conecta a la Base de Datos para la generacion del
+						// reporte
 						ManipulacionDatos md = new ManipulacionDatos();
 						Connection con = md.obtenerConexion();
 
@@ -535,7 +532,8 @@ public class Reportes extends JInternalFrame implements ItemListener {
 						if (chckbxReporteFiltrarPor.isSelected()) {
 							parametro.put("f_area", String.valueOf(cbReporteArea.getSelectedItem()));
 
-							// Obtiene el indice de todos los elementos seleccionados
+							// Obtiene el indice de todos los elementos
+							// seleccionados
 							int[] indicesSeleccionados = listReporteSubArea.getSelectedIndices();
 
 							if (indicesSeleccionados.length > MAX_SUBAREA) {
@@ -565,16 +563,19 @@ public class Reportes extends JInternalFrame implements ItemListener {
 						JasperViewer jv = new JasperViewer(jp, false);
 						jv.setVisible(true);
 						jv.setTitle("Reporte de Paros por " + titulo);
+						
 					} catch (JRException ex) {
-						log.log(Level.SEVERE, ex.toString(), ex);
+						logger.error(ex.toString(), ex);
 						JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(),
 								JOptionPane.ERROR_MESSAGE);
 					}
+					
 				} catch (NullPointerException npe) {
 					JOptionPane.showMessageDialog(null, "Debe elegir un rango de Fecha", "Rango de Fecha",
 							JOptionPane.INFORMATION_MESSAGE);
+					
 				} catch (Exception e) {
-					log.log(Level.SEVERE, e.toString(), e);
+					logger.error(e.toString(), e);
 					JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
 				}
@@ -598,6 +599,12 @@ public class Reportes extends JInternalFrame implements ItemListener {
 				Principal.lblStatusBar.setText("Listo");
 				btnInformeGenerarReporte.setVisible(true);
 				btnInformeGenerarReporte.setEnabled(true);
+				
+				// Guarda la accion en un archivo log
+				usuarioLog = Principal.usuarioActual.getText();
+				
+				logger.info("Usuario: " + usuarioLog + " conectado en PC: " + captura.obtenerNombrePC()
+						+ " genero un reporte");
 			}
 		};
 
@@ -704,8 +711,7 @@ public class Reportes extends JInternalFrame implements ItemListener {
 				modelo.addElement(rs.getString("nombre_sub_area"));
 			}
 		} catch (SQLException sqle) {
-			// TODO Auto-generated catch block
-			sqle.printStackTrace();
+			logger.error(sqle.toString(), sqle);
 		}
 
 		listReporteSubArea.setModel(modelo);

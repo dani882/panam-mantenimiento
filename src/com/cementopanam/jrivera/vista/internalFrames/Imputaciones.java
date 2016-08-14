@@ -10,6 +10,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.ResultSet;
@@ -18,8 +20,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -44,12 +44,14 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.text.MaskFormatter;
 
-import com.cementopanam.jrivera.controlador.ComparacionFechas;
+import org.apache.log4j.Logger;
+
 import com.cementopanam.jrivera.controlador.Imputacion;
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
 import com.cementopanam.jrivera.controlador.usuario.AdministracionUsuario;
+import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.vista.ModificacionPendiente;
 import com.cementopanam.jrivera.vista.NombreEquipo;
 import com.cementopanam.jrivera.vista.Principal;
@@ -58,21 +60,18 @@ import com.cementopanam.jrivera.vista.helper.JComboBoxPersonalizado;
 import com.cementopanam.jrivera.vista.helper.TimerThread;
 
 import net.proteanit.sql.DbUtils;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class Imputaciones extends JInternalFrame {
 
 	/**
 	 * 
 	 */
-	private static final Logger log = Logger.getLogger(Imputaciones.class.getName());
+	private static final Logger logger = Logger.getLogger(Imputaciones.class);
 	private static final long serialVersionUID = -5302400411757216295L;
 
-	ManipulacionDatos md;
+	private ManipulacionDatos md;
 	private AdministracionParos admParos;
-	ComparacionFechas comparacionFechas;
-	Principal pri;
+	private Principal pri;
 
 	// private CapturaUsuario captura = null;
 	// private CapturaUsuario nombreHost = new CapturaUsuario();
@@ -141,12 +140,18 @@ public class Imputaciones extends JInternalFrame {
 	int max = 100;
 	private JPanel panelParos;
 
+	private CapturaUsuario captura = new CapturaUsuario();
+	private String usuarioLog = Principal.usuarioActual.getText();
+
 	/**
 	 * Crea el frame
 	 */
 	public Imputaciones() {
 		initComponents();
 		rellenarcomboBox("area");
+		usuarioLog = Principal.usuarioActual.getText();
+		logger.info("Usuario: " + usuarioLog + " conectado en PC: " + captura.obtenerNombrePC());
+
 	}
 
 	private void initComponents() {
@@ -431,7 +436,8 @@ public class Imputaciones extends JInternalFrame {
 			formattedTextFieldFechaInicio = new JFormattedTextField();
 			mascaraFecha.install(formattedTextFieldFechaInicio);
 		} catch (ParseException e1) {
-			log.log(Level.WARNING, e1.toString(), e1);
+			logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ e1.toString());
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 		formattedTextFieldFechaInicio.addFocusListener(new FocusAdapter() {
@@ -455,7 +461,8 @@ public class Imputaciones extends JInternalFrame {
 			formattedTextFieldFechaFin = new JFormattedTextField();
 			mascaraFecha.install(formattedTextFieldFechaFin);
 		} catch (ParseException e1) {
-			log.log(Level.WARNING, e1.toString(), e1);
+			logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ e1.toString());
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -664,28 +671,48 @@ public class Imputaciones extends JInternalFrame {
 				Principal.lblStatusBar.setText("Paro Imputado correctamente");
 				limpiarCampos();
 				actualizarTabla(estado[1]);
+
+				// Guarda la accion en un archivo log
+				usuarioLog = Principal.usuarioActual.getText();
+				logger.info("Usuario: " + usuarioLog + " conectado en PC: " + captura.obtenerNombrePC()
+						+ " imputo paro correctamente");
+
 			} else {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 				Principal.lblStatusBar.setText("No se pudo completar la operacion");
 				return;
 			}
+
+			// Cuenta la cantidad de paros pendientes por completar
 			pri.mostrarPendientes(admParos.contarPendientes());
+
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ sqle.toString());
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			return;
+
 		} catch (ParseException pe) {
+			logger.warn("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ""
+					+ ". La Fecha introducida es invalida. Exception: " + pe.toString());
 			JOptionPane.showMessageDialog(null, "La Fecha introducida es invalida", "Fecha invalida",
-					JOptionPane.ERROR_MESSAGE);
+					JOptionPane.WARNING_MESSAGE);
+
 		} catch (ArrayIndexOutOfBoundsException aiobe) {
-			JOptionPane.showMessageDialog(null, "Debe elegir un paro", "Seleccionar paro", JOptionPane.ERROR_MESSAGE);
+			logger.warn("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ""
+					+ ". Debe elegir un paro. Exception: " + aiobe.toString());
+			JOptionPane.showMessageDialog(null, "Debe elegir un paro", "Seleccionar paro", JOptionPane.WARNING_MESSAGE);
 			return;
+
 		} catch (NumberFormatException nfe) {
-			log.log(Level.SEVERE, nfe.toString(), nfe);
+			logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ nfe.toString());
 			JOptionPane.showMessageDialog(null, nfe.getMessage(), nfe.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+
 		} catch (Exception e1) {
-			log.log(Level.SEVERE, e1.toString(), e1);
+			logger.error(
+					"Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ". Exception: " + e1.toString());
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -711,7 +738,9 @@ public class Imputaciones extends JInternalFrame {
 			rs = md.actualizarTabla(estado);
 			tblParos.setModel(DbUtils.resultSetToTableModel(rs));
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+
+			logger.error(
+					"Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		} finally {
 			md.cerrarConexiones();
@@ -787,13 +816,15 @@ public class Imputaciones extends JInternalFrame {
 		}
 
 		catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ sqle.toString());
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		}
 
 		catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(
+					"Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		} finally {
 			md.cerrarConexiones();
@@ -909,6 +940,11 @@ public class Imputaciones extends JInternalFrame {
 					limpiarCampos();
 					actualizarTabla(estado[0]);
 
+					// Guarda la accion en un archivo log
+					usuarioLog = Principal.usuarioActual.getText();
+					logger.info("Usuario: " + usuarioLog + " conectado en PC: " + captura.obtenerNombrePC()
+							+ " imputo paro correctamente");
+
 				} else {
 					Principal.lblStatusBar
 							.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
@@ -917,18 +953,22 @@ public class Imputaciones extends JInternalFrame {
 				pri.mostrarPendientes(admParos.contarPendientes());
 			}
 		} catch (NumberFormatException nfe) {
-			log.log(Level.SEVERE, nfe.toString(), nfe);
+			logger.error("Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ nfe.toString());
 			JOptionPane.showMessageDialog(null, nfe.getMessage(), nfe.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		} catch (ParseException pe) {
-			log.log(Level.SEVERE, pe.toString(), pe);
+			logger.error("Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ""
+					+ ". Formato de fecha incorrecto. Exception: " + pe.toString());
 			JOptionPane.showMessageDialog(null, "Formato de fecha incorrecto", "Fecha invalida",
 					JOptionPane.ERROR_MESSAGE);
 		} catch (NullPointerException npe) {
-			log.log(Level.WARNING, npe.toString(), npe);
+			logger.warn("Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ""
+					+ ". Debe rellenar todos los campos. Exception: " + npe.toString());
 			JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos", npe.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception ex) {
-			log.log(Level.SEVERE, ex.toString(), ex);
+			logger.error(
+					"Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ". Exception: " + ex.toString());
 			JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -1075,11 +1115,13 @@ public class Imputaciones extends JInternalFrame {
 			}
 
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error("Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ sqle.toString());
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(
+					"Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 		return tipoUsuario;

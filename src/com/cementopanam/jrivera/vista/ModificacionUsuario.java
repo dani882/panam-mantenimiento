@@ -11,8 +11,6 @@ import java.awt.event.ItemListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -27,13 +25,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
-import javax.swing.UIManager;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.border.TitledBorder;
 
+import org.apache.log4j.Logger;
+
 import com.cementopanam.jrivera.controlador.usuario.AdministracionUsuario;
+import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.controlador.usuario.Usuario;
 
 public class ModificacionUsuario extends JDialog {
@@ -41,16 +42,16 @@ public class ModificacionUsuario extends JDialog {
 	/**
 	 * 
 	 */
-	private static final Logger log = Logger.getLogger(ModificacionUsuario.class.getName());
+	private static final Logger logger = Logger.getLogger(ModificacionUsuario.class);
 	private static final long serialVersionUID = 8299667867069516816L;
 	private final JPanel contentPanel = new JPanel();
-	
+
 	private JComboBox<String> cbUsuario;
-	
+
 	private JPasswordField pwdClave;
 	private JPasswordField pwdRepetirClave;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
-	
+
 	private JComboBox<Object> cbTipoUsuario;
 
 	private String usuarioActual = Principal.usuarioActual.getText();
@@ -59,17 +60,19 @@ public class ModificacionUsuario extends JDialog {
 
 	private ResultSet rs = null;
 	private AdministracionUsuario admUsuario = new AdministracionUsuario();
-	
+
 	private JButton btnBorrar;
+
+	private CapturaUsuario captura = new CapturaUsuario();
+	private String usuarioLog = Principal.usuarioActual.getText();
 
 	/**
 	 * Crea el dialogo.
 	 */
 	public ModificacionUsuario() {
 
-				
 		setModal(true);
-		
+
 		setFont(new Font("Verdana", Font.PLAIN, 12));
 		setTitle("Modificacion de Usuario");
 		setSize(401, 343);
@@ -89,7 +92,7 @@ public class ModificacionUsuario extends JDialog {
 
 					mostrarUsuario(String.valueOf(e.getItem()));
 					mostrarUsuario();
-					
+
 				}
 			}
 		});
@@ -199,21 +202,21 @@ public class ModificacionUsuario extends JDialog {
 			}
 			{
 				JButton btnCancelar = new JButton("Cancelar");
-				btnCancelar
-						.setIcon(new ImageIcon(ModificacionUsuario.class.getResource("/iconos32x32/fail32x32.png")));
+				btnCancelar.setIcon(new ImageIcon(ModificacionUsuario.class.getResource("/iconos32x32/fail32x32.png")));
 				btnCancelar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						dispose();
 					}
 				});
-				
+
 				btnBorrar = new JButton("Borrar");
 				btnBorrar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						
-						//TODO Agregar pantalla de validacion de Eliminacion. Ver Codigo en Eliminar Paro
+
+						// TODO Agregar pantalla de validacion de Eliminacion.
+						// Ver Codigo en Eliminar Paro
 						eliminarUsuario();
-						
+
 					}
 				});
 				btnBorrar.setIcon(new ImageIcon(ModificacionUsuario.class.getResource("/iconos32x32/delete32x32.png")));
@@ -228,17 +231,19 @@ public class ModificacionUsuario extends JDialog {
 
 		mostrarUsuario();
 		cbUsuario.setSelectedItem(usuarioActual);
-		
+
 		pack();
 		setLocationRelativeTo(null);
 	}
 
 	/**
-	 * Verifica si las claves introducidas coinciden y si son mayores que cuatro caracteres
+	 * Verifica si las claves introducidas coinciden y si son mayores que cuatro
+	 * caracteres
+	 * 
 	 * @return - true si la clave coincide, false si no coinciden
 	 */
 	private boolean validarPassword() {
-		
+
 		if (Arrays.equals(pwdClave.getPassword(), pwdRepetirClave.getPassword())) {
 			return true;
 		} else
@@ -285,16 +290,14 @@ public class ModificacionUsuario extends JDialog {
 			clave += c;
 		}
 
-		
 		// Verifica si la clave introducida tiene cuatro o mas caracteres
-		if(pwdClave.getPassword().length > 0 && pwdClave.getPassword().length <= 4) {
+		if (pwdClave.getPassword().length > 0 && pwdClave.getPassword().length <= 4) {
 			JOptionPane.showMessageDialog(null, "Debe escribir una clave de minimo cinco caracteres", "Clave corta",
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		// Valida si las claves coinciden
 		if (validarPassword() == false) {
-			log.info("La clave de usuario no coincide");
 			JOptionPane.showMessageDialog(null, "La clave de usuario no coincide", "Clave de Usuario",
 					JOptionPane.WARNING_MESSAGE);
 			return;
@@ -326,6 +329,11 @@ public class ModificacionUsuario extends JDialog {
 			if (resultado == true) {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Usuario " + usuario + " actualizado correctamente");
+
+				// Guarda la accion en un archivo log
+				usuarioLog = Principal.usuarioActual.getText();
+				logger.info("Usuario: " + usuarioLog + " conectado en PC: " + captura.obtenerNombrePC()
+						+ " actualizo usuario: " + usuario + " correctamente");
 				dispose();
 			} else {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
@@ -333,16 +341,16 @@ public class ModificacionUsuario extends JDialog {
 			}
 
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
+
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 	}
-	
-	
+
 	private void mostrarUsuario() {
 
 		try {
@@ -351,7 +359,7 @@ public class ModificacionUsuario extends JDialog {
 			while (rs.next()) {
 
 				cbUsuario.addItem(rs.getString("nombre_usuario"));
-				
+
 			}
 			// Elimina el item duplicado
 			if (cbUsuario.getItemAt(1).equals("admin")) {
@@ -359,7 +367,7 @@ public class ModificacionUsuario extends JDialog {
 			}
 
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -376,15 +384,14 @@ public class ModificacionUsuario extends JDialog {
 				// Administrador
 				if (rs.getString("tipo_usuario").equalsIgnoreCase("administrador")) {
 					cbTipoUsuario.setSelectedIndex(0);
-				
-				// Operador
+
+					// Operador
 				} else if (rs.getString("tipo_usuario").equalsIgnoreCase("operador")) {
 					while (rs2.next()) {
-						
-						if (rs2.getString("tipo_usuario").equalsIgnoreCase("administrador")){
+
+						if (rs2.getString("tipo_usuario").equalsIgnoreCase("administrador")) {
 							cbTipoUsuario.setSelectedIndex(1);
-						}
-						else {
+						} else {
 							cbTipoUsuario.setSelectedIndex(1);
 							ocultarBotones(false);
 						}
@@ -392,13 +399,12 @@ public class ModificacionUsuario extends JDialog {
 
 					// Consultor
 				} else if (rs.getString("tipo_usuario").equalsIgnoreCase("consultor")) {
-					
+
 					while (rs2.next()) {
-						
+
 						if (rs2.getString("tipo_usuario").equalsIgnoreCase("administrador")) {
 							cbTipoUsuario.setSelectedIndex(2);
-						}
-						else {
+						} else {
 							cbTipoUsuario.setSelectedIndex(2);
 							ocultarBotones(false);
 						}
@@ -414,11 +420,12 @@ public class ModificacionUsuario extends JDialog {
 			}
 
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
+
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -439,17 +446,18 @@ public class ModificacionUsuario extends JDialog {
 	 * Elimina el usuario seleccionado
 	 */
 	private void eliminarUsuario() {
-		
+
 		boolean resultado = false;
 
-		//Restringe que el usuario admin no sea eliminado por que es el usuario que crea las nuevas causa
+		// Restringe que el usuario admin no sea eliminado por que es el usuario
+		// que crea las nuevas causa
 		// y de borrarse, se eliminan todas las causas
-		if(cbUsuario.getSelectedItem().equals("admin")) {
-			JOptionPane.showMessageDialog(null, "El usuario admin no puede ser eliminado",
-					"Borrar Usuario", JOptionPane.ERROR_MESSAGE);
+		if (cbUsuario.getSelectedItem().equals("admin")) {
+			JOptionPane.showMessageDialog(null, "El usuario admin no puede ser eliminado", "Borrar Usuario",
+					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		//Coloca el boton de OptonPane en Español
+		// Coloca el boton de OptonPane en Español
 		UIManager.put("OptionPane.yesButtonText", "Si");
 		int respuesta = JOptionPane.showConfirmDialog(null, "¿Esta seguro que desea borrar este Usuario?",
 				"Confirmar Borrado", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -462,22 +470,28 @@ public class ModificacionUsuario extends JDialog {
 
 				Usuario usuario = new Usuario();
 				usuario.setNombreUsuario(String.valueOf(cbUsuario.getSelectedItem()));
-				
+
 				resultado = admUsuario.eliminarUsuario(usuario);
-				
+
 				if (resultado == true) {
 					Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
-					Principal.lblStatusBar.setText("Usuario " + usuario.getNombreUsuario() + " eliminado correctamente");
+					Principal.lblStatusBar
+							.setText("Usuario " + usuario.getNombreUsuario() + " eliminado correctamente");
+
+					// Guarda la accion en un archivo log
+					usuarioLog = Principal.usuarioActual.getText();
+					logger.info("Usuario: " + usuarioLog + " conectado en PC: " + captura.obtenerNombrePC()
+							+ " elimino usuario: " + usuario.getNombreUsuario() + " correctamente");
 					dispose();
 				} else {
-					Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
+					Principal.lblStatusBar
+							.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/warning-icon.png")));
 					Principal.lblStatusBar.setText("No se pudo completar la operacion");
 				}
+			} catch (SQLException e1) {
+				logger.error(e1.toString(), e1);
 			}
-			catch (SQLException e1) {
-					log.log(Level.SEVERE, e1.toString(), e1);
-			}
-				
+
 		} else {
 			return;
 		}

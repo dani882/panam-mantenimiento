@@ -4,10 +4,10 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
+
+import org.apache.log4j.Logger;
 
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.modelo.ConeccionBD;
@@ -18,7 +18,7 @@ import com.cementopanam.jrivera.modelo.ConeccionBD;
  */
 public class AdministracionUsuario extends ManipulacionDatos {
 
-	private static final Logger log = Logger.getLogger(AdministracionUsuario.class.getName());
+	private static final Logger logger = Logger.getLogger(AdministracionUsuario.class);
 	private ConeccionBD cbd;
 	private Connection con;
 
@@ -30,7 +30,7 @@ public class AdministracionUsuario extends ManipulacionDatos {
 			try {
 				cbd.conectarABaseDatos();
 			} catch (Exception e) {
-				log.log(Level.SEVERE, e.toString(), e);
+				logger.error(e.toString(), e);
 				JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			}
 		}
@@ -59,22 +59,25 @@ public class AdministracionUsuario extends ManipulacionDatos {
 
 			cs.execute();
 			con.commit();
+
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
 			return false;
+
 		} catch (NumberFormatException nfe) {
-			log.log(Level.SEVERE, nfe.toString(), nfe);
+			logger.warn("Formato de Codigo Empleado incorrecto", nfe);
 			JOptionPane.showMessageDialog(null, "Formato de Codigo Empleado incorrecto", "Codigo Empleado",
 					JOptionPane.WARNING_MESSAGE);
 
 			con.rollback();
 			return false;
+
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
@@ -108,14 +111,15 @@ public class AdministracionUsuario extends ManipulacionDatos {
 			cs.execute();
 			con.commit();
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
 			return false;
+
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
@@ -142,15 +146,17 @@ public class AdministracionUsuario extends ManipulacionDatos {
 
 			cs.execute();
 			con.commit();
+
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
 			return false;
+
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
@@ -171,7 +177,7 @@ public class AdministracionUsuario extends ManipulacionDatos {
 
 		ResultSet rs = null;
 		CallableStatement cs = null;
-		
+
 		try {
 
 			con = cbd.conectarABaseDatos();
@@ -182,14 +188,13 @@ public class AdministracionUsuario extends ManipulacionDatos {
 		}
 
 		catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-
 		}
 
 		return rs;

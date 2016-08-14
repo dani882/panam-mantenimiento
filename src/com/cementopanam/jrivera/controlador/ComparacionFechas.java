@@ -6,8 +6,13 @@ import java.util.Date;
 
 import javax.swing.JOptionPane;
 
+import org.apache.log4j.Logger;
+
 public class ComparacionFechas {
 
+	private static final Logger logger = Logger.getLogger(ComparacionFechas.class);
+	
+	
 	/**
 	 * Compara las fechas proporcionadas
 	 * @param fechaInicio - fecha de inicio a ser comparada
@@ -29,6 +34,7 @@ public class ComparacionFechas {
 			}
 
 		} catch (ParseException e) {
+			logger.error("La fecha introducida no es valida");
 			JOptionPane.showMessageDialog(null, "La fecha introducida no es valida",
 					"Fecha invalida", JOptionPane.ERROR_MESSAGE);
 		}

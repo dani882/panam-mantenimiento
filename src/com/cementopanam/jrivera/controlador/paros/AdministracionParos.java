@@ -5,10 +5,11 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import com.cementopanam.jrivera.controlador.ComparacionFechas;
 import com.cementopanam.jrivera.controlador.Imputacion;
@@ -17,7 +18,7 @@ import com.cementopanam.jrivera.modelo.ConeccionBD;
 
 public class AdministracionParos extends ManipulacionDatos {
 
-	private static final Logger log = Logger.getLogger(AdministracionParos.class.getName());
+	private static final Logger logger = Logger.getLogger(AdministracionParos.class);
 	private ConeccionBD cbd;
 	private Connection con = null;
 	private CallableStatement cs = null;
@@ -30,13 +31,16 @@ public class AdministracionParos extends ManipulacionDatos {
 	public AdministracionParos() {
 
 		cbd = ConeccionBD.getInstance();
+		logger.info("Iniciando Constructor AdministracionParos");
 
 		if (!cbd.verificarConexion()) {
 			try {
 				cbd.conectarABaseDatos();
 			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-				log.log(Level.SEVERE, e.toString(), e);
+				logger.error(e.toString(), e);
+				JOptionPane.showMessageDialog(null, "Se va cerrar la aplicacion", "Cierre de Aplicacion",
+						JOptionPane.ERROR_MESSAGE);
+				System.exit(0);
 			}
 		}
 	}
@@ -78,12 +82,14 @@ public class AdministracionParos extends ManipulacionDatos {
 						descripcionAdicional, disciplina));
 			}
 		} catch (SQLException sqle) {
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
-			log.log(Level.SEVERE, sqle.toString(), sqle);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
+			JOptionPane.showMessageDialog(null, "Se va cerrar la aplicacion", "Cierre de Aplicacion",
+					JOptionPane.ERROR_MESSAGE);
+			System.exit(0);
 		}
 		return lista;
 	}
@@ -125,15 +131,17 @@ public class AdministracionParos extends ManipulacionDatos {
 			con.commit();
 
 		} catch (SQLException sqle) {
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			con.rollback();
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+
 			return false;
 		} catch (Exception e) {
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			con.rollback();
-			log.log(Level.SEVERE, e.toString(), e);
+
 			return false;
 		}
 		return true;
@@ -175,13 +183,13 @@ public class AdministracionParos extends ManipulacionDatos {
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			con.rollback();
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
 			return false;
 
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			con.rollback();
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			return false;
 		}
 		return true;
@@ -211,7 +219,7 @@ public class AdministracionParos extends ManipulacionDatos {
 
 				return false;
 			} catch (Exception e) {
-				log.log(Level.WARNING, e.toString(), e);
+				logger.log(Level.WARN, e.toString(), e);
 				return false;
 			}
 		}
@@ -258,16 +266,17 @@ public class AdministracionParos extends ManipulacionDatos {
 			cs.execute();
 			con.commit();
 		} catch (SQLException sqle) {
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			con.rollback();
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+
 			return false;
 
 		} catch (Exception e) {
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			con.rollback();
-			log.log(Level.SEVERE, e.toString(), e);
 			return false;
 		}
 		return true;
@@ -291,16 +300,18 @@ public class AdministracionParos extends ManipulacionDatos {
 			cs.execute();
 			con.commit();
 		} catch (SQLException sqle) {
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			con.rollback();
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+
 			return false;
 
 		} catch (Exception e) {
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			con.rollback();
-			log.log(Level.SEVERE, e.toString(), e);
+
 			return false;
 		}
 		return true;
@@ -335,12 +346,13 @@ public class AdministracionParos extends ManipulacionDatos {
 			resultado = cs.getInt(3);
 
 		} catch (SQLException sqle) {
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 		}
 		return resultado;
 	}
@@ -357,7 +369,7 @@ public class AdministracionParos extends ManipulacionDatos {
 		try (Connection con = cbd.conectarABaseDatos();
 				CallableStatement cs = con.prepareCall("{call sp_contar_paros_pendientes(?)}");) {
 
-			log.info("Conectado de Contador Paros Pendientes");
+			logger.info("Conectado a Contador Paros Pendientes");
 			cs.registerOutParameter(1, java.sql.Types.INTEGER);
 
 			cs.executeQuery();
@@ -367,12 +379,13 @@ public class AdministracionParos extends ManipulacionDatos {
 		} catch (SQLException sqle) {
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
+
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 		}
-		log.info("Desconectado de Contador Paros Pendientes");
+		logger.info("Desconectado de Contador Paros Pendientes");
 		return resultado;
 	}
 
@@ -386,10 +399,10 @@ public class AdministracionParos extends ManipulacionDatos {
 			cs.setInt(1, codigoParo);
 
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage());
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 

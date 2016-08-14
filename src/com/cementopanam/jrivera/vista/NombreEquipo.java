@@ -5,10 +5,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -17,8 +13,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
-import com.cementopanam.jrivera.controlador.ManipulacionDatos;
-import com.cementopanam.jrivera.modelo.ConeccionBD;
 import com.cementopanam.jrivera.vista.helper.tablaModelo.TablaModeloEquipos;
 
 public class NombreEquipo extends JDialog {
@@ -27,14 +21,7 @@ public class NombreEquipo extends JDialog {
 	 * 
 	 */
 	private static final long serialVersionUID = 4631645774768719309L;
-	ManipulacionDatos md;
-	ConeccionBD cbd;
-	Connection con = null;
 
-	CallableStatement cs = null;
-
-	PreparedStatement pstmt = null;
-	ResultSet rs = null;
 	private JTable tblEquipo;
 	private TablaModeloEquipos tablaModeloEquipos = new TablaModeloEquipos();
 	private JTextField txtCodigoEquipo;

@@ -6,54 +6,67 @@ public class Equipo {
 	private String codEquipo;
 	private String nombreEquipo;
 	private String idSubArea;
+
 	/**
 	 * @return the idEquipo
 	 */
 	public int getIdEquipo() {
 		return idEquipo;
 	}
+
 	/**
-	 * @param idEquipo the idEquipo to set
+	 * @param idEquipo
+	 *            the idEquipo to set
 	 */
 	public void setIdEquipo(int idEquipo) {
 		this.idEquipo = idEquipo;
 	}
+
 	/**
 	 * @return the codEquipo
 	 */
 	public String getCodEquipo() {
 		return codEquipo;
 	}
+
 	/**
-	 * @param codEquipo the codEquipo to set
+	 * @param codEquipo
+	 *            the codEquipo to set
 	 */
 	public void setCodEquipo(String codEquipo) {
 		this.codEquipo = codEquipo;
 	}
+
 	/**
 	 * @return the nombreEquipo
 	 */
 	public String getNombreEquipo() {
 		return nombreEquipo;
 	}
+
 	/**
-	 * @param nombreEquipo the nombreEquipo to set
+	 * @param nombreEquipo
+	 *            the nombreEquipo to set
 	 */
 	public void setNombreEquipo(String nombreEquipo) {
 		this.nombreEquipo = nombreEquipo;
 	}
+
 	/**
 	 * @return the idSubArea
 	 */
 	public String getIdSubArea() {
 		return idSubArea;
 	}
+
 	/**
-	 * @param idSubArea the idSubArea to set
+	 * @param idSubArea
+	 *            the idSubArea to set
 	 */
 	public void setIdSubArea(String idSubArea) {
 		this.idSubArea = idSubArea;
 	}
+
 	/**
 	 * @param idEquipo
 	 * @param codEquipo
@@ -66,6 +79,7 @@ public class Equipo {
 		this.nombreEquipo = nombreEquipo;
 		this.idSubArea = idSubArea;
 	}
-	
-	public Equipo() {}
+
+	public Equipo() {
+	}
 }

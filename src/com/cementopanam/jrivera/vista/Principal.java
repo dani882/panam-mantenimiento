@@ -1,6 +1,7 @@
 package com.cementopanam.jrivera.vista;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -13,8 +14,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -32,6 +31,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.vista.helper.BarraEstado;
 import com.cementopanam.jrivera.vista.helper.TimerThread;
@@ -41,14 +42,12 @@ import com.cementopanam.jrivera.vista.internalFrames.Imputaciones;
 import com.cementopanam.jrivera.vista.internalFrames.Reportes;
 import com.cementopanam.jrivera.vista.main.Login;
 
-import java.awt.Color;
-
 public class Principal extends JFrame implements Runnable {
 
 	/**
 	 * 
 	 */
-	private static final Logger log = Logger.getLogger(Principal.class.getName());
+	private static final Logger logger = Logger.getLogger(Principal.class);
 	private static final long serialVersionUID = 5631455790428057770L;
 	
 	private AdministracionUsuarios admUsuario;
@@ -58,11 +57,11 @@ public class Principal extends JFrame implements Runnable {
 	private Reportes reportes;
 	private Autor author;
 
-	final JPopupMenu menuRegistros = new JPopupMenu();
+	private final JPopupMenu menuRegistros = new JPopupMenu();
 	private JMenuItem itemRegistros;
 	private JMenuItem itemUsuario;
 
-	final JPopupMenu menuUsuario = new JPopupMenu();
+	private final JPopupMenu menuUsuario = new JPopupMenu();
 	private JMenuItem itemCerrarSession;
 	private JMenuItem itemModificarUsuario;
 	
@@ -375,6 +374,9 @@ public class Principal extends JFrame implements Runnable {
 			reportes.setVisible(true);
 		}
 		else{
+			/*
+			 * Muestra el panel de reporte y desactiva la primera pestaña en caso de que el usuario sea consultor
+			 */
 			reportes.setVisible(true);
 			reportes.tabbedPane.setEnabledAt(0, false);
 			reportes.tabbedPane.setSelectedIndex(1);
@@ -413,7 +415,8 @@ public class Principal extends JFrame implements Runnable {
 		if(contador > 0) {
 			lblParosPendientes.setText("Paros pendientes: " + contador);
 		}
-		else lblParosPendientes.setText("");
+		else {
+			lblParosPendientes.setText("");}
 	}
 
 	public JDesktopPane getDesktopPane() {
@@ -487,12 +490,12 @@ public class Principal extends JFrame implements Runnable {
 				});
 				Thread.sleep(duracion);
 			} catch (InterruptedException ie) {
-				log.log(Level.SEVERE, ie.toString(), ie);
+				logger.error(ie.toString(), ie);
 				JOptionPane.showMessageDialog(null, ie.getMessage(), 
 						ie.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			}
 			catch (Exception e) {
-				log.log(Level.SEVERE, e.toString(), e);
+				logger.error(e.toString(), e);
 				JOptionPane.showMessageDialog(null, e.getMessage(), 
 						e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			}

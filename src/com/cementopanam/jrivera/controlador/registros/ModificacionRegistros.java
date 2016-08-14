@@ -5,11 +5,11 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
+import org.apache.log4j.Logger;
 
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.controlador.entidad.Area;
@@ -17,6 +17,7 @@ import com.cementopanam.jrivera.controlador.entidad.Causa;
 import com.cementopanam.jrivera.controlador.entidad.Disciplina;
 import com.cementopanam.jrivera.controlador.entidad.Equipo;
 import com.cementopanam.jrivera.controlador.entidad.SubArea;
+import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.modelo.ConeccionBD;
 
 /**
@@ -25,9 +26,11 @@ import com.cementopanam.jrivera.modelo.ConeccionBD;
  */
 public class ModificacionRegistros extends ManipulacionDatos {
 
-	private static final Logger log = Logger.getLogger(ManipulacionDatos.class.getName());
+	private static final Logger logger = Logger.getLogger(ModificacionRegistros.class);
 	private ConeccionBD cbd;
 	private Connection con = null;
+	
+	private CapturaUsuario captura = new CapturaUsuario();
 	
 	public ModificacionRegistros() {
 		
@@ -37,15 +40,23 @@ public class ModificacionRegistros extends ManipulacionDatos {
 			try {
 				cbd.conectarABaseDatos();
 			} catch (Exception e) {
-				log.log(Level.SEVERE, e.toString(), e);
+				logger.error(e.toString(), e);
 				JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
 	
 
+	/**
+	 * Borrar los registros seleccionados
+	 * @param causas - las causas que se borraran
+	 * @param disciplinas - las disciplinas que se borraran
+	 * @return - true si el borrado fue exitoso, false si no fue satisfactorio
+	 * @throws SQLException
+	 */
 	public boolean borrarRegistros(List<Causa> causas, List<Disciplina> disciplinas) throws SQLException {
 		
+		//TODO Agregar los demas registros de eliminacion en los parametros
 		try (Connection con = cbd.conectarABaseDatos();
 				CallableStatement cs = con.prepareCall("{call sp_eliminar_registros(?,?)}");) {
 						
@@ -54,7 +65,8 @@ public class ModificacionRegistros extends ManipulacionDatos {
 				cs.setString(1, causa.getTipoCausa());
 				cs.setString(2, causa.getIdDisciplina());
 				cs.addBatch();
-				log.info("Nombre de Causa: " + causa.getTipoCausa());
+				
+				logger.info("Borrado Causa: " + causa.getTipoCausa() + " por Usuario en PC: " + captura.obtenerNombrePC());
 			}
 			
 			//Borra registro de Disciplina
@@ -62,7 +74,8 @@ public class ModificacionRegistros extends ManipulacionDatos {
 				cs.setString(1, disciplina.getNombreDisciplina());
 				cs.setString(2, "disciplina");
 				cs.addBatch();
-				log.info("Nombre de Disciplina: " + disciplina.getNombreDisciplina());
+				
+				logger.info("Borrado Displina: " + disciplina.getNombreDisciplina() + " por Usuario en PC: " + captura.obtenerNombrePC());
 			}
 			
 			cs.executeBatch();
@@ -70,7 +83,7 @@ public class ModificacionRegistros extends ManipulacionDatos {
 		}
 		
 		catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 
@@ -79,7 +92,7 @@ public class ModificacionRegistros extends ManipulacionDatos {
 			
 		} 
 		catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();
@@ -119,6 +132,8 @@ public class ModificacionRegistros extends ManipulacionDatos {
 			cs.setString(4, equipo.getIdSubArea());
 			cs.addBatch();
 
+			logger.info("Agregado Equipo. Codigo: " + equipo.getCodEquipo() +" Nombre: "+ equipo.getNombreEquipo() +" por Usuario en PC: " + captura.obtenerNombrePC());
+			
 			// Area
 			cs.setString(1, area.getNombreArea());
 			cs.setString(2, "area");
@@ -126,12 +141,16 @@ public class ModificacionRegistros extends ManipulacionDatos {
 			cs.setInt(4, area.getIdArea());
 			cs.addBatch();
 
+			logger.info("Agregado Area: " + area.getNombreArea() + " por Usuario en PC: " + captura.obtenerNombrePC());
+
 			// SubArea
 			cs.setString(1, subArea.getNombreSubArea());
 			cs.setString(2, "subArea");
 			cs.setString(3, "");
 			cs.setString(4, subArea.getIdArea());
 			cs.addBatch();
+			
+			logger.info("Agregado SubArea: " + subArea.getNombreSubArea() + " por Usuario en PC: " + captura.obtenerNombrePC());
 
 			// Disciplina
 			cs.setString(1, disciplina.getNombreDisciplina());
@@ -139,6 +158,8 @@ public class ModificacionRegistros extends ManipulacionDatos {
 			cs.setString(3, "");
 			cs.setInt(4, disciplina.getIdDisciplina());
 			cs.addBatch();
+
+			logger.info("Agregado Disciplina: " + disciplina.getNombreDisciplina() + " por Usuario en PC: " + captura.obtenerNombrePC());
 
 			// Causa
 			for (Causa causa : causas) {
@@ -151,6 +172,9 @@ public class ModificacionRegistros extends ManipulacionDatos {
 				cs.setString(3, "");
 				cs.setString(4, causa.getIdDisciplina());
 				cs.addBatch();
+				
+				logger.info("Agregado Causa: " + causa.getTipoCausa() + " por Usuario en PC: " + captura.obtenerNombrePC());
+
 			}
 
 			cs.executeBatch();
@@ -158,7 +182,7 @@ public class ModificacionRegistros extends ManipulacionDatos {
 
 		} 
 		catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 
@@ -166,7 +190,7 @@ public class ModificacionRegistros extends ManipulacionDatos {
 			return false;
 		}
 		catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 
 			con.rollback();

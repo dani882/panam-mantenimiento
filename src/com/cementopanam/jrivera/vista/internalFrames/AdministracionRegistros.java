@@ -12,8 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -33,6 +31,8 @@ import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import org.apache.log4j.Logger;
+
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
 import com.cementopanam.jrivera.controlador.entidad.Area;
 import com.cementopanam.jrivera.controlador.entidad.Causa;
@@ -40,13 +40,14 @@ import com.cementopanam.jrivera.controlador.entidad.Disciplina;
 import com.cementopanam.jrivera.controlador.entidad.Equipo;
 import com.cementopanam.jrivera.controlador.entidad.SubArea;
 import com.cementopanam.jrivera.controlador.registros.ModificacionRegistros;
+import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.vista.Principal;
 
 public class AdministracionRegistros extends JInternalFrame {
 	/**
 	 * 
 	 */
-	private static final Logger log = Logger.getLogger(AdministracionRegistros.class.getName());
+	private static final Logger logger = Logger.getLogger(AdministracionRegistros.class);
 	private static final long serialVersionUID = 7802198920491306605L;
 
 	private ManipulacionDatos manipulacionDatos = new ManipulacionDatos();
@@ -68,8 +69,19 @@ public class AdministracionRegistros extends JInternalFrame {
 	private JTable tblBorrarCausa;
 	private JTable tblBorrarDisciplina;
 
+	private CapturaUsuario captura = new CapturaUsuario();
+	private String usuarioLog = Principal.usuarioActual.getText();
+	
 	public AdministracionRegistros() {
 
+		initComponents();
+
+	}
+
+	/**
+	 * 
+	 */
+	private void initComponents() {
 		setFrameIcon(null);
 		setIconifiable(true);
 		setClosable(true);
@@ -411,7 +423,6 @@ public class AdministracionRegistros extends JInternalFrame {
 			public void keyTyped(KeyEvent e) {
 
 				if (e.getKeyChar() == KeyEvent.VK_DELETE) {
-					log.info("Se presiono delete");
 					borrarRegistros();
 				}
 			}
@@ -457,7 +468,6 @@ public class AdministracionRegistros extends JInternalFrame {
 		btnBorrarRegistros.setFont(new Font("Verdana", Font.PLAIN, 12));
 		btnBorrarRegistros.setBounds(628, 381, 171, 41);
 		panelCentroBorrar.add(btnBorrarRegistros);
-
 	}
 
 	/**
@@ -559,6 +569,11 @@ public class AdministracionRegistros extends JInternalFrame {
 
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Registro(s) agregado(s) correctamente");
+				
+				// Guarda la accion en un archivo log
+				usuarioLog = Principal.usuarioActual.getText();
+				logger.info("Usuario: " + usuarioLog + " conectado en PC: " + captura.obtenerNombrePC()
+				+ " agrego registro(s) correctamente");
 				rellenarCombo();
 				limpiarCampos();
 			} else {
@@ -567,11 +582,12 @@ public class AdministracionRegistros extends JInternalFrame {
 			}
 
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
+
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -626,11 +642,11 @@ public class AdministracionRegistros extends JInternalFrame {
 			}
 
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 		cbSubArea.setSelectedItem(-1);

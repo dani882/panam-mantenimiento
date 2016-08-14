@@ -11,14 +11,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import org.apache.log4j.Logger;
+
 public class ConeccionBD {
 
-	private static final Logger log = Logger.getLogger(ConeccionBD.class.getName());
+	private static final Logger logger = Logger.getLogger(ConeccionBD.class);
 	private Connection con = null;
 
 	private static ConeccionBD cbd = new ConeccionBD();
@@ -40,6 +40,7 @@ public class ConeccionBD {
 	public Connection conectarABaseDatos() throws SQLException {
 
 		try (InputStream in = getClass().getResourceAsStream("/properties/db.properties");) {
+			
 			// Carga las propiedades del archivo
 			Properties pros = new Properties();
 			pros.load(in);
@@ -54,10 +55,12 @@ public class ConeccionBD {
 			Class.forName(driverBD).newInstance();
 			con = DriverManager.getConnection(url, usuario, password);
 			con.setAutoCommit(false);
+			
+			logger.info("Conectado con la Base de Datos");
 		}
 
 		catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
 			System.exit(0);
@@ -75,9 +78,9 @@ public class ConeccionBD {
 
 		if (verificarConexion() == true) {
 			con.close();
-			log.info("Desconectado");
+			logger.info("Desconectado de la Base de Datos");
 		} else {
-			log.info("Conexion abierta");
+			logger.info("Conexion abierta");
 		}
 	}
 

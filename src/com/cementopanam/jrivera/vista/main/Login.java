@@ -14,8 +14,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -31,7 +29,10 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
 import com.cementopanam.jrivera.controlador.ManipulacionDatos;
+import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.vista.Principal;
 import com.jtattoo.plaf.acryl.AcrylLookAndFeel;
 
@@ -44,7 +45,7 @@ public class Login extends JFrame {
 	/**
 	 * 
 	 */
-	private static final Logger log = Logger.getLogger(Login.class.getName());
+	private static final Logger logger = Logger.getLogger(Login.class);
 	private static final long serialVersionUID = 1788905256991802788L;
 	private ManipulacionDatos md;
 	private ResultSet rs = null;
@@ -66,7 +67,7 @@ public class Login extends JFrame {
 	private Dimension dim;
 	private int w, h, x, y;
 
-	// CapturaUsuario captura = new CapturaUsuario();
+	private CapturaUsuario captura = new CapturaUsuario();
 
 	/**
 	 * Lanza la aplicacion.
@@ -115,15 +116,16 @@ public class Login extends JFrame {
 			// UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 		}
 
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					new Login().setVisible(true);
+
 				} catch (Exception e) {
-					log.log(Level.SEVERE, e.toString(), e);
+					logger.error(e.toString(), e);
 					JOptionPane.showMessageDialog(null, e.getMessage());
 					JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
 					System.exit(0);
@@ -136,7 +138,6 @@ public class Login extends JFrame {
 	 * Crea el frame.
 	 */
 	public Login() {
-		setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/imagenes/logo-panam.png")));
 		initComponents();
 	}
 
@@ -147,6 +148,7 @@ public class Login extends JFrame {
 		setSize(552, 305);
 		setResizable(false);
 		contentPane = new JPanel();
+		setIconImage(Toolkit.getDefaultToolkit().getImage(Login.class.getResource("/imagenes/logo-panam.png")));
 
 		// Obtiene la dimension de la pantalla
 		dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -218,6 +220,9 @@ public class Login extends JFrame {
 		contentPane.add(btnAcceder);
 	}
 
+	/**
+	 * Verifica los credenciales del usuario proporcionado
+	 */
 	private void validarUsuario() {
 
 		SwingWorker<String, String> worker = new SwingWorker<String, String>() {
@@ -257,7 +262,8 @@ public class Login extends JFrame {
 
 						if (tipoUsuario == 1 && estadoUsuario.equalsIgnoreCase("activo")) {
 							// Interfaz de Administrador
-							log.info("Es Administrador");
+							logger.info("Usuario: " + usuario + " conectado como Administrador en PC: "
+									+ captura.obtenerNombrePC());
 							// Desactiva la ventana imputacion en el usuario
 							// admin
 							if (nombreUsuario.equalsIgnoreCase("admin")) {
@@ -276,7 +282,8 @@ public class Login extends JFrame {
 							// return true;
 						} else if (tipoUsuario == 2 && estadoUsuario.equalsIgnoreCase("activo")) {
 							// Interfaz de el Operador
-							log.info("Es Operador");
+							logger.info("Usuario: " + usuario + " conectado como Operador en PC: "
+									+ captura.obtenerNombrePC());
 							// guardarUsuario();
 							SwingUtilities.invokeLater(principal);
 
@@ -290,7 +297,8 @@ public class Login extends JFrame {
 							// return true;
 						} else if (tipoUsuario == 3 && estadoUsuario.equalsIgnoreCase("activo")) {
 							// Interfaz de el Consultor
-							log.info("Es Consultor");
+							logger.info("Usuario: " + usuario + " conectado como Consultor en PC: "
+									+ captura.obtenerNombrePC());
 							SwingUtilities.invokeLater(principal);
 
 							Principal.usuarioActual.setText(getNombreUsuario());
@@ -314,13 +322,12 @@ public class Login extends JFrame {
 						return "Credenciales invalidos!";
 					}
 				} catch (SQLException sqle) {
-					log.log(Level.SEVERE, sqle.toString(), sqle);
+					logger.error(sqle.toString(), sqle);
 					JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
-					// return false;
 
 				} catch (Exception e) {
-					log.log(Level.SEVERE, e.toString(), e);
+					logger.error(e.toString(), e);
 					JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(),
 							JOptionPane.ERROR_MESSAGE);
 					JOptionPane.showMessageDialog(null, "Se va a cerrar la aplicacion");
@@ -339,7 +346,7 @@ public class Login extends JFrame {
 
 				lblIncorrecto.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/loading.gif")));
 				lblIncorrecto.setText("Comprobando credenciales. Espere...");
-		//		lblIncorrecto.setText(chunks.toString());
+				// lblIncorrecto.setText(chunks.toString());
 				// countLabel1.setText(Integer.toString(mostRecentValue));
 			}
 

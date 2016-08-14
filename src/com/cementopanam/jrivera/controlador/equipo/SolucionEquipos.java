@@ -7,10 +7,13 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import org.apache.log4j.Logger;
+
 import com.cementopanam.jrivera.modelo.ConeccionBD;
 
 public class SolucionEquipos {
 
+	private static final Logger logger = Logger.getLogger(SolucionEquipos.class);
 	ConeccionBD cbd;
 	Connection con = null;
 	CallableStatement cs = null;
@@ -24,6 +27,7 @@ public class SolucionEquipos {
 			try {
 				cbd.conectarABaseDatos();
 			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 				JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			}
 		}
@@ -47,6 +51,7 @@ public class SolucionEquipos {
 		}
 
 		catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 		return solucionEquipo;

@@ -10,8 +10,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -33,8 +31,11 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.border.TitledBorder;
 
+import org.apache.log4j.Logger;
+
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
+import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.vista.helper.JComboBoxPersonalizado;
 import com.cementopanam.jrivera.vista.internalFrames.Imputaciones;
 
@@ -44,7 +45,7 @@ public class ModificacionPendiente extends JDialog {
 	 * 
 	 */
 	private static final long serialVersionUID = -9176940230032185832L;
-	private static final Logger log = Logger.getLogger(ModificacionPendiente.class.getName());
+	private static final Logger logger = Logger.getLogger(ModificacionPendiente.class);
 	private final JPanel contentPanel = new JPanel();
 	private JButton btnGuardar;
 	private JButton btnCancelar;
@@ -59,13 +60,16 @@ public class ModificacionPendiente extends JDialog {
 	private int codigoCausa;
 	private int codigoEquipo;
 
-	ResultSet informacionPendiente = null;
+	private ResultSet informacionPendiente = null;
 
 	private AdministracionParos admParo;
 	private JDesktopPane desktopPane;
 	private JLabel label;
 	private JButton btnBorrar;
 	private JComboBox<String> cbEquipo;
+
+	private CapturaUsuario captura = new CapturaUsuario();
+	private String usuarioLog = Principal.usuarioActual.getText();
 
 	public ModificacionPendiente(int codigoParo, String subArea, JDesktopPane desktopPane) throws SQLException {
 
@@ -92,12 +96,15 @@ public class ModificacionPendiente extends JDialog {
 				cbEquipo.addItem(rs.getString("cod_equipo"));
 			}
 		} catch (SQLException sqle) {
+			logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ sqle.toString());
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+
 		} catch (Exception e) {
+			logger.error(
+					"Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-			log.log(Level.SEVERE, e.toString(), e);
 		}
 
 		this.codigoParo = codigoParo;
@@ -115,19 +122,19 @@ public class ModificacionPendiente extends JDialog {
 			}
 
 		} catch (SQLException sqle) {
+			logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ sqle.toString());
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
-			log.log(Level.SEVERE, sqle.toString(), sqle);
+
 		} finally {
 			// Obtiene el codigo de Causa
 			codigoCausa = admParo.buscarIndiceCausa(String.valueOf(cbCausa.getSelectedItem()),
 					txtDescripcionAdicional.getText());
-			
-			codigoEquipo = admParo.buscarIndice(String.valueOf(cbEquipo.getSelectedItem()), "equipo");			
+
+			codigoEquipo = admParo.buscarIndice(String.valueOf(cbEquipo.getSelectedItem()), "equipo");
 			admParo.cerrarConexiones();
-			System.out.println("El codigo de equipo es: " + codigoEquipo);
 		}
-		System.out.println("El codigo de la Causa desde el constructor es: " + codigoCausa);
 	}
 
 	public ModificacionPendiente() {
@@ -325,6 +332,11 @@ public class ModificacionPendiente extends JDialog {
 					Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 					Principal.lblStatusBar.setText("Paro Eliminado correctamente");
 
+					// Guarda la accion en un archivo log
+					usuarioLog = Principal.usuarioActual.getText();
+					logger.info("Usuario: " + usuarioLog + " conectado en PC: " + captura.obtenerNombrePC()
+							+ " elimino paro correctamente");
+
 					mostrarImputacion();
 				} else {
 					Principal.lblStatusBar
@@ -332,12 +344,16 @@ public class ModificacionPendiente extends JDialog {
 					Principal.lblStatusBar.setText("No se pudo completar la operacion");
 				}
 			} catch (SQLException sqle) {
+				logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
+						+ sqle.toString());
 				JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 						JOptionPane.ERROR_MESSAGE);
-				log.log(Level.SEVERE, sqle.toString(), sqle);
+
 			} catch (Exception e) {
+				logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
+						+ e.toString());
 				JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-				log.log(Level.SEVERE, e.toString(), e);
+
 			}
 		} else if (respuesta == JOptionPane.CLOSED_OPTION) {
 			return;
@@ -383,6 +399,11 @@ public class ModificacionPendiente extends JDialog {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Paro Actualizado correctamente");
 
+				// Guarda la accion en un archivo log
+				usuarioLog = Principal.usuarioActual.getText();
+				logger.info("Usuario: " + usuarioLog + " conectado en PC: " + captura.obtenerNombrePC()
+						+ " actualizo paro correctamente");
+
 				mostrarImputacion();
 
 			} else {
@@ -390,14 +411,15 @@ public class ModificacionPendiente extends JDialog {
 				Principal.lblStatusBar.setText("No se pudo completar la operacion");
 			}
 		} catch (SQLException sqle) {
-			log.log(Level.SEVERE, sqle.toString(), sqle);
-			JOptionPane.showMessageDialog(null, sqle.getMessage(), 
-					sqle.getClass().toString(), JOptionPane.ERROR_MESSAGE);
-		}
-		catch (Exception e) {
-			log.log(Level.SEVERE, e.toString(), e);
-			JOptionPane.showMessageDialog(null, e.getMessage(), 
-					e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+			logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ sqle.toString());
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+
+		} catch (Exception e) {
+			logger.error(
+					"Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 
 		}
 	}

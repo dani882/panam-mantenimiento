@@ -10,8 +10,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -32,19 +30,20 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import org.apache.log4j.Logger;
+
 import com.cementopanam.jrivera.controlador.paros.AdministracionParos;
 import com.cementopanam.jrivera.controlador.paros.Paro;
+import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.vista.helper.JComboBoxPersonalizado;
 import com.cementopanam.jrivera.vista.internalFrames.Reportes;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class ModificacionParo extends JDialog {
 
 	/**
 	 * 
 	 */
-	private static final Logger LOG = Logger.getLogger(ModificacionParo.class.getName());
+	private static final Logger logger = Logger.getLogger(ModificacionParo.class);
 	private static final long serialVersionUID = -7239938319668117403L;
 	private final JPanel contentPanel = new JPanel();
 	private JButton btnGuardar;
@@ -65,6 +64,9 @@ public class ModificacionParo extends JDialog {
 	private JDesktopPane desktopPane;
 	private JLabel label;
 	private JButton btnBorrar;
+	
+	private CapturaUsuario captura = new CapturaUsuario();
+	private String usuarioLog = Principal.usuarioActual.getText();
 
 	public ModificacionParo(Paro modificacion, AdministracionParos paroDB, JDesktopPane desktopPane) {
 
@@ -86,7 +88,7 @@ public class ModificacionParo extends JDialog {
 			}
 
 		} catch (SQLException e) {
-			LOG.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 		}
 
 		codigoParo = modificacion.getCodigo();
@@ -327,7 +329,7 @@ public class ModificacionParo extends JDialog {
 					Principal.lblStatusBar.setText("No se pudo completar la operacion");
 				}
 			} catch (SQLException e) {
-				LOG.log(Level.SEVERE, e.toString(), e);
+				logger.error(e.toString(), e);
 			}
 		} else if (respuesta == JOptionPane.CLOSED_OPTION) {
 			return;
@@ -366,6 +368,11 @@ public class ModificacionParo extends JDialog {
 
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Paro Actualizado correctamente");
+				
+				// Guarda la accion en un archivo log
+				usuarioLog = Principal.usuarioActual.getText();
+				logger.info("Usuario: " + usuarioLog + " conectado en PC: " + captura.obtenerNombrePC()
+						+ " actualizo paro correctamente");
 
 				mostrarReporte();
 			} else {
@@ -373,7 +380,7 @@ public class ModificacionParo extends JDialog {
 				Principal.lblStatusBar.setText("No se pudo completar la operacion");
 			}
 		} catch (SQLException e) {
-			LOG.log(Level.SEVERE, e.toString(), e);
+			logger.error(e.toString(), e);
 		}
 	}
 }

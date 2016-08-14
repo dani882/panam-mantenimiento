@@ -8,8 +8,6 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -27,7 +25,10 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.MaskFormatter;
 
+import org.apache.log4j.Logger;
+
 import com.cementopanam.jrivera.controlador.usuario.AdministracionUsuario;
+import com.cementopanam.jrivera.controlador.usuario.CapturaUsuario;
 import com.cementopanam.jrivera.controlador.usuario.Usuario;
 import com.cementopanam.jrivera.vista.ModificacionUsuario;
 import com.cementopanam.jrivera.vista.Principal;
@@ -37,27 +38,38 @@ public class AdministracionUsuarios extends JInternalFrame {
 	/**
 	 * 
 	 */
-	private static final Logger log = Logger.getLogger(AdministracionUsuarios.class.getName());
+	private static final Logger logger = Logger.getLogger(AdministracionUsuarios.class);
 	private static final long serialVersionUID = -6053479021274723939L;
 	private JTextField txtNombre;
 	private JTextField txtApellido;
-	private JFormattedTextField  txtCodEmpleado;
+	private JFormattedTextField txtCodEmpleado;
 	private JTextField txtNombreUsuario;
 	private JPasswordField pwdClave;
 	private JPasswordField pwdConfirmarClave;
 	private JButton btnLimpiar;
 	private JButton btnEditar;
 	private JComboBox<Object> cbTipoUsuario;
-	
+
 	private MaskFormatter formateador;
 
 	private AdministracionUsuario admUsuario = new AdministracionUsuario();
+
+	private CapturaUsuario captura = new CapturaUsuario();
+	private String usuarioLog = Principal.usuarioActual.getText();
 
 	/**
 	 * Create the frame.
 	 */
 	public AdministracionUsuarios() {
-		
+
+		initComponents();
+	}
+
+	/**
+	 * 
+	 */
+	private void initComponents() {
+
 		getContentPane().setFont(new Font("Verdana", Font.PLAIN, 12));
 		setFrameIcon(null);
 		setClosable(true);
@@ -104,18 +116,18 @@ public class AdministracionUsuarios extends JInternalFrame {
 		/*
 		 * Restringe el uso de solo numeros en el codigo empleado
 		 */
-		
+
 		try {
 			formateador = new MaskFormatter("######");
-			
+
 			txtCodEmpleado = new JFormattedTextField();
 			formateador.install(txtCodEmpleado);
 		}
-		
-		catch(ParseException e1) {
-			log.log(Level.WARNING, e1.toString(), e1);
+
+		catch (ParseException e1) {
+			logger.warn(e1.toString(), e1);
 		}
-		
+
 		txtCodEmpleado.setFont(new Font("Verdana", Font.PLAIN, 12));
 		txtCodEmpleado.setColumns(10);
 		txtCodEmpleado.setBounds(35, 55, 147, 30);
@@ -208,12 +220,12 @@ public class AdministracionUsuarios extends JInternalFrame {
 		getContentPane().add(layeredPaneDatosEmpleado);
 		getContentPane().add(layeredPaneAcceso);
 		getContentPane().add(layeredPaneBotones);
-		
+
 		JPanel panelTitulo = new JPanel();
 		panelTitulo.setBackground(Color.BLACK);
 		panelTitulo.setBounds(0, 11, 433, 36);
 		getContentPane().add(panelTitulo);
-		
+
 		JLabel lblNuevoUsuario = new JLabel("Agregar Nuevo Usuario");
 		lblNuevoUsuario.setForeground(Color.WHITE);
 		lblNuevoUsuario.setFont(new Font("Verdana", Font.BOLD, 16));
@@ -234,7 +246,7 @@ public class AdministracionUsuarios extends JInternalFrame {
 		}
 	}
 
-	private boolean validarPassword() {
+	private boolean validarClave() {
 
 		if (Arrays.equals(pwdClave.getPassword(), pwdConfirmarClave.getPassword())) {
 			return true;
@@ -274,13 +286,13 @@ public class AdministracionUsuarios extends JInternalFrame {
 			int tipoUsuario = obtenerTipoUsuario();
 
 			// Verifica si la clave introducida tiene cuatro o mas caracteres
-			if(pwdClave.getPassword().length > 0 && pwdClave.getPassword().length <= 4) {
+			if (pwdClave.getPassword().length > 0 && pwdClave.getPassword().length <= 4) {
 				JOptionPane.showMessageDialog(null, "Debe escribir una clave de minimo cinco caracteres", "Clave corta",
 						JOptionPane.INFORMATION_MESSAGE);
 				return false;
 			}
 			// Valida si las claves coinciden
-			if (validarPassword() == false) {
+			if (validarClave() == false) {
 				JOptionPane.showMessageDialog(null, "La clave de usuario no coincide", "Clave de Usuario",
 						JOptionPane.WARNING_MESSAGE);
 				return false;
@@ -292,6 +304,12 @@ public class AdministracionUsuarios extends JInternalFrame {
 			if (admUsuario.registrarUsuario(usuario) == true) {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Usuario " + nombreUsuario + " creado correctamente");
+
+				// Guarda la accion en un archivo log
+				usuarioLog = Principal.usuarioActual.getText();
+				logger.info("Usuario: " + usuarioLog + " conectado en PC: " + captura.obtenerNombrePC()
+						+ " creo el usuario: " + nombreUsuario + " correctamente");
+
 				limpiarCamposUsuario();
 				return true;
 			} else {
@@ -299,6 +317,7 @@ public class AdministracionUsuarios extends JInternalFrame {
 				Principal.lblStatusBar.setText("No se pudo completar la operacion");
 			}
 		} catch (SQLException sqle) {
+			logger.error(sqle.toString(), sqle);
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 			return false;
@@ -315,6 +334,7 @@ public class AdministracionUsuarios extends JInternalFrame {
 					JOptionPane.ERROR_MESSAGE);
 			return false;
 		} catch (Exception e1) {
+			logger.error(e1.toString(), e1);
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
