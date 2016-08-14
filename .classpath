@@ -81,6 +81,6 @@
 	<classpathentry kind="lib" path="resources/lib/xml-apis-ext.jar"/>
 	<classpathentry kind="lib" path="resources/lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="resources/lib/xmlbeans-2.5.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/jrivera/Downloads/commons-io-2.5-bin/commons-io-2.5/commons-io-2.5.jar"/>
+	<classpathentry kind="lib" path="resources/lib/commons-io-2.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
