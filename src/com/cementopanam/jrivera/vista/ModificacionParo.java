@@ -67,6 +67,7 @@ public class ModificacionParo extends JDialog {
 	
 	private CapturaUsuario captura = new CapturaUsuario();
 	private String usuarioLog = Principal.usuarioActual.getText();
+	private JComboBox cbEquipo;
 
 	public ModificacionParo(Paro modificacion, AdministracionParos paroDB, JDesktopPane desktopPane) {
 
@@ -171,68 +172,79 @@ public class ModificacionParo extends JDialog {
 		JScrollPane scrollPaneDescripcionAdicional = new JScrollPane();
 		scrollPaneDescripcionAdicional.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"),
 				"Descripcion Adicional", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		
+		JLabel lblCodigoEquipo = new JLabel("Codigo Equipo");
+		lblCodigoEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
+		
+		cbEquipo = new JComboBox();
+		cbEquipo.setEnabled(false);
+		cbEquipo.setFont(new Font("Verdana", Font.PLAIN, 12));
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
-		gl_contentPanel.setHorizontalGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+		gl_contentPanel.setHorizontalGroup(
+			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-						.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-								.addGroup(gl_contentPanel.createSequentialGroup().addContainerGap().addComponent(
-										scrollPaneSolucion, GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE))
-								.addGroup(gl_contentPanel.createSequentialGroup().addGap(8)
-										.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-												.addComponent(lblTiempoInicio).addComponent(lblDisciplina))
-										.addPreferredGap(ComponentPlacement.UNRELATED)
-										.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-												.addComponent(cbDisciplina, GroupLayout.DEFAULT_SIZE, 174,
-														Short.MAX_VALUE)
-												.addComponent(txtTiempoInicio, GroupLayout.DEFAULT_SIZE, 174,
-														Short.MAX_VALUE))))
-						.addGap(18).addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING).addGroup(
-								gl_contentPanel
-										.createSequentialGroup().addGroup(
-												gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
-														.addComponent(lblCausa, GroupLayout.DEFAULT_SIZE,
-																GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-														.addComponent(lblTiempoFin, GroupLayout.DEFAULT_SIZE,
-																GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-										.addPreferredGap(ComponentPlacement.UNRELATED)
-										.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-												.addComponent(cbCausa, Alignment.TRAILING, 0, 182,
-														Short.MAX_VALUE)
-												.addComponent(txtTiempoFin, GroupLayout.DEFAULT_SIZE, 182,
-														Short.MAX_VALUE)))
-								.addComponent(scrollPaneDescripcionAdicional, GroupLayout.DEFAULT_SIZE, 308,
-										Short.MAX_VALUE))
-						.addContainerGap()));
+					.addContainerGap()
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+								.addGroup(Alignment.LEADING, gl_contentPanel.createSequentialGroup()
+									.addComponent(lblCodigoEquipo)
+									.addGap(18)
+									.addComponent(cbEquipo, 0, 187, Short.MAX_VALUE))
+								.addGroup(Alignment.LEADING, gl_contentPanel.createSequentialGroup()
+									.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+										.addComponent(lblTiempoInicio)
+										.addComponent(lblDisciplina))
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+										.addComponent(cbDisciplina, GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
+										.addComponent(txtTiempoInicio, GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE))))
+							.addGap(18)
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(lblCausa, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(lblTiempoFin))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(txtTiempoFin, GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
+								.addComponent(cbCausa, 0, 221, Short.MAX_VALUE))
+							.addGap(8))
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addComponent(scrollPaneSolucion, GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE)
+							.addGap(18)
+							.addComponent(scrollPaneDescripcionAdicional, GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+							.addContainerGap())))
+		);
 		gl_contentPanel.setVerticalGroup(
-				gl_contentPanel.createParallelGroup(Alignment.LEADING).addGroup(gl_contentPanel.createSequentialGroup()
-						.addGap(38).addGroup(gl_contentPanel
-								.createParallelGroup(Alignment.LEADING).addGroup(gl_contentPanel.createSequentialGroup()
-										.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-												.addComponent(lblTiempoInicio).addComponent(txtTiempoInicio,
-														GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(ComponentPlacement.UNRELATED)
-										.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-												.addComponent(cbDisciplina,
-														GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
-												.addComponent(lblDisciplina)))
-								.addGroup(
-										gl_contentPanel.createSequentialGroup()
-												.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-														.addComponent(txtTiempoFin, GroupLayout.PREFERRED_SIZE, 27,
-																GroupLayout.PREFERRED_SIZE)
-														.addComponent(lblTiempoFin))
-												.addPreferredGap(ComponentPlacement.UNRELATED)
-												.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-														.addComponent(cbCausa, GroupLayout.PREFERRED_SIZE, 31,
-																GroupLayout.PREFERRED_SIZE)
-														.addComponent(lblCausa))))
-						.addGap(54)
-						.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(scrollPaneSolucion, GroupLayout.PREFERRED_SIZE, 137,
-										GroupLayout.PREFERRED_SIZE)
-								.addComponent(scrollPaneDescripcionAdicional, GroupLayout.PREFERRED_SIZE, 137,
-										GroupLayout.PREFERRED_SIZE))
-						.addContainerGap(25, Short.MAX_VALUE)));
+			gl_contentPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPanel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(cbEquipo, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblCodigoEquipo))
+					.addGap(18)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblTiempoInicio)
+								.addComponent(txtTiempoInicio, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(cbDisciplina, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblDisciplina)))
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(txtTiempoFin, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblTiempoFin))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(cbCausa, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblCausa))))
+					.addPreferredGap(ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(scrollPaneSolucion, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
+						.addComponent(scrollPaneDescripcionAdicional, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap())
+		);
 
 		txtDescripcionAdicional = new JTextArea();
 		txtDescripcionAdicional.setFont(new Font("Verdana", Font.PLAIN, 12));
@@ -353,6 +365,7 @@ public class ModificacionParo extends JDialog {
 	 */
 	private void actualizarParo() {
 
+		String codigoEquipo = String.valueOf(cbEquipo.getSelectedItem());
 		String tiempoInicio = txtTiempoInicio.getText();
 		String disciplina = String.valueOf(cbDisciplina.getSelectedItem());
 		String tiempoFin = txtTiempoFin.getText();

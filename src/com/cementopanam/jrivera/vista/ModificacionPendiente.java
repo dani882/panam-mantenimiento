@@ -58,7 +58,7 @@ public class ModificacionPendiente extends JDialog {
 
 	private int codigoParo;
 	private int codigoCausa;
-	private int codigoEquipo;
+//	private int codigoEquipo;
 
 	private ResultSet informacionPendiente = null;
 
@@ -132,7 +132,7 @@ public class ModificacionPendiente extends JDialog {
 			codigoCausa = admParo.buscarIndiceCausa(String.valueOf(cbCausa.getSelectedItem()),
 					txtDescripcionAdicional.getText());
 
-			codigoEquipo = admParo.buscarIndice(String.valueOf(cbEquipo.getSelectedItem()), "equipo");
+		//	codigoEquipo = admParo.buscarIndice(String.valueOf(cbEquipo.getSelectedItem()), "equipo");
 			admParo.cerrarConexiones();
 		}
 	}

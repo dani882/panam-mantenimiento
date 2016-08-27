@@ -6,7 +6,14 @@ import javax.swing.table.AbstractTableModel;
 
 import com.cementopanam.jrivera.controlador.equipo.ListadoEquipos;
 import com.cementopanam.jrivera.controlador.equipo.NombreEquipo;
+import com.cementopanam.jrivera.vista.internalFrames.Imputaciones;
 
+/**
+ * Clase utilizada para modelar la tabla Equipos ubicado en el boton de la clase Imputaciones
+ * @see Imputaciones#mostrarAyudaEquipo()
+ * @author jrivera
+ *
+ */
 public class TablaModeloEquipos extends AbstractTableModel {
 
 	/**

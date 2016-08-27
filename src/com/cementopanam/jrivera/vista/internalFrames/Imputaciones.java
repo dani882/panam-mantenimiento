@@ -61,6 +61,11 @@ import com.cementopanam.jrivera.vista.helper.TimerThread;
 
 import net.proteanit.sql.DbUtils;
 
+/**
+ * Interfaz de Usuario para almacenar los paros en la base de datos
+ * @author jrivera
+ *
+ */
 public class Imputaciones extends JInternalFrame {
 
 	/**
@@ -147,11 +152,9 @@ public class Imputaciones extends JInternalFrame {
 	 * Crea el frame
 	 */
 	public Imputaciones() {
-		initComponents();
-		rellenarcomboBox("area");
-		usuarioLog = Principal.usuarioActual.getText();
-		logger.info("Usuario: " + usuarioLog + " conectado en PC: " + captura.obtenerNombrePC());
 
+		initComponents(); // Inicia los componentes de la interfaz
+		rellenarcomboBox("area");
 	}
 
 	private void initComponents() {
@@ -246,7 +249,7 @@ public class Imputaciones extends JInternalFrame {
 					if (!(cbSubArea.isEnabled())) {
 						cbSubArea.setEnabled(true);
 					}
-					// Elimina todos los elementos del Combo
+					// Elimina todos los elementos del ComboBox SubArea
 					cbSubArea.removeAllItems();
 					rellenarcomboBox("subArea");
 					cbEquipo.removeAllItems();
@@ -273,7 +276,7 @@ public class Imputaciones extends JInternalFrame {
 					if (!(cbCausa.isEnabled())) {
 						cbCausa.setEnabled(true);
 					}
-					// Elimina todos los elementos del Combo
+					// Elimina todos los elementos del ComboBox Causa
 					cbCausa.removeAllItems();
 					rellenarcomboBox("causa");
 				}
@@ -327,9 +330,13 @@ public class Imputaciones extends JInternalFrame {
 				return componente;
 			}
 		};
+		
+		
 		tblParos.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
+				
+				// Valida si se presiono la tecla enter en el Jtable de Paros Pendientes
 				if (e.getKeyCode() == KeyEvent.VK_ENTER && paroSeleccionado.equals("Pendiente")) {
 
 					visualizarPendiente();
@@ -340,6 +347,7 @@ public class Imputaciones extends JInternalFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
+				// Valida si se dio click dos veces en el Jtable de Paros Pendientes
 				if (e.getClickCount() == 2 && paroSeleccionado.equals("Pendiente")) {
 
 					visualizarPendiente();
@@ -356,7 +364,7 @@ public class Imputaciones extends JInternalFrame {
 		tblParos.setFont(new Font("Verdana", Font.PLAIN, 12));
 
 		scrollPaneTablaParos.setViewportView(tblParos);
-		actualizarTabla(estado[0]);
+		actualizarTabla(estado[0]); // Muestra el listado de Paros Completados
 
 		btnIniciarParo = new JButton("Imputar Paro");
 		btnIniciarParo.setIcon(new ImageIcon(Imputaciones.class.getResource("/iconos32x32/ok32x32.png")));
@@ -389,7 +397,7 @@ public class Imputaciones extends JInternalFrame {
 		btnEquipo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				new NombreEquipo();
+				mostrarAyudaEquipo();
 			}
 		});
 		btnEquipo.setIcon(new ImageIcon(Imputaciones.class.getResource("/iconos24x24/Support_help.png")));
@@ -597,10 +605,11 @@ public class Imputaciones extends JInternalFrame {
 
 		String usuarioActual = Principal.usuarioActual.getText();
 		String usuarioTabla = String.valueOf(tblParos.getValueAt(fila, 1));
-		String tipoUsuario = mostrarUsuario(usuarioActual);
+		String tipoUsuario = verificarTipoUsuario(usuarioActual);
 
-		// Verifica si el usuario autenticado tiene privilegios para modificar
-		// el paro seleccionado
+		// Verifica si el usuario autenticado es el mismo o tiene privilegios
+		// para modificar
+		// el paro pendiente seleccionado
 		if (!(usuarioActual.equals(usuarioTabla) || tipoUsuario.equals("administrador"))) {
 			JOptionPane.showMessageDialog(null, "No tiene privilegios para modificar este paro",
 					"Privilegios de Usuario", JOptionPane.INFORMATION_MESSAGE);
@@ -612,8 +621,19 @@ public class Imputaciones extends JInternalFrame {
 			ModificacionPendiente modificacion = new ModificacionPendiente(codigoParo, subArea, getDesktopPane());
 			setVisible(false);
 			modificacion.setVisible(true);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException sqle) {
+
+			logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
+					+ sqle.toString());
+			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
+					JOptionPane.ERROR_MESSAGE);
+
+		} catch (Exception e) {
+
+			logger.error(
+					"Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
+			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
+
 		}
 	}
 
@@ -635,7 +655,7 @@ public class Imputaciones extends JInternalFrame {
 			String fechaInicio = String.valueOf(tblParos.getValueAt(fila, 5));
 			String fechaFin = formattedTextFieldFechaFin.getText();
 
-			String tipoUsuario = mostrarUsuario(usuarioActual);
+			String tipoUsuario = verificarTipoUsuario(usuarioActual);
 
 			// Verifica si el usuario autenticado tiene privilegios para
 			// modificar el paro seleccionado
@@ -670,7 +690,8 @@ public class Imputaciones extends JInternalFrame {
 				Principal.lblStatusBar.setIcon(new ImageIcon(getClass().getResource("/iconos16x16/ok.png")));
 				Principal.lblStatusBar.setText("Paro Imputado correctamente");
 				limpiarCampos();
-				actualizarTabla(estado[1]);
+				actualizarTabla(estado[1]); // Muestra el listado de Paros
+											// Pendientes
 
 				// Guarda la accion en un archivo log
 				usuarioLog = Principal.usuarioActual.getText();
@@ -712,7 +733,7 @@ public class Imputaciones extends JInternalFrame {
 
 		} catch (Exception e1) {
 			logger.error(
-					"Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ". Exception: " + e1.toString());
+					"Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: " + e1.toString());
 			JOptionPane.showMessageDialog(null, e1.getMessage(), e1.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -728,7 +749,12 @@ public class Imputaciones extends JInternalFrame {
 		return true;
 	}
 
-	// Muestra los paros en un JTable
+	/**
+	 * Muestra los paros Completados y Pendientes en un JTable
+	 * 
+	 * @param estado
+	 *            - Tipo de paro que se desee visualizar
+	 */
 	private void actualizarTabla(String estado) {
 
 		ResultSet rs = null;
@@ -740,7 +766,7 @@ public class Imputaciones extends JInternalFrame {
 		} catch (Exception e) {
 
 			logger.error(
-					"Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
+					"Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		} finally {
 			md.cerrarConexiones();
@@ -748,11 +774,9 @@ public class Imputaciones extends JInternalFrame {
 	}
 
 	/**
-	 * Metodo para poblar los comboBox
+	 * Metodo para poblar los comboBox desde los campos de la base de datos
 	 */
 	private void rellenarcomboBox(String campo) {
-
-		ManipulacionDatos md = new ManipulacionDatos();
 
 		ResultSet rs = null;
 		md = new ManipulacionDatos();
@@ -765,12 +789,12 @@ public class Imputaciones extends JInternalFrame {
 				while (rs.next()) {
 					cbArea.addItem(rs.getString("nombre_area"));
 				}
-
 				cbArea.setSelectedIndex(-1);
 			}
+
 			// Rellena comboBox SubArea
 			else if (campo.equals("subArea")) {
-				// Busca el indice de area seleccionado
+				// Busca el indice de area seleccionada
 				String area = String.valueOf(cbArea.getSelectedItem());
 
 				rs = md.rellenarCombo("subArea", area);
@@ -779,8 +803,9 @@ public class Imputaciones extends JInternalFrame {
 					cbSubArea.addItem(subArea);
 				}
 				cbSubArea.setSelectedIndex(-1);
+
 			} else if (campo.equals("equipo")) {
-				// Busca el indice de subArea seleccionado
+				// Busca el indice de subArea seleccionada
 				String subArea = String.valueOf(cbSubArea.getSelectedItem());
 
 				rs = md.rellenarCombo("equipo", subArea);
@@ -791,7 +816,7 @@ public class Imputaciones extends JInternalFrame {
 				cbEquipo.setSelectedIndex(-1);
 			}
 
-			// Rellena comboBox Area
+			// Rellena comboBox Disciplina
 			if (campo.equals("disciplina")) {
 				rs = md.rellenarCombo("disciplina", null);
 
@@ -802,8 +827,8 @@ public class Imputaciones extends JInternalFrame {
 				cbDisciplina.setSelectedIndex(-1);
 			}
 
+			// Rellena comboBox Causa
 			if (campo.equals("causa")) {
-				// Rellena comboBox Area
 				String disciplina = String.valueOf(cbDisciplina.getSelectedItem());
 				rs = md.rellenarCombo("causa", disciplina);
 
@@ -827,6 +852,7 @@ public class Imputaciones extends JInternalFrame {
 					"Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		} finally {
+			// Cierra la conexion de la Base de Datos
 			md.cerrarConexiones();
 		}
 	}
@@ -855,7 +881,7 @@ public class Imputaciones extends JInternalFrame {
 	}
 
 	/**
-	 * Guarda la informacion suministrado de un paro
+	 * Guarda la informacion suministrada de un paro
 	 */
 	private void imputarParo() {
 
@@ -875,8 +901,9 @@ public class Imputaciones extends JInternalFrame {
 			String usuario = Principal.usuarioActual.getText();
 			String otraCausa = textAreaMotivoCausa.getText();
 
+			// Valida si las fechas introducidas tienen un formato correcto
 			if (rdbtnCompletado.isSelected()) {
-				// Valida si las fechas introducidas tienen un formato correcto
+
 				pruebaFecha = df.parse(fechaFin);
 				if (!df.format(pruebaFecha).equals(fechaFin)) {
 					JOptionPane.showMessageDialog(null, "La Fecha introducida es invalida", "Fecha de Fin",
@@ -886,27 +913,34 @@ public class Imputaciones extends JInternalFrame {
 				}
 			}
 
+			// Valida si se selecciono el estado de paro
 			if (estadoParo.equals(null)) {
+
 				JOptionPane.showMessageDialog(null, "Debe seleccionar el estado de Paro", "Seleccionar Paro",
 						JOptionPane.ERROR_MESSAGE);
 
 				return;
 			}
 
+			// Valida si se escribio la Descripcion Adicional de una Causa
 			else if (otraCausa.equals(null) || otraCausa.trim().length() == 0) {
 
 				JOptionPane.showMessageDialog(null, "Debe escribir Descripcional Adicional de Paro",
 						"Descripcion Adicional", JOptionPane.ERROR_MESSAGE);
 				return;
 
-			} else {
+			}
+
+			else {
+
 				String solucion = "";
 
-				// Verifica si el Paro es Compleado o Pendiente
+				// Verifica si el Paro es Compleado
 				if (estadoParo.equals("Completado")) {
 
 					solucion = escribirSolucion();
 
+					// Verifica si escribio una solucion de Paro Completado
 					if (solucion == null) {
 
 						JOptionPane.showMessageDialog(null, "Debe escribir la solucion del paro", "Solucion de Paro",
@@ -953,22 +987,22 @@ public class Imputaciones extends JInternalFrame {
 				pri.mostrarPendientes(admParos.contarPendientes());
 			}
 		} catch (NumberFormatException nfe) {
-			logger.error("Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ". Exception: "
+			logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
 					+ nfe.toString());
 			JOptionPane.showMessageDialog(null, nfe.getMessage(), nfe.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		} catch (ParseException pe) {
-			logger.error("Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ""
+			logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ""
 					+ ". Formato de fecha incorrecto. Exception: " + pe.toString());
 			JOptionPane.showMessageDialog(null, "Formato de fecha incorrecto", "Fecha invalida",
 					JOptionPane.ERROR_MESSAGE);
 		} catch (NullPointerException npe) {
-			logger.warn("Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ""
+			logger.warn("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ""
 					+ ". Debe rellenar todos los campos. Exception: " + npe.toString());
 			JOptionPane.showMessageDialog(null, "Debe rellenar todos los campos", npe.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception ex) {
 			logger.error(
-					"Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ". Exception: " + ex.toString());
+					"Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: " + ex.toString());
 			JOptionPane.showMessageDialog(null, ex.getMessage(), ex.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -983,10 +1017,13 @@ public class Imputaciones extends JInternalFrame {
 		// Coloca los botones del JOptionPane en español
 		UIManager.put("OptionPane.okButtonText", "Aceptar");
 		UIManager.put("OptionPane.cancelButtonText", "Cancelar");
+
 		String solucion = JOptionPane.showInputDialog(null, "¿Que se tuvo que hacer para solucionar este paro?",
 				"Solucion de paro", JOptionPane.INFORMATION_MESSAGE);
 
-		if (solucion == null || solucion.equals(null) || solucion == "" || solucion.equals("")) {
+		if (solucion.trim() == null || solucion.trim().equals(null) || solucion.trim() == ""
+				|| solucion.trim().equals("")) {
+
 			return null;
 		}
 		return solucion;
@@ -1030,7 +1067,7 @@ public class Imputaciones extends JInternalFrame {
 		}
 	}
 
-	// Metodo para mostrar los Paros Completados en la Tabla
+	// Metodo para mostrar los Paros Completados en el JTable
 	private void btnParosCompletadosActionPerformed(ActionEvent e) {
 
 		paroSeleccionado = "Completado";
@@ -1055,6 +1092,7 @@ public class Imputaciones extends JInternalFrame {
 
 				@Override
 				public void run() {
+					// Muestra el listado de Paros Completados
 					actualizarTabla(estado[0]);
 				}
 			});
@@ -1095,13 +1133,22 @@ public class Imputaciones extends JInternalFrame {
 
 				@Override
 				public void run() {
+					// Muestra el listado de Paros Pendientes
 					actualizarTabla(estado[1]);
 				}
 			});
 		}
 	}
 
-	private String mostrarUsuario(String usuarioSeleccionado) {
+	/**
+	 * Valida el tipo de Usuario(Administrador, Consultor o Operador) del
+	 * Usuario Actual Conectado al Sistema
+	 * 
+	 * @param usuarioSeleccionado
+	 *            - Usuario actual
+	 * @return - Tipo de Usuario conectado al sistema
+	 */
+	private String verificarTipoUsuario(String usuarioSeleccionado) {
 
 		String tipoUsuario = "";
 		ResultSet rs = null;
@@ -1115,19 +1162,30 @@ public class Imputaciones extends JInternalFrame {
 			}
 
 		} catch (SQLException sqle) {
-			logger.error("Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ". Exception: "
+			logger.error("Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: "
 					+ sqle.toString());
 			JOptionPane.showMessageDialog(null, sqle.getMessage(), sqle.getClass().toString(),
 					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception e) {
 			logger.error(
-					"Usuario: " + usuarioLog + "en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
+					"Usuario: " + usuarioLog + " en PC: " + captura.obtenerNombrePC() + ". Exception: " + e.toString());
 			JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().toString(), JOptionPane.ERROR_MESSAGE);
 		}
 		return tipoUsuario;
 	}
 
+	/**
+	 * @param nuevoValor
+	 *            porcentaje para actua
+	 */
 	public void actualizarBarraEstado(int nuevoValor) {
 		Principal.pbar.setValue(nuevoValor);
+	}
+
+	/**
+	 * Muestra el JTable de la busqueda de equipos por codigo
+	 */
+	public void mostrarAyudaEquipo() {
+		new NombreEquipo();
 	}
 }

@@ -41,7 +41,7 @@ public class Autor extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	private CapturaUsuario captura = new CapturaUsuario();
 
-	private String rutaPDF = "\\\\172.16.2.15\\panam\\Backup Sistemas\\Imputacion de Paros\\Documentacion";
+	private String rutaPDF = "\\\\CCDDOSTIW000222\\Imputacion de Paro\\Documentacion";
 
 	/**
 	 * Crea el dialog.
@@ -118,9 +118,8 @@ public class Autor extends JDialog {
 						Desktop.getDesktop().open(manual);
 					} catch (Exception ex) {
 						logger.error("Usuario en PC: " + captura.obtenerNombrePC() + ". Exception: " + ex.toString());
-						JOptionPane.showMessageDialog(null,
-								"No se pudo abrir el manual",
-								"Manual no encontrado", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, "No se pudo abrir el manual", "Manual no encontrado",
+								JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
